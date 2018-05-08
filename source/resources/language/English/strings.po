@@ -1,0 +1,769 @@
+# Addon Name: TvWatch
+# Addon id: plugin.video.tvwatch
+# Addon Provider: TvWatch
+msgid ""
+msgstr ""
+
+msgctxt "#30000"
+msgid "Logging"
+msgstr ""
+
+msgctxt "#30001"
+msgid "Default player"
+msgstr ""
+
+msgctxt "#30002"
+msgid "Auto-activate subtitles"
+msgstr ""
+
+msgctxt "#30003"
+msgid "Activate filtering search"
+msgstr ""
+
+msgctxt "#30004"
+msgid "Filter Error"
+msgstr ""
+
+msgctxt "#30005"
+msgid "TvWatch will be faster with your own API key."
+msgstr ""
+
+msgctxt "#30006"
+msgid "Search Metadata (slowed the Addon)"
+msgstr ""
+
+msgctxt "#30007"
+msgid "Posters Size"
+msgstr ""
+
+msgctxt "#30008"
+msgid "Fanarts Size"
+msgstr ""
+
+msgctxt "#30009"
+msgid "Use extendedinfo"
+msgstr ""
+
+msgctxt "#30010"
+msgid "Color Text note"
+msgstr ""
+
+msgctxt "#30500"
+msgid "Select"
+msgstr ""
+
+msgctxt "#30501"
+msgid "Name"
+msgstr ""
+
+msgctxt "#30021"
+msgid "General"
+msgstr ""
+
+msgctxt "#30023"
+msgid "Plugins preferences"
+msgstr ""
+
+msgctxt "#30024"
+msgid "Host"
+msgstr ""
+
+msgctxt "#30025"
+msgid "Home"
+msgstr ""
+
+msgctxt "#30026"
+msgid "IPTV and TV Guid"
+msgstr ""
+
+msgctxt "#30027"
+msgid "Waiting time for player (ms)"
+msgstr ""
+
+msgctxt "#30028"
+msgid "PVR addon setting"
+msgstr ""
+
+msgctxt "#30029"
+msgid "Play default"
+msgstr ""
+
+msgctxt "#30030"
+msgid "Player"
+msgstr ""
+
+msgctxt "#30031"
+msgid "Metadata"
+msgstr ""
+
+msgctxt "#30032"
+msgid "View"
+msgstr ""
+
+msgctxt "#30033"
+msgid "Tools"
+msgstr ""
+
+msgctxt "#30034"
+msgid "About"
+msgstr ""
+
+msgctxt "#30035"
+msgid "Support Us"
+msgstr ""
+
+msgctxt "#30036"
+msgid "Changelog"
+msgstr ""
+
+msgctxt "#30076"
+msgid "Search"
+msgstr ""
+
+msgctxt "#30077"
+msgid "[COLOR gold]Select your search for: %s[/COLOR]"
+msgstr ""
+
+msgctxt "#30078"
+msgid "Search (Movie)"
+msgstr ""
+
+msgctxt "#30079"
+msgid "Search (TVShows/Cartoons)"
+msgstr ""
+
+msgctxt "#30080"
+msgid "Search (Other categories)"
+msgstr ""
+
+msgctxt "#30081"
+msgid "[COLOR gold]Results for: %s[/COLOR]"
+msgstr ""
+
+msgctxt "#30088"
+msgid "Visual search"
+msgstr ""
+
+msgctxt "#30089"
+msgid "Search 2"
+msgstr ""
+
+msgctxt "#30090"
+msgid "Search 3"
+msgstr ""
+
+msgctxt "#30091"
+msgid "Search 4"
+msgstr ""
+
+msgctxt "#30092"
+msgid "Multiple Choices"
+msgstr ""
+
+msgctxt "#30093"
+msgid "Select Search Engine"
+msgstr ""
+
+msgctxt "#30094"
+msgid "Select your Sources"
+msgstr ""
+
+msgctxt "#30101"
+msgid "News"
+msgstr ""
+
+msgctxt "#30102"
+msgid "Most seeing"
+msgstr ""
+
+msgctxt "#30103"
+msgid "Most commented"
+msgstr ""
+
+msgctxt "#30104"
+msgid "Top rated"
+msgstr ""
+
+msgctxt "#30105"
+msgid "Genre"
+msgstr ""
+
+msgctxt "#30106"
+msgid "Years"
+msgstr ""
+
+msgctxt "#30107"
+msgid "Vf"
+msgstr ""
+
+msgctxt "#30108"
+msgid "Vostfr"
+msgstr ""
+
+msgctxt "#30109"
+msgid "Children"
+msgstr ""
+
+msgctxt "#30112"
+msgid "Documentaries"
+msgstr ""
+
+msgctxt "#30113"
+msgid "Sport"
+msgstr ""
+
+msgctxt "#30114"
+msgid "Web video"
+msgstr ""
+
+msgctxt "#30115"
+msgid "Television / Radio"
+msgstr ""
+
+msgctxt "#30116"
+msgid "All the sources"
+msgstr ""
+
+msgctxt "#30117"
+msgid "TV replay"
+msgstr ""
+
+msgctxt "#30120"
+msgid "Movies"
+msgstr ""
+
+msgctxt "#30121"
+msgid "TVShows"
+msgstr ""
+
+msgctxt "#30122"
+msgid "Cartoons"
+msgstr ""
+
+msgctxt "#30125"
+msgid "Research Update (source only)"
+msgstr ""
+
+msgctxt "#30126"
+msgid "Beta Tester (not recommended)"
+msgstr ""
+
+msgctxt "#30127"
+msgid "Tools"
+msgstr ""
+
+msgctxt "#30128"
+msgid "Clear Cache Addon"
+msgstr ""
+
+msgctxt "#30129"
+msgid "Clear Cache Addon"
+msgstr ""
+
+msgctxt "#30130"
+msgid "Lists"
+msgstr ""
+
+msgctxt "#30134"
+msgid "Movies VF"
+msgstr ""
+
+msgctxt "#30135"
+msgid "Movies VOSTFR"
+msgstr ""
+
+msgctxt "#30138"
+msgid "Sources"
+msgstr ""
+
+msgctxt "#30145"
+msgid "Download folder"
+msgstr ""
+
+msgctxt "#30146"
+msgid "Show / Hide search settings"
+msgstr ""
+
+msgctxt "#30147"
+msgid "Plugins on/off (2/3)"
+msgstr ""
+
+msgctxt "#30148"
+msgid "Plugins on/off (3/3)"
+msgstr ""
+
+msgctxt "#30160"
+msgid "Quality HD"
+msgstr ""
+
+msgctxt "#30201"
+msgid "Playlist"
+msgstr ""
+
+msgctxt "#30202"
+msgid "Download"
+msgstr ""
+
+msgctxt "#30203"
+msgid "Webradio"
+msgstr ""
+
+msgctxt "#30204"
+msgid "[COLOR red]No informations[/COLOR]"
+msgstr ""
+
+msgctxt "#30205"
+msgid "Connection Failed"
+msgstr ""
+
+msgctxt "#30206"
+msgid "Mark view/Not view"
+msgstr ""
+
+msgctxt "#30207"
+msgid "Bookmarks"
+msgstr ""
+
+msgctxt "#30208"
+msgid "Information"
+msgstr ""
+
+msgctxt "#30209"
+msgid "[COLOR red]Delete Bookmark[/COLOR]"
+msgstr ""
+
+msgctxt "#30210"
+msgid "Bookmark"
+msgstr ""
+
+msgctxt "#30211"
+msgid "[COLOR red]Clear this category[/COLOR]"
+msgstr ""
+
+msgctxt "#30212"
+msgid "Trailer"
+msgstr ""
+
+msgctxt "#30213"
+msgid "Search Similar"
+msgstr ""
+
+msgctxt "#30214"
+msgid "Trakt"
+msgstr ""
+
+msgctxt "#30215"
+msgid "Start download"
+msgstr ""
+
+msgctxt "#30216"
+msgid "Remove from list"
+msgstr ""
+
+msgctxt "#30217"
+msgid "[COLOR red]Delete definitely[/COLOR]"
+msgstr ""
+
+msgctxt "#30218"
+msgid "Stop download"
+msgstr ""
+
+msgctxt "#30219"
+msgid "Read"
+msgstr ""
+
+msgctxt "#30220"
+msgid "Reset"
+msgstr ""
+
+
+msgctxt "#30300"
+msgid "Library"
+msgstr ""
+
+msgctxt "#30301"
+msgid "To configure in kodi if you want them to be imported"
+msgstr ""
+
+msgctxt "#30302"
+msgid "Auto update"
+msgstr ""
+
+msgctxt "#30303"
+msgid "Disable"
+msgstr ""
+
+msgctxt "#30304"
+msgid "Go to [COLOR teal]%s[/COLOR] Enter the code [COLOR teal]%s[/COLOR]"
+msgstr ""
+
+msgctxt "#30305"
+msgid "[COLOR khaki]Click here to login[/COLOR]"
+msgstr ""
+
+msgctxt "#30306"
+msgid "[B]Hello %s ![/B]"
+msgstr ""
+
+msgctxt "#30307"
+msgid "Movie (%s/%s) watch / Show watch (%s) / episode (%s/%s) watch"
+msgstr ""
+
+msgctxt "#30308"
+msgid "History"
+msgstr ""
+
+msgctxt "#30309"
+msgid "Disconnection"
+msgstr ""
+
+msgctxt "#30310"
+msgid "Collection"
+msgstr ""
+
+msgctxt "#30311"
+msgid "Watchlist"
+msgstr ""
+
+msgctxt "#30312"
+msgid "Watch"
+msgstr ""
+
+msgctxt "#30313"
+msgid "recommended"
+msgstr ""
+
+msgctxt "#30314"
+msgid "BoxOffice"
+msgstr ""
+
+msgctxt "#30315"
+msgid "Popular"
+msgstr ""
+
+msgctxt "#30316"
+msgid "Most viewed this week"
+msgstr ""
+
+msgctxt "#30317"
+msgid "Most viewed of the month"
+msgstr ""
+
+msgctxt "#30318"
+msgid "Watchlist (seasons)"
+msgstr ""
+
+msgctxt "#30319"
+msgid "Watchlist (episodes)"
+msgstr ""
+
+msgctxt "#30320"
+msgid "You have successfully logged out"
+msgstr ""
+
+msgctxt "#30321"
+msgid "Add collection"
+msgstr ""
+
+msgctxt "#30322"
+msgid "Add watch history"
+msgstr ""
+
+msgctxt "#30323"
+msgid "Add watchlist"
+msgstr ""
+
+msgctxt "#30324"
+msgid "Library"
+msgstr ""
+
+msgctxt "#30325"
+msgid "Uptobox"
+msgstr ""
+
+msgctxt "#30326"
+msgid "DL and Read"
+msgstr ""
+
+msgctxt "#30330"
+msgid "Search"
+msgstr ""
+
+msgctxt "#30331"
+msgid "Calendar"
+msgstr ""
+
+msgctxt "#30332"
+msgid "WebTv"
+msgstr ""
+
+msgctxt "#30400"
+msgid "Premium/Login"
+msgstr ""
+
+msgctxt "#30401"
+msgid "Username"
+msgstr ""
+
+msgctxt "#30402"
+msgid "TvWatch Code"
+msgstr ""
+
+msgctxt "#30403"
+msgid "Enable"
+msgstr ""
+
+msgctxt "#30404"
+msgid "View : Movies (recommended 50-51-500-501-508) "
+msgstr ""
+
+msgctxt "#30405"
+msgid "View: TVShow (recommended 50-51-500-501-508) "
+msgstr ""
+
+msgctxt "#30406"
+msgid "View: Default (recommended 50-51-500) "
+msgstr ""
+
+msgctxt "#30407"
+msgid "Vue: Home (recommended 50-51-500) "
+msgstr ""
+
+msgctxt "#30408"
+msgid "Enable customized view"
+msgstr ""
+
+msgctxt "#30409"
+msgid "Close"
+msgstr ""
+
+msgctxt "#30410"
+msgid "Miscellaneous"
+msgstr ""
+
+msgctxt "#30411"
+msgid "Disable notification sounds"
+msgstr ""
+
+msgctxt "#30412"
+msgid "[COLOR red]Delete entry[/COLOR]"
+msgstr ""
+
+msgctxt "#30413"
+msgid "[COLOR red]Delete history[/COLOR]"
+
+msgctxt "#30414"
+msgid "[COLOR gold]Full series search[/COLOR]"
+msgstr ""
+
+msgctxt "#30415"
+msgid "[COLOR gold]Full season search[/COLOR]"
+msgstr ""
+
+msgctxt "#30416"
+msgid "[COLOR gold]Search history[/COLOR]"
+msgstr ""
+
+msgctxt "#30417"
+msgid "[COLOR orange]Search on Alluc_ee[/COLOR]"
+msgstr ""
+
+msgctxt "#30418"
+msgid "[COLOR skyblue]Update available[/COLOR]"
+msgstr ""
+
+msgctxt "#30419"
+msgid "View: Visual search (recommended 500)"
+msgstr ""
+
+msgctxt "#30420"
+msgid "Enable/Disable sources"
+msgstr ""
+
+msgctxt "#30421"
+msgid "Please enter your code"
+msgstr ""
+
+msgctxt "#30422"
+msgid "TvWatch code"
+msgstr ""
+
+msgctxt "#30423"
+msgid "My list"
+msgstr ""
+
+msgctxt "#30424"
+msgid "Continue Watching"
+msgstr ""
+
+msgctxt "#30425"
+msgid "Shows"
+msgstr ""
+
+msgctxt "#30426"
+msgid "Recently Added"
+msgstr ""
+
+msgctxt "#30427"
+msgid "Popular"
+msgstr ""
+
+msgctxt "#30428"
+msgid "Blu-rays"
+msgstr ""
+
+msgctxt "#30429"
+msgid "3D Movies"
+msgstr ""
+
+msgctxt "#30430"
+msgid "HDLight Movies"
+msgstr ""
+
+msgctxt "#30431"
+msgid "4K Movies"
+msgstr ""
+
+msgctxt "#30432"
+msgid "Cartoons"
+msgstr ""
+
+msgctxt "#30433"
+msgid "TVShows VF"
+msgstr ""
+
+msgctxt "#30434"
+msgid "TVShows VOSTFR"
+msgstr ""
+
+msgctxt "#30435"
+msgid "Cartoons VF"
+msgstr ""
+
+msgctxt "#30436"
+msgid "Cartoons VOSTFR"
+msgstr ""
+
+msgctxt "#30437"
+msgid "Your code is already in use"
+msgstr ""
+
+msgctxt "#30438"
+msgid "No search results"
+msgstr ""
+
+msgctxt "#30439"
+msgid "Next episode in 20 seconds"
+msgstr ""
+
+msgctxt "#30440"
+msgid "Remove from this list"
+msgstr ""
+
+msgctxt "#30441"
+msgid "Add to my list"
+msgstr ""
+
+msgctxt "#30442"
+msgid "Your code expires in [B][COLOR khaki]%s[/COLOR][/B] days"
+msgstr ""
+
+msgctxt "#30443"
+msgid "Available qualities for this movie :"
+msgstr ""
+
+msgctxt "#30444"
+msgid "Available seasons for this TVShow :"
+msgstr ""
+
+msgctxt "#30445"
+msgid "Other available seasons for this TVShow :"
+msgstr ""
+
+msgctxt "#30446"
+msgid "Continue watching :"
+msgstr ""
+
+msgctxt "#30447"
+msgid "Available episodes for this season :"
+msgstr ""
+
+msgctxt "#30448"
+msgid "Other available episodes for this season :"
+msgstr ""
+
+msgctxt "#30449"
+msgid "You will find here the Movies and TVShows that you started watching !"
+msgstr ""
+
+msgctxt "#30450"
+msgid "[COLOR red]Your code has expired ![/COLOR]"
+msgstr ""
+
+msgctxt "#30451"
+msgid "Cast"
+msgstr ""
+
+msgctxt "#30452"
+msgid "Expiration in"
+msgstr ""
+
+msgctxt "#30453"
+msgid "You can resume from"
+msgstr ""
+
+msgctxt "#30454"
+msgid "Your Cast configuration has changed.\nDo you want to restart Kodi to take effect ?"
+msgstr ""
+
+msgctxt "#30455"
+msgid "You have to download LocalCast App to continue.\nDo you want to proceed now ?"
+msgstr ""
+
+msgctxt "#30456"
+msgid "Google Play can't start.\nPlease download and install LocalCast App."
+msgstr ""
+
+msgctxt "#30457"
+msgid "Do you want to start next episode ?"
+msgstr ""
+
+msgctxt "#30458"
+msgid "A problem occurred, please try again later"
+msgstr ""
+
+msgctxt "#30459"
+msgid "Authentication"
+msgstr ""
+
+msgctxt "#30460"
+msgid "days"
+msgstr ""
+
+msgctxt "#30461"
+msgid "Last Update"
+msgstr ""
+
+msgctxt "#30462"
+msgid "Play now"
+msgstr ""
+
+msgctxt "#30463"
+msgid "Upload Logs"
+msgstr ""
+
+msgctxt "#30464"
+msgid "The Logs have been uploaded successfully"
+msgstr ""
+
+msgctxt "#30465"
+msgid "Clear Cache"
+msgstr ""
+
+msgctxt "#30466"
+msgid "Are you sure ?"
+msgstr ""
+
+msgctxt "#30467"
+msgid "The Cache has been cleared successfully"
+msgstr ""

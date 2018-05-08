@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+
+    <!-- <category label="30021"> -->
+        <setting label="30030" type="lsep"/>
+        <setting type="sep"/>
+        <setting id="castPlay" type="enum" lvalues="30303|30403" label="30451" default="0" enable="System.Platform.Android"/>
+        <setting id="playerType" type="enum" values="Auto|MPlayer|DVDPlayer" label="30001" default="0"/>
+
+        <setting label="30459" type="lsep"/>
+        <setting type="sep"/>
+        <setting id="tvWatchCode" type="number" label="30402" default="0000000000"/>
+        <setting id="expirationDate" type="text" label="30452" default="0" enable="false"/>
+
+        <setting label="30410" type="lsep"/>
+        <setting type="sep"/>
+        <setting id="Block_Noti_sound" type="bool" label="30411" default="false"/>
+        <setting id="service_time" type="text" label="30461" default="" enable="false"/>
+        <!-- <setting id="history-view" type="bool" label="Activer l'historique de recherche" default="true"/> -->
+        <setting label="30463" type="action"  action="XBMC.RunScript(special://home/addons/plugin.video.tvwatch/resources/lib/runscript.py, sendLogsByFTP)" />
+        <setting label="30465" type="action"  action="XBMC.RunScript(special://home/addons/plugin.video.tvwatch/resources/lib/runscript.py, deleteCache)" />
+
+        <!-- Unvisible section -->
+        <setting visible="false" id="isPlaying" type="text" default="-1" />
+        <setting visible="false" label="Recherches: Image" type="image" id="images_cherches" default="special://home/addons/plugin.video.tvwatch/resources/art/fanart.png"/>
+        <setting visible="false" label="Recherches visuelles: Image" type="image" id="images_cherchev" default="special://home/addons/plugin.video.tvwatch/resources/art/fanart.png"/>
+        <setting visible="false" label="Télévisions: Image" type="image" id="images_tvs" default="special://home/addons/plugin.video.tvwatch/resources/art/fanart.png"/>
+        <setting visible="false" label="Télévisions Replays: Image" type="image" id="images_replaytvs" default="special://home/addons/plugin.video.tvwatch/resources/art/fanart.png"/>
+        <setting visible="false" label="Films: Image" type="image" id="images_films" default="special://home/addons/plugin.video.tvwatch/resources/art/fanart.png"/>
+        <setting visible="false" label="Séries: Image" type="image" id="images_series" default="special://home/addons/plugin.video.tvwatch/resources/art/fanart.png"/>
+        <setting visible="false" label="Animés: Image" type="image" id="images_anims" default="special://home/addons/plugin.video.tvwatch/resources/art/fanart.png"/>
+        <setting visible="false" label="Documentaires: Images" type="image" id="images_docs" default="special://home/addons/plugin.video.tvwatch/resources/art/fanart.png"/>
+        <setting visible="false" label="Sports: Image" type="image" id="images_sports" default="special://home/addons/plugin.video.tvwatch/resources/art/fanart.png"/>
+        <setting visible="false" label="Vidéos: Image" type="image" id="images_videos" default="special://home/addons/plugin.video.tvwatch/resources/art/fanart.png"/>
+        <setting visible="false" label="Images Fav" type="image" id="images_marks" default="special://home/addons/plugin.video.tvwatch/resources/art/fanart.png"/>
+        <setting visible="false" label="Images sources" type="image" id="images_hosts" default="special://home/addons/plugin.video.tvwatch/resources/art/fanart.png"/>
+        <setting visible="false" label="Images update" type="image" id="images_updates" default="special://home/addons/plugin.video.tvwatch/resources/art/fanart.png"/>
+        <setting visible="false" label="Images download" type="image" id="images_downloads" default="special://home/addons/plugin.video.tvwatch/resources/art/fanart.png"/>
+        <setting visible="false" label="Images library" type="image" id="images_librarys" default="special://home/addons/plugin.video.tvwatch/resources/art/fanart.png"/>
+        <setting visible="false" label="Trakt" type="image" id="images_trakt" default="special://home/addons/plugin.video.tvwatch/resources/art/fanart.png"/>
+    <!-- </category> -->
+
+</settings>

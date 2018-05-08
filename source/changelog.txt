@@ -1,0 +1,43 @@
+=============================================================================
+- Version & Repository: https://github.com/tvwatch-kodi/TvWatch/releases
+- Question & Support: https://github.com/tvwatch-kodi/TvWatch/issues
+=============================================================================
+- Auteurs : Primatech
+=============================================================================
+- Current Version 1.0.15 - 8.5.2018
+=============================================================================
+- Version 1.0.0
+21-02-2018 -- @tvwatch-kodi -- First stable version
+- Version 1.0.1
+23-02-2018 -- @tvwatch-kodi -- Clean settings
+23-02-2018 -- @tvwatch-kodi -- Bug fixes
+- Version 1.0.2
+24-02-2018 -- @tvwatch-kodi -- Clean continue to watch
+24-02-2018 -- @tvwatch-kodi -- Bug fixes
+- Version 1.0.3
+24-02-2018 -- @tvwatch-kodi -- Improve Update
+- Version 1.0.4
+24-02-2018 -- @tvwatch-kodi -- Play next episode improvement
+- Version 1.0.5
+24-02-2018 -- @tvwatch-kodi -- Bug fixes
+- Version 1.0.6
+25-02-2018 -- @tvwatch-kodi -- Play next episode improvement
+- Version 1.0.7
+25-02-2018 -- @tvwatch-kodi -- Increase timeout to get protected URL
+- Version 1.0.8
+25-02-2018 -- @tvwatch-kodi -- Fix Bug play next episode improvement
+- Version 1.0.9
+26-02-2018 -- @tvwatch-kodi -- Continue to watch platform
+- Version 1.0.10
+26-02-2018 -- @tvwatch-kodi -- Send logs
+- Version 1.0.11
+25-03-2018 -- @tvwatch-kodi -- Update provider
+- Version 1.0.12
+15-04-2018 -- @tvwatch-kodi -- Improve upload logs
+15-04-2018 -- @tvwatch-kodi -- Clear Cache feature
+- Version 1.0.13
+29-04-2018 -- @tvwatch-kodi -- Improve ContinueToWatch listing
+- Version 1.0.14
+07-05-2018 -- @tvwatch-kodi -- Fix provider
+- Version 1.0.15
+08-05-2018 -- @tvwatch-kodi -- Fix continue to watch
