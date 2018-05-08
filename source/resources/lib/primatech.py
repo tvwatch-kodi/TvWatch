@@ -57,7 +57,9 @@ class OO0o :
     self . n = IiiIII111iI [ 2 ]
     self . cED = IiiIII111iI [ 4 ]
     self . cIP = IiiIII111iI [ 5 ]
-    self . oConfig . setSetting ( uc ( 'eGZzcw==' ) , IiiIII111iI [ 6 ] )
+    ili1 , ili1l = IiiIII111iI [ 6 ] . split ( "$" )
+    self . oConfig . setSetting ( uc ( 'dXNlck4=' ) , ili1 )
+    self . oConfig . setSetting ( uc ( 'cGFzc1c=' ) , ili1l )
     if 41 - 41: I1II1
     return True
   if I11iIi1I == [ ] :

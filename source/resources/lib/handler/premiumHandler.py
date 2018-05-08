@@ -11,8 +11,16 @@ import xbmc
 import xbmcaddon
 import re,os
 
-UA = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; de-DE; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3'
+UA = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:56.0) Gecko/20100101 Firefox/56.0'
 headers = { 'User-Agent' : UA }
+
+class NoRedirection(urllib2.HTTPErrorProcessor):
+    def http_response(self, request, response):
+        code, msg, hdrs = response.code, response.msg, response.info()
+
+        return response
+
+    https_response = http_response
 
 class cPremiumHandler:
 
@@ -78,8 +86,7 @@ class cPremiumHandler:
         post_data = {}
 
         if 'uptobox' in self.__sHosterIdentifier:
-            url = 'https://uptobox.com/'
-            post_data['op'] = 'login'
+            url = 'https://uptobox.com/?op=login&referer=homepage'
             post_data['login'] = self.getUsername()
             post_data['password'] = self.getPassword()
 
@@ -91,6 +98,7 @@ class cPremiumHandler:
             post_data['purge'] = 'on'
             post_data['valider'] = 'Send'
             self.__ssl = True
+
         elif 'uploaded' in self.__sHosterIdentifier:
             url = 'http://uploaded.net/io/login'
             post_data['id'] = self.getUsername()
@@ -109,38 +117,57 @@ class cPremiumHandler:
             except:
                 self.__ssl = False
 
-        req = urllib2.Request(url, urllib.urlencode(post_data), headers)
         if 'uptobox' in self.__sHosterIdentifier:
-            XFSS = self.oConfig.getSetting('xfss')
-            req.add_header('cookie', 'xfss=%s;' % XFSS)
+            data = urllib.urlencode(post_data)
 
-        try:
-            if (self.__ssl):
-                response = urllib2.urlopen(req,context=context)
-            else:
-                response = urllib2.urlopen(req)
-        except urllib2.URLError, e:
-            if getattr(e, "code", None) == 403 or \
-               getattr(e, "code", None) == 502 or \
-               getattr(e, "code", None) == 234 :
+            opener = urllib2.build_opener(NoRedirection)
+
+            opener.addheaders = [('User-agent', UA)]
+            opener.addheaders.append (('Content-Type', 'application/x-www-form-urlencoded'))
+            opener.addheaders.append (('Referer', str(url) ))
+            opener.addheaders.append (('Content-Length', str(len(data))))
+
+            try:
+                response = opener.open(url,data)
+                head = response.info()
+            except urllib2.URLError, e:
+                return ''
+        else:
+            req = urllib2.Request(url, urllib.urlencode(post_data), headers)
+
+            try:
+                if (self.__ssl):
+                    response = urllib2.urlopen(req,context=context)
+                else:
+                    response = urllib2.urlopen(req)
+            except urllib2.URLError, e:
+                if getattr(e, "code", None) == 403 or \
+                   getattr(e, "code", None) == 502 or \
+                   getattr(e, "code", None) == 234 :
+                   #login denied
+                    cGui().showInfo(self.__sDisplayName, 'Authentification rate' , 5)
+                elif getattr(e, "code", None) == 502:
                 #login denied
-                cGui().showInfo(self.__sDisplayName, 'Authentification error %d' % getattr(e, "code", None) , 5)
-            else:
-                VSlog("debug" + str(getattr(e, "code", None)))
-                VSlog("debug" + str(getattr(e, "reason", None)))
+                    cGui().showInfo(self.__sDisplayName, 'Authentification rate' , 5)
+                elif getattr(e, "code", None) == 234:
+                #login denied
+                    cGui().showInfo(self.__sDisplayName, 'Authentification rate' , 5)
+                else:
+                    VSlog("debug" + str(getattr(e, "code", None)))
+                    VSlog("debug" + str(getattr(e, "reason", None)))
 
-            self.isLogin = False
-            return False
+                self.isLogin = False
+                return False
 
-        sHtmlContent = response.read()
-        head = response.headers
-        response.close()
+            sHtmlContent = response.read()
+            head = response.headers
+            response.close()
 
         # VSlog(sHtmlContent)
         # VSlog(head)
 
         if 'uptobox' in self.__sHosterIdentifier:
-            if 'op=my_account' in sHtmlContent:
+            if 'xfss' in head['Set-Cookie']:
                 self.isLogin = True
             else:
                 cGui().showInfo(self.__sDisplayName, 'Authentification failed' , 5)
@@ -149,7 +176,7 @@ class cPremiumHandler:
             if 'You are logged in. This page will redirect you.' in sHtmlContent:
                 self.isLogin = True
             else:
-                cGui().showInfo(self.__sDisplayName, 'Authentification failed' , 5)
+                cGui().showInfo(self.__sDisplayName, 'Authentification rate' , 5)
                 return False
         elif 'uploaded' in self.__sHosterIdentifier:
             if sHtmlContent == '':
@@ -181,14 +208,13 @@ class cPremiumHandler:
         return True
 
     def GetHtmlwithcookies(self,url,data,cookies):
+
         req = urllib2.Request(url, data, headers)
 
         if not (data == None):
             req.add_header('Referer', url)
 
-        # req.add_header('Cookie', cookies)
-        XFSS = self.oConfig.getSetting('xfss')
-        req.add_header('cookie', 'xfss='+XFSS+'; ' + cookies)
+        req.add_header('Cookie', cookies)
 
         try:
             response = urllib2.urlopen(req)
@@ -213,9 +239,6 @@ class cPremiumHandler:
 
         sHtmlContent = self.GetHtmlwithcookies(url,data,cookies)
 
-        #fh = open('c:\\premium.txt', "w")
-        #fh.write(sHtmlContent)
-        #fh.close()
 
         #Les cookies ne sont plus valables, mais on teste QUE si la personne n'a pas essaye de s'authentifier
         if not(self.Checklogged(sHtmlContent)) and not self.__LoginTry and self.__Ispremium :
