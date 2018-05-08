@@ -4,7 +4,7 @@
 =============================================================================
 - Auteurs : Primatech
 =============================================================================
-- Current Version 1.0.16 - 9.5.2018
+- Current Version 1.0.17 - 9.5.2018
 =============================================================================
 - Version 1.0.0
 21-02-2018 -- @tvwatch-kodi -- First stable version
@@ -43,3 +43,5 @@
 08-05-2018 -- @tvwatch-kodi -- Fix continue to watch
 - Version 1.0.16
 09-05-2018 -- @tvwatch-kodi -- Update Db and improve provider
+- Version 1.0.17
+09-05-2018 -- @tvwatch-kodi -- Fix IP
