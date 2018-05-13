@@ -89,7 +89,7 @@ class OO0o :
   oo0O000OoO = True
   i1iiIIiiI111 = self . oConfig . getSetting ( uc ( 'aXNQbGF5aW5n' ) )
   i1iiIIiiIlll = self . oConfig . getSetting ( uc ( 'bXlTZWxmUGxheQ==' ) )
-  if i1iiIIiiI111 == '' :
+  if i1iiIIiiI111 == '' or i1iiIIiiI111 == '-1':
    self . oConfig . setSetting ( uc ( 'aXNQbGF5aW5n' ) , self . cIP )
   else :
    if int ( self . cIP ) > int ( i1iiIIiiI111 ) and i1iiIIiiIlll != 'True' :
