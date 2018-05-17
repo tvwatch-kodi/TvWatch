@@ -644,6 +644,7 @@ class cGui():
         xbmc.executebuiltin( 'Container.Refresh' )
 
     def removeHistory(self):
+        util.VS_show_busy_dialog()
         oInputParameterHandler = cInputParameterHandler()
         sRawtitle = oInputParameterHandler.getValue('sRawtitle')
         cDb().del_history(sRawtitle)

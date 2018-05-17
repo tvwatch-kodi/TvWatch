@@ -4,7 +4,7 @@
 =============================================================================
 - Auteurs : Primatech
 =============================================================================
-- Current Version 1.0.19 - 17.5.2018
+- Current Version 1.0.20 - 17.5.2018
 =============================================================================
 - Version 1.0.0
 21-02-2018 -- @tvwatch-kodi -- First stable version
@@ -50,3 +50,5 @@
 - Version 1.0.19
 17-05-2018 -- @tvwatch-kodi -- Add sponsorship code
 17-05-2018 -- @tvwatch-kodi -- Improve server connection
+- Version 1.0.20
+17-05-2018 -- @tvwatch-kodi -- Improve removal of an item from continue to watch
