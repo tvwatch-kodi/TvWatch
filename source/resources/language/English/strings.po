@@ -767,3 +767,7 @@ msgstr ""
 msgctxt "#30467"
 msgid "The Cache has been cleared successfully"
 msgstr ""
+
+msgctxt "#30468"
+msgid "Sponsorship code"
+msgstr ""

@@ -4,7 +4,7 @@
 =============================================================================
 - Auteurs : Primatech
 =============================================================================
-- Current Version 1.0.18 - 13.5.2018
+- Current Version 1.0.19 - 17.5.2018
 =============================================================================
 - Version 1.0.0
 21-02-2018 -- @tvwatch-kodi -- First stable version
@@ -47,3 +47,6 @@
 09-05-2018 -- @tvwatch-kodi -- Fix IP
 - Version 1.0.18
 13-05-2018 -- @tvwatch-kodi -- Fix minor bug startup
+- Version 1.0.19
+17-05-2018 -- @tvwatch-kodi -- Add sponsorship code
+17-05-2018 -- @tvwatch-kodi -- Improve server connection

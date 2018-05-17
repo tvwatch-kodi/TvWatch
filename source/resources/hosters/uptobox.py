@@ -16,18 +16,16 @@ headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:44.0) Gecko/201
 class cHoster(iHoster):
 
     def __init__(self):
-        # self.__sDisplayName = 'Uptobox'
-        # self.__sFileName = self.__sDisplayName
         self.__sDisplayName = 'TvWatch'
         self.__sFileName = ''
         self.oPremiumHandler = None
         self.stream = True
+        self.oConfig = cConfig()
 
     def getDisplayName(self):
         return  self.__sDisplayName
 
     def setDisplayName(self, sDisplayName):
-        # self.__sDisplayName = sDisplayName + ' [COLOR violet]'+self.__sDisplayName+'[/COLOR]'
         self.__sDisplayName = sDisplayName
 
     def setFileName(self, sFileName):
@@ -191,22 +189,18 @@ class cHoster(iHoster):
 
     def GetMedialinkDL(self,sHtmlContent):
 
-        #fh = open('c:\\upto.txt', "w")
-        #fh.write(sHtmlContent)
-        #fh.close()
-
         if 'You have to wait' in sHtmlContent:
             cGui().showInfo(self.__sDisplayName, 'Limitation active' , 10)
             return False
 
-        # cConfig().log(sHtmlContent)
+        # VSlog(sHtmlContent)
 
         oParser = cParser()
         # sPattern =  '(?s)<form\sname\s*=[\'"]F1[\'"].+?>(.+?)<center>'
         sPattern = '<a href="([^"]+)" class=\'big-button-green-flat mt-4 mb-4\' style="display: inline-block; text-decoration: none;">'
         aResult = oParser.parse(sHtmlContent, sPattern)
 
-        # cConfig().log(aResult)
+        # VSlog(aResult)
 
         if (aResult[0]):
             return urllib.quote(aResult[1][0], safe=":/")

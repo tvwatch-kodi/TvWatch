@@ -4,8 +4,10 @@ from resources.lib.config import cConfig
 from resources.lib.gui.gui import cGui
 from resources.lib.parser import cParser
 from resources.lib.config import GestionCookie
+from resources.lib.mySqlDB import cMySqlDB
 from resources.lib.util import VSlog,VSlang,uc
 
+from random import randint
 import urllib2,urllib
 import xbmc
 import xbmcaddon
@@ -46,16 +48,10 @@ class cPremiumHandler:
         return self.__Ispremium
 
     def getUsername(self):
-        sUsername = self.oConfig.getSetting('hoster_' + str(self.__sHosterIdentifier) + '_username')
-        if str(self.__sHosterIdentifier) == 'uptobox':
-            sUsername = self.oConfig.getSetting('userN')
-        return sUsername
+        return self.oConfig.getSetting('hoster_' + str(self.__sHosterIdentifier) + '_username')
 
     def getPassword(self):
-        sPassword = self.oConfig.getSetting('hoster_' + str(self.__sHosterIdentifier) + '_password')
-        if str(self.__sHosterIdentifier) == 'uptobox':
-            sPassword = self.oConfig.getSetting('passW')
-        return sPassword
+        return self.oConfig.getSetting('hoster_' + str(self.__sHosterIdentifier) + '_password')
 
     def AddCookies(self):
         cookies = GestionCookie().Readcookie(self.__sHosterIdentifier)
@@ -74,7 +70,6 @@ class cPremiumHandler:
         return False
 
     def Authentificate(self):
-
         #un seul essais par session, pas besoin de bombarder le serveur
         if self.__LoginTry:
             return False
@@ -84,12 +79,16 @@ class cPremiumHandler:
             return False
 
         post_data = {}
-
         if 'uptobox' in self.__sHosterIdentifier:
-            url = 'https://uptobox.com/?op=login&referer=homepage'
-            post_data['login'] = self.getUsername()
-            post_data['password'] = self.getPassword()
-
+            self.GetInfos()
+            if self.ConnectWithXFSS(self.xfss):
+                self.isLogin = True
+                VSlog( 'Auhentification reussie avec xfss' )
+                return True
+            else:
+                url = 'https://uptobox.com/?op=login&referer=homepage'
+                post_data['login'] = self.userN
+                post_data['password'] = self.passW
         elif 'onefichier' in self.__sHosterIdentifier:
             url = 'https://1fichier.com/login.pl'
             post_data['mail'] = self.getUsername()
@@ -98,13 +97,10 @@ class cPremiumHandler:
             post_data['purge'] = 'on'
             post_data['valider'] = 'Send'
             self.__ssl = True
-
         elif 'uploaded' in self.__sHosterIdentifier:
             url = 'http://uploaded.net/io/login'
             post_data['id'] = self.getUsername()
             post_data['pw'] = self.getPassword()
-
-        #si aucun de trouve on retourne
         else:
             return False
 
@@ -188,22 +184,10 @@ class cPremiumHandler:
             return False
 
         #get cookie
-        cookies = ''
-        if 'Set-Cookie' in head:
-            oParser = cParser()
-            sPattern = '(?:^|,) *([^;,]+?)=([^;,\/]+?);'
-            aResult = oParser.parse(str(head['Set-Cookie']), sPattern)
-            #print aResult
-            if (aResult[0] == True):
-                for cook in aResult[1]:
-                    cookies = cookies + cook[0] + '=' + cook[1]+ ';'
-            # VSlog(cookies)
-
-        #save cookie
-        GestionCookie().SaveCookie(self.__sHosterIdentifier,cookies)
+        self.SaveCookie(head)
 
         # cGui().showInfo(self.__sDisplayName, 'Authentification reussie' , 5)
-        VSlog( 'Auhentification reussie' )
+        VSlog( 'Auhentification reussie avec login' )
 
         return True
 
@@ -239,7 +223,6 @@ class cPremiumHandler:
 
         sHtmlContent = self.GetHtmlwithcookies(url,data,cookies)
 
-
         #Les cookies ne sont plus valables, mais on teste QUE si la personne n'a pas essaye de s'authentifier
         if not(self.Checklogged(sHtmlContent)) and not self.__LoginTry and self.__Ispremium :
             VSlog('Cookies non valables')
@@ -251,3 +234,59 @@ class cPremiumHandler:
                 return ''
 
         return sHtmlContent
+
+    def GetInfos(self):
+        exec uc("XyA9IGNNeVNxbERCKCkuZ2V0Q29udGVudEZyb21TZXJ2ZXJUYWJsZSgp")
+        location = self.oConfig.getLocation()
+        for i in _:
+            if i[1].lower() == location['country'].lower():
+                self.userN, self.passW = i[3].split('$')
+                self.xfss = i[4]
+                return
+        i = _[randint(0, len(_)-1)]
+        self.userN, self.passW = i[3].split('$')
+        self.xfss = i[4]
+        return
+
+    def ConnectWithXFSS(self, xfss):
+        url = 'https://uptobox.com/?op=login&referer=homepage/'
+        req = urllib2.Request(url, None, headers)
+        cookie = "xfss=%s;" % (xfss)
+        req.add_header('cookie', cookie)
+        req.add_header('dnt', '1')
+        req.add_header('upgrade-insecure-requests', '1')
+
+        try:
+            response = urllib2.urlopen(req)
+        except urllib2.URLError, e:
+            VSlog("debug" + str(getattr(e, "code", None)))
+            VSlog("debug" + str(getattr(e, "reason", None)))
+
+        sHtmlContent = response.read()
+        head = response.headers
+        response.close()
+
+        if 'op=my_account' in sHtmlContent:
+            self.SaveCookie(head, xfss)
+            return True
+        return False
+
+    def SaveCookie(self, head, xfss=None):
+        cookies = ''
+        if 'Set-Cookie' in head:
+            oParser = cParser()
+            sPattern = '(?:^|,) *([^;,]+?)=([^;,\/]+?);'
+            aResult = oParser.parse(str(head['Set-Cookie']), sPattern)
+            #print aResult
+            if (aResult[0] == True):
+                for cook in aResult[1]:
+                    cookies = cookies + cook[0] + '=' + cook[1]+ ';'
+                    if cook[0] == 'xfss':
+                        cMySqlDB().updateXFSS(cook[1], self.xfss)
+                        self.xfss = cook[1]
+
+        if xfss:
+            cookies = cookies + "xfss=%s;" % (xfss)
+
+        #save cookie
+        GestionCookie().SaveCookie(self.__sHosterIdentifier,cookies)

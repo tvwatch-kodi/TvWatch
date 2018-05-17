@@ -47,19 +47,22 @@ class OO0o :
    return False
    if 64 - 64: OOooo000oo0 . i1 * ii1IiI1i % IIIiiIIii
  def iCV ( self ) :
-  I11iIi1I = cMySqlDB ( ) . getContent ( )
+  I11iIi1I = cMySqlDB ( ) . getContentFromMainTable ( )
   for IiiIII111iI in I11iIi1I :
    IiII , iI1Ii11111iIi = IiiIII111iI [ 3 ] . split ( "$" )
    if hashlib . sha1 ( self . cC + IiII ) . hexdigest ( ) == iI1Ii11111iIi :
+    iI1Ii11111iIi = iI1Ii11111iIi.upper()
     self . oConfig . setSetting ( uc ( 'dHZXYXRjaENvZGU=' ) , self . cC )
     self . oConfig . setSetting ( uc ( 'Y2xpZW50SUQ=' ) , str ( IiiIII111iI [ 0 ] ) )
     self . p = IiiIII111iI [ 1 ]
     self . n = IiiIII111iI [ 2 ]
     self . cED = IiiIII111iI [ 4 ]
     self . cIP = IiiIII111iI [ 5 ]
-    ili1 , ili1l = IiiIII111iI [ 6 ] . split ( "$" )
-    self . oConfig . setSetting ( uc ( 'dXNlck4=' ) , ili1 )
-    self . oConfig . setSetting ( uc ( 'cGFzc1c=' ) , ili1l )
+    # ili1 , ili1l = IiiIII111iI [ 6 ] . split ( "$" )
+    # self . oConfig . setSetting ( uc ( 'dXNlck4=' ) , ili1 )
+    # self . oConfig . setSetting ( uc ( 'cGFzc1c=' ) , ili1l )
+    self . oConfig . setSetting ( uc ( 'c3BvbnNvcnNoaXA=' ) , iI1Ii11111iIi[-7:] )
+    # self . oConfig . setSetting ( uc ( 'eGZzcw==' ) , IiiIII111iI [ 7 ] )
     if 41 - 41: I1II1
     return True
   if I11iIi1I == [ ] :

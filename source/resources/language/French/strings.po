@@ -768,3 +768,7 @@ msgstr "Êtes-vous sûr ?"
 msgctxt "#30467"
 msgid "The Cache has been cleared successfully"
 msgstr "Le Cache a été vidé avec succès"
+
+msgctxt "#30468"
+msgid "Sponsorship code"
+msgstr "Code de parrainage"

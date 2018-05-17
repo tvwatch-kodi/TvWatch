@@ -5,6 +5,7 @@ import xbmcplugin
 import xbmcgui
 import xbmcaddon
 import unicodedata
+from resources.lib.util import VSlog
 
 DIALOG2 = None
 
@@ -154,16 +155,18 @@ class cConfig():
             try:
                 xbmcplugin.openSettings( sys.argv[ 0 ] )
             except:
-		pass
+                VSlog('ERROR: showSettingsWindow')
 
     def getSetting(self, sName):
+        setting = ''
         if (self.__bIsDharma):
-            return self.__oSettings.getSetting(sName)
+            setting = self.__oSettings.getSetting(sName)
         else:
             try:
-                return xbmcplugin.getSetting(sName)
+                setting = xbmcplugin.getSetting(sName)
             except:
-		return ''
+                VSlog('ERROR: getSetting')
+        return setting
 
     def getCurrentDate(self):
         from datetime import date
@@ -177,8 +180,44 @@ class cConfig():
             if int(y)>2017 and int(m)>0 and int(m)<13 and int(d)>0 and int(d)<32:
                 dateOfToday = date(int(y), int(m), int(d))
         except:
-            pass
+            VSlog('ERROR: getCurrentDate ')
         return dateOfToday
+
+    def getLocation(self):
+        location = {}
+        location['country'] = ''
+        location['city'] = ''
+        location['region'] = ''
+
+        try:
+            from urllib2 import urlopen
+            res = urlopen('http://iplocation.com/')
+            content = res.read()
+
+            if '<th>Country</th>' in content:
+                country = content[content.find('<th>Country</th>'):]
+                if ('"country_name">' in country) and ('</span>' in country):
+                    a = country.find('"country_name">') + 15
+                    b = country.find('</span>')
+                    location['country'] = country[a:b]
+
+            if '<th>Region</th>' in content:
+                region = content[content.find('<th>Region</th>'):]
+                if ('"region_name">' in region) and ('</span>' in region):
+                    a = region.find('"region_name">') + 14
+                    b = region.find('</span>')
+                    location['region'] = region[a:b]
+
+            if '<th>City</th>' in content:
+                city = content[content.find('<th>City</th>'):]
+                if ('"city">' in city) and ('</td>' in city):
+                    a = city.find('"city">') + 7
+                    b = city.find('</td>')
+                    location['city'] = city[a:b]
+        except:
+            VSlog('ERROR: getLocation ')
+
+        return location
 
 
     def html_decode(self, s):
@@ -201,13 +240,15 @@ class cConfig():
         return
 
     def getlanguage(self, sCode):
+        langauge = ''
         if (self.__bIsDharma):
-            return self.__aLanguage(sCode).encode("utf-8")
+            langauge = self.__aLanguage(sCode).encode("utf-8")
         else:
             try:
-		return xbmc.getLocalizedString(sCode).encode("utf-8")
+                langauge = xbmc.getLocalizedString(sCode).encode("utf-8")
             except:
-		return ''
+                VSlog('ERROR: getlanguage')
+        return langauge
 
     def showKeyBoard(self, sDefaultText=''):
         keyboard = xbmc.Keyboard(sDefaultText)
@@ -235,7 +276,7 @@ class cConfig():
         return qst
 
     def createDialog(self, sSite):
-	global DIALOG2
+        global DIALOG2
         if DIALOG2 == None:
             oDialog = xbmcgui.DialogProgress()
             oDialog.create(sSite)
@@ -264,7 +305,7 @@ class cConfig():
     def finishDialog(self, dialog):
         if xbmcgui.Window(10101).getProperty('search') != 'true':
             dialog.close()
-            xbmc.log('\t[PLUGIN] TvWatch: close dialog')
+            VSlog('\t[PLUGIN] TvWatch: close dialog')
             del dialog
             return False
 
@@ -296,11 +337,11 @@ class cConfig():
 
     def error(self, e):
         xbmc.executebuiltin("Notification(%s,%s,%s,%s)" % ('TvWatch', ('Erreur: '+str(e)), '10000', self.__sIcon))
-        xbmc.log('\t[PLUGIN] TvWatch Erreur: '+str(e))
+        VSlog('\t[PLUGIN] TvWatch Erreur: '+str(e))
         #cConfig().ERROR.append(e)
 
     def log(self, e):
-        xbmc.log('\t[PLUGIN] TvWatch: '+str(e), xbmc.LOGNOTICE)
+        VSlog('\t[PLUGIN] TvWatch: '+str(e))
 
     def openerror(self):
         xbmc.executebuiltin( "ActivateWindow(10147)" )
