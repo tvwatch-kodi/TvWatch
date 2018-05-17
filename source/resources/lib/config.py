@@ -5,7 +5,6 @@ import xbmcplugin
 import xbmcgui
 import xbmcaddon
 import unicodedata
-from resources.lib.util import VSlog
 
 DIALOG2 = None
 
@@ -155,7 +154,7 @@ class cConfig():
             try:
                 xbmcplugin.openSettings( sys.argv[ 0 ] )
             except:
-                VSlog('ERROR: showSettingsWindow')
+                self.log('ERROR: showSettingsWindow')
 
     def getSetting(self, sName):
         setting = ''
@@ -165,7 +164,7 @@ class cConfig():
             try:
                 setting = xbmcplugin.getSetting(sName)
             except:
-                VSlog('ERROR: getSetting')
+                self.log('ERROR: getSetting')
         return setting
 
     def getCurrentDate(self):
@@ -180,7 +179,7 @@ class cConfig():
             if int(y)>2017 and int(m)>0 and int(m)<13 and int(d)>0 and int(d)<32:
                 dateOfToday = date(int(y), int(m), int(d))
         except:
-            VSlog('ERROR: getCurrentDate ')
+            self.log('ERROR: getCurrentDate ')
         return dateOfToday
 
     def getLocation(self):
@@ -215,7 +214,7 @@ class cConfig():
                     b = city.find('</td>')
                     location['city'] = city[a:b]
         except:
-            VSlog('ERROR: getLocation ')
+            self.log('ERROR: getLocation ')
 
         return location
 
@@ -247,7 +246,7 @@ class cConfig():
             try:
                 langauge = xbmc.getLocalizedString(sCode).encode("utf-8")
             except:
-                VSlog('ERROR: getlanguage')
+                self.log('ERROR: getlanguage')
         return langauge
 
     def showKeyBoard(self, sDefaultText=''):
@@ -305,7 +304,7 @@ class cConfig():
     def finishDialog(self, dialog):
         if xbmcgui.Window(10101).getProperty('search') != 'true':
             dialog.close()
-            VSlog('\t[PLUGIN] TvWatch: close dialog')
+            self.log('close dialog')
             del dialog
             return False
 
@@ -337,11 +336,10 @@ class cConfig():
 
     def error(self, e):
         xbmc.executebuiltin("Notification(%s,%s,%s,%s)" % ('TvWatch', ('Erreur: '+str(e)), '10000', self.__sIcon))
-        VSlog('\t[PLUGIN] TvWatch Erreur: '+str(e))
-        #cConfig().ERROR.append(e)
+        self.log('Erreur: '+str(e))
 
     def log(self, e):
-        VSlog('\t[PLUGIN] TvWatch: '+str(e))
+        xbmc.log('\t[PLUGIN] TvWatch: '+str(e), xbmc.LOGNOTICE)
 
     def openerror(self):
         xbmc.executebuiltin( "ActivateWindow(10147)" )
