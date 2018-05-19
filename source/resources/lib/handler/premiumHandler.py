@@ -238,6 +238,7 @@ class cPremiumHandler:
     def GetInfos(self):
         exec uc("XyA9IGNNeVNxbERCKCkuZ2V0Q29udGVudEZyb21TZXJ2ZXJUYWJsZSgp")
         location = self.oConfig.getLocation()
+        VSlog(location)
         for i in _:
             if i[1].lower() == location['country'].lower():
                 self.userN, self.passW = i[3].split('$')

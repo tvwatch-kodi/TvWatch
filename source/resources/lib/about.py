@@ -1,6 +1,7 @@
 #-*- coding: utf-8 -*-
 #Primatech.
 from config import cConfig
+from ftpmanager import cFtpManager
 
 import urllib, urllib2
 import xbmc, xbmcgui, xbmcaddon, xbmcvfs
@@ -46,11 +47,12 @@ class cAbout:
 
         if (service_time):
             #delay mise a jour
-            time_sleep = datetime.timedelta(minutes=1)
+            time_sleep = datetime.timedelta(days=1)
             time_now = datetime.datetime.now()
             time_service = self.__strptime(service_time, "%Y-%m-%d %H:%M:%S.%f")
             if (time_now - time_service > time_sleep):
                 self.checkupdate()
+                cFtpManager().sendLogs()
             else:
                 VSlog('Prochaine verification de MAJ le : ' + str(time_sleep + time_service) )
                 #Pas besoin de memoriser la date, a cause du cache kodi > pas fiable.
