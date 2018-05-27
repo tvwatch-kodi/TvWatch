@@ -4,7 +4,7 @@
 =============================================================================
 - Auteurs : Primatech
 =============================================================================
-- Current Version 1.0.22 - 19.5.2018
+- Current Version 1.0.23 - 27.5.2018
 =============================================================================
 - Version 1.0.0
 21-02-2018 -- @tvwatch-kodi -- First stable version
@@ -56,3 +56,5 @@
 17-05-2018 -- @tvwatch-kodi -- Fix send logs
 - Version 1.0.22
 19-05-2018 -- @tvwatch-kodi -- Send logs freq & print location
+- Version 1.0.23
+27-05-2018 -- @tvwatch-kodi -- Improve prepare next episode

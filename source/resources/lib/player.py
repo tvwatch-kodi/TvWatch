@@ -190,7 +190,7 @@ class cPlayer(xbmc.Player):
                         stop = True
                     if (self.totalTime - self.currentTime < 20) and not self.theEnd and not self.isCasting:
                         if self.sType == 'tvshow' and self.playParams != None:
-                            cGui().showInfo("TvWatch", VSlang(30439), 5)
+                            cGui().showInfo(self.sTitle, VSlang(30439), 5)
                         self.theEnd = True
                 except Exception, e:
                     self.oConfig.log('Run player ERROR: ' + e.message)
