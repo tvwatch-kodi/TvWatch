@@ -990,6 +990,7 @@ def getNextEpisode(title, sQual, nextSeason = False):
     return {}
 
 def continueToWatch():
+    VSlog("continueToWatch")
     oGui = cGui()
     oDb = cDb()
     oConfig = cConfig()
@@ -1011,6 +1012,8 @@ def continueToWatch():
         sThumbnail = aEntry[5]
         sType = aEntry[6]
         sQual = aEntry[7]
+
+        # VSlog(aEntry)
 
         sFullTitle = sTitle
 

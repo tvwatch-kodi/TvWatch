@@ -36,10 +36,10 @@ class cPlayer(xbmc.Player):
         #xbmc.log(str(aParams))
 
         self.sHosterIdentifier = oInputParameterHandler.getValue('sHosterIdentifier')
-        self.sTitle = oInputParameterHandler.getValue('sTitle')
+        #self.sTitle = oInputParameterHandler.getValue('sTitle')
         #self.sSite = oInputParameterHandler.getValue('site')
-        self.sSite = oInputParameterHandler.getValue('siteUrl')
-        self.sThumbnail = xbmc.getInfoLabel('ListItem.Art(thumb)')
+        #self.sSite = oInputParameterHandler.getValue('siteUrl')
+        #self.sThumbnail = xbmc.getInfoLabel('ListItem.Art(thumb)')
 
         self.playBackEventReceived = False
         self.playBackStoppedEventReceived = False
@@ -88,6 +88,12 @@ class cPlayer(xbmc.Player):
             self.sType = 'tvshow'
         else:
             self.sType = 'movie'
+
+        title = self.sTitle
+        if "- Saison" in title:
+            title = title[:title.find("- Saison")]
+        elif "Saison" in title:
+            title = title[:title.find("Saison")]
 
         sPluginHandle = cPluginHandler().getPluginHandle()
 
@@ -190,7 +196,7 @@ class cPlayer(xbmc.Player):
                         stop = True
                     if (self.totalTime - self.currentTime < 20) and not self.theEnd and not self.isCasting:
                         if self.sType == 'tvshow' and self.playParams != None:
-                            cGui().showInfo(self.sTitle, VSlang(30439), 5)
+                            cGui().showInfo(title, VSlang(30439), 5)
                         self.theEnd = True
                 except Exception, e:
                     self.oConfig.log('Run player ERROR: ' + e.message)
