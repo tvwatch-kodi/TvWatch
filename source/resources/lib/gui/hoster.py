@@ -144,6 +144,7 @@ class cHosterGui:
                 playParams['sItemUrl'] = protectedLink
                 playParams['sMainUrl'] = sMainUrl
                 playParams['sQual'] = sQual
+                playParams['sThumbnail'] = sThumbnail
 
                 return oPlayer.run(playParams)
             else:

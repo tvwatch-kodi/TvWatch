@@ -4,7 +4,7 @@
 =============================================================================
 - Auteurs : Primatech
 =============================================================================
-- Current Version 1.0.24 - 2.6.2018
+- Current Version 1.0.25 - 3.6.2018
 =============================================================================
 - Version 1.0.0
 21-02-2018 -- @tvwatch-kodi -- First stable version
@@ -60,3 +60,5 @@
 27-05-2018 -- @tvwatch-kodi -- Improve prepare next episode
 - Version 1.0.24
 02-06-2018 -- @tvwatch-kodi -- Fix icon on continueToWatch
+- Version 1.0.25
+03-06-2018 -- @tvwatch-kodi -- Fix icon on continueToWatch

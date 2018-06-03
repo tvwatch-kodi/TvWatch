@@ -70,13 +70,12 @@ class cPlayer(xbmc.Player):
             self.Subtitles_file = files
 
     def run(self, playParams):
-
         self.totalTime = 0
         self.currentTime = 0
         self.timeCast = 0
         self.theEnd = False
         self.sTitle = playParams['title']
-        self.Thumbnail = playParams['guiElement'].getThumbnail()
+        self.Thumbnail = playParams['sThumbnail']
         self.sItemUrl = playParams['sItemUrl']
         self.mainUrl = playParams['sMainUrl']
         self.clientID = self.oConfig.getSetting('clientID')
