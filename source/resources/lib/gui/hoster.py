@@ -1,6 +1,6 @@
 #-*- coding: utf-8 -*-
 # Primatech.
-# https://github.com/Kodi-TvWatch/primatech-xbmc-addons
+
 #
 from resources.lib.gui.gui import cGui
 from resources.lib.gui.guiElement import cGuiElement
@@ -145,6 +145,7 @@ class cHosterGui:
                 playParams['sMainUrl'] = sMainUrl
                 playParams['sQual'] = sQual
                 playParams['sThumbnail'] = sThumbnail
+                playParams['tv'] = 'False'
 
                 return oPlayer.run(playParams)
             else:

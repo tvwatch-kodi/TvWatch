@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-# https://github.com/Kodi-TvWatch/primatech-xbmc-addons
+
 #
 from resources.lib.handler.inputParameterHandler import cInputParameterHandler
 from resources.lib.handler.pluginHandler import cPluginHandler
@@ -82,6 +82,7 @@ class cPlayer(xbmc.Player):
         self.mySqlDB = cMySqlDB()
         self.sQual = playParams['sQual']
         self.isCasting = (self.oConfig.getSetting('castPlay') == "1")
+        self.tv = (playParams['tv'] == "True")
         self.playParams = None
         if "Episode" in playParams['title']:
             self.sType = 'tvshow'
@@ -246,16 +247,17 @@ class cPlayer(xbmc.Player):
             #     self.__setResume()
             # except Exception, e:
             #     self.oConfig.log("__setResume ERROR: " + e.message)
-            try:
-                self.__setHistory()
-            except Exception, e:
-                self.oConfig.log("__setHistory ERROR: " + e.message)
-            if self.theEnd:
-                self.db.del_resume(self.sTitle)
-                if self.sType != 'tvshow':
-                    self.db.del_history(self.sTitle)
-            # Send Database by FTP
-            cFtpManager().sendDb()
+            if not self.tv:
+                try:
+                    self.__setHistory()
+                except Exception, e:
+                    self.oConfig.log("__setHistory ERROR: " + e.message)
+                if self.theEnd:
+                    self.db.del_resume(self.sTitle)
+                    if self.sType != 'tvshow':
+                        self.db.del_history(self.sTitle)
+                # Send Database by FTP
+                cFtpManager().sendDb()
 
     def onPlayBackStarted(self):
         VSlog("player started")
@@ -297,7 +299,7 @@ class cPlayer(xbmc.Player):
         # if self.currentTime < 30 or self.theEnd:
         #     return
 
-        if self.isCasting:
+        if self.isCasting or self.tv:
             return
 
         meta = {}
@@ -309,6 +311,7 @@ class cPlayer(xbmc.Player):
             self.db.insert_resume(meta)
 
     def __setHistory(self):
+
         self.oConfig.log('__setHistory')
 
         meta = {}

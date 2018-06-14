@@ -771,3 +771,11 @@ msgstr ""
 msgctxt "#30468"
 msgid "Sponsorship code"
 msgstr ""
+
+msgctxt "#30469"
+msgid "Live TV"
+msgstr ""
+
+msgctxt "#30470"
+msgid "Loading... "
+msgstr ""

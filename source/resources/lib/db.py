@@ -32,7 +32,9 @@ class cDb:
             self.db = sqlite.connect(DB)
             self.dbcur = self.db.cursor()
         except Exception, e:
-            VSlog('cDb ERROR in Constructor: ' + e.message)
+            VSlog('cDb ERROR in Constructor: ' + str(e.message))
+
+
 
     def __del__(self):
         ''' Cleanup db when object destroyed '''
@@ -40,7 +42,7 @@ class cDb:
             self.dbcur.close()
             self.db.close()
         except Exception, e:
-            VSlog('cDb ERROR in Destructor: ' + e.message)
+            VSlog('cDb ERROR in Destructor: ' + str(e.message))
 
     def createTables(self):
 
@@ -60,6 +62,9 @@ class cDb:
         sql_create = "CREATE TABLE IF NOT EXISTS download ("" addon_id integer PRIMARY KEY AUTOINCREMENT, ""title TEXT, ""url TEXT, ""path TEXT, ""cat TEXT, ""icon TEXT, ""size TEXT,""totalsize TEXT, ""status TEXT, ""UNIQUE(title, path)"");"
         self.dbcur.execute(sql_create)
 
+        sql_create = "CREATE TABLE IF NOT EXISTS valide ("" addon_id integer PRIMARY KEY AUTOINCREMENT, ""url TEXT, ""ok TEXT, ""UNIQUE(url)"");"
+        self.dbcur.execute(sql_create)
+
         VSlog('Table initialized')
 
     def dropTables(self):
@@ -69,6 +74,7 @@ class cDb:
             self.dbcur.execute("DROP TABLE IF EXISTS %s" %('watched'))
             self.dbcur.execute("DROP TABLE IF EXISTS %s" %('favorite'))
             self.dbcur.execute("DROP TABLE IF EXISTS %s" %('download'))
+            self.dbcur.execute("DROP TABLE IF EXISTS %s" %('valide'))
             VSlog('Tables dropped successfully')
         except:
             VSlog("deleteTable FAIL")
@@ -115,8 +121,8 @@ class cDb:
             self.db.commit()
             VSlog('SQL INSERT resume Successfully')
         except Exception, e:
-            VSlog('SQL ERROR INSERT resume: ' + e.message)
-            if 'UNIQUE constraint failed' in e.message:
+            VSlog('SQL ERROR INSERT resume: ' + str(e.message))
+            if 'UNIQUE constraint failed' in str(e.message):
                 self.update_resume(meta)
 
     def update_resume(self, meta):
@@ -128,7 +134,7 @@ class cDb:
             self.db.commit()
             VSlog('SQL UPDATE resume Successfully')
         except Exception, e:
-            VSlog('SQL ERROR UPDATE resume: ' + e.message)
+            VSlog('SQL ERROR UPDATE resume: ' + str(e.message))
 
     def get_resume(self, meta):
         title = self.str_conv(meta['title'])
@@ -138,7 +144,7 @@ class cDb:
             matchedrow = self.dbcur.fetchall()
             return matchedrow
         except Exception, e:
-            VSlog('SQL ERROR EXECUTE resume: ' + e.message)
+            VSlog('SQL ERROR EXECUTE resume: ' + str(e.message))
             return []
 
     def del_resume(self, title):
@@ -149,7 +155,7 @@ class cDb:
             self.db.commit()
             VSlog('SQL DELETE resume Successfully')
         except Exception, e:
-            VSlog('SQL ERROR DELETE resume: ' + e.message)
+            VSlog('SQL ERROR DELETE resume: ' + str(e.message))
 
     #***********************************
     #   Watched fonctions
@@ -164,7 +170,7 @@ class cDb:
             self.db.commit()
             VSlog('SQL INSERT watched Successfully')
         except Exception, e:
-            VSlog('SQL ERROR INSERT watched: ' + e.message)
+            VSlog('SQL ERROR INSERT watched: ' + str(e.message))
 
     def get_watched(self, meta):
         count = 0
@@ -177,7 +183,7 @@ class cDb:
                 count = 1
             return count
         except Exception, e:
-            VSlog('SQL ERROR EXECUTE watched: ' + e.message)
+            VSlog('SQL ERROR EXECUTE watched: ' + str(e.message))
             return None
 
     def del_watched(self, meta):
@@ -188,7 +194,7 @@ class cDb:
             self.db.commit()
             return False, False
         except Exception, e:
-            VSlog('SQL ERROR DELETE watched: ' + e.message)
+            VSlog('SQL ERROR DELETE watched: ' + str(e.message))
             return False, False
 
     #***********************************
@@ -207,9 +213,9 @@ class cDb:
             VSlog('SQL INSERT favorite Successfully')
             self.oConfig.showInfo(meta['title'], 'Enregistré avec succés')
         except Exception, e:
-            if 'UNIQUE constraint failed' in e.message:
+            if 'UNIQUE constraint failed' in str(e.message):
                 self.oConfig.showInfo(meta['title'], 'Item déjà présent dans votre Liste')
-            VSlog('SQL ERROR INSERT favorite: ' + e.message)
+            VSlog('SQL ERROR INSERT favorite: ' + str(e.message))
             pass
 
     def get_favorite(self):
@@ -219,7 +225,7 @@ class cDb:
             self.dbcur.execute(sql_select)
             matchedrow = self.dbcur.fetchall()
         except Exception, e:
-            VSlog('SQL ERROR EXECUTE favorite: ' + e.message)
+            VSlog('SQL ERROR EXECUTE favorite: ' + str(e.message))
         return matchedrow
 
 
@@ -246,7 +252,7 @@ class cDb:
             self.oConfig.update()
             return False, False
         except Exception, e:
-            VSlog('SQL ERROR EXECUTE favorite: ' + e.message)
+            VSlog('SQL ERROR EXECUTE favorite: ' + str(e.message))
             return False, False
 
     def writeFavourites(self):
@@ -305,7 +311,7 @@ class cDb:
             VSlog('SQL INSERT download Successfully')
             self.oConfig.showInfo(meta['title'], 'Enregistré avec succés')
         except Exception, e:
-            VSlog('SQL ERROR INSERT download: ' + e.message)
+            VSlog('SQL ERROR INSERT download: ' + str(e.message))
             pass
 
     def get_Download(self, meta = ''):
@@ -320,7 +326,7 @@ class cDb:
             matchedrow = self.dbcur.fetchall()
             return matchedrow
         except Exception, e:
-            VSlog('SQL ERROR EXECUTE download: ' + e.message)
+            VSlog('SQL ERROR EXECUTE download: ' + str(e.message))
             return None
 
     def clean_download(self):
@@ -330,7 +336,7 @@ class cDb:
             self.db.commit()
             return False, False
         except Exception, e:
-            VSlog('SQL ERROR EXECUTE download: ' + e.message)
+            VSlog('SQL ERROR EXECUTE download: ' + str(e.message))
             return False, False
 
     def reset_download(self, meta):
@@ -341,7 +347,7 @@ class cDb:
             self.db.commit()
             return False, False
         except Exception, e:
-            VSlog('SQL ERROR EXECUTE download: ' + e.message)
+            VSlog('SQL ERROR EXECUTE download: ' + str(e.message))
             return False, False
 
     def del_download(self, meta):
@@ -359,7 +365,7 @@ class cDb:
             self.db.commit()
             return False, False
         except Exception, e:
-            VSlog('SQL ERROR EXECUTE download: ' + e.message)
+            VSlog('SQL ERROR EXECUTE download: ' + str(e.message))
             return False, False
 
     def Cancel_download(self):
@@ -369,7 +375,7 @@ class cDb:
             self.db.commit()
             return False, False
         except Exception, e:
-            VSlog('SQL ERROR EXECUTE download: ' + e.message)
+            VSlog('SQL ERROR EXECUTE download: ' + str(e.message))
             return False, False
 
     def update_download(self, meta):
@@ -384,7 +390,7 @@ class cDb:
             self.db.commit()
             return False, False
         except Exception, e:
-            VSlog('SQL ERROR EXECUTE download: ' + e.message)
+            VSlog('SQL ERROR EXECUTE download: ' + str(e.message))
             return False, False
 
     #***********************************
@@ -409,8 +415,8 @@ class cDb:
             self.db.commit()
             VSlog('SQL INSERT history Successfully')
         except Exception, e:
-            VSlog('SQL ERROR INSERT history: ' + e.message)
-            if 'UNIQUE constraint failed' in e.message:
+            VSlog('SQL ERROR INSERT history: ' + str(e.message))
+            if 'UNIQUE constraint failed' in str(e.message):
                 self.update_history(meta)
 
     def update_history(self, meta):
@@ -431,7 +437,7 @@ class cDb:
             self.db.commit()
             VSlog('SQL UPDATE history Successfully')
         except Exception, e:
-            VSlog('SQL UPDATE history: ' + e.message)
+            VSlog('SQL UPDATE history: ' + str(e.message))
 
 
     def get_history(self):
@@ -444,7 +450,7 @@ class cDb:
             #     matchedrow[i][2] = self.str_deconv(matchedrow[i][2])
             return matchedrow
         except Exception, e:
-            VSlog('SQL ERROR GET history: ' + e.message)
+            VSlog('SQL ERROR GET history: ' + str(e.message))
             return []
 
     def get_historyFromTitle(self, title):
@@ -461,7 +467,7 @@ class cDb:
             #     matchedrow[i][2] = self.str_deconv(matchedrow[i][2])
             return matchedrow
         except Exception, e:
-            VSlog('SQL ERROR GET history: ' + e.message)
+            VSlog('SQL ERROR GET history: ' + str(e.message))
             return []
 
 
@@ -476,4 +482,51 @@ class cDb:
             self.db.commit()
             VSlog('SQL DELETE history Successfully')
         except Exception, e:
-            VSlog('SQL ERROR DELETE history: ' + e.message)
+            VSlog('SQL ERROR DELETE history: ' + str(e.message))
+
+    #***********************************
+    #   valide fonctions
+    #***********************************
+
+    def insert_valide(self, url, ok):
+        if '?wmsAuthSign' in url:
+            url = url[:url.find('?wmsAuthSign')]
+        # url = urllib.quote_plus(url)
+        try:
+            ex = "INSERT INTO valide (url, ok) VALUES (?, ?)"
+            self.dbcur.execute(ex, (url,ok))
+            self.db.commit()
+        except Exception, e:
+            VSlog('SQL ERROR INSERT valide: ' + str(e.message))
+
+    def get_valideFromUrl(self, url):
+        if '?wmsAuthSign' in url:
+            url = url[:url.find('?wmsAuthSign')]
+        # url = urllib.quote_plus(url)
+        sql_select = "SELECT * FROM valide WHERE url = '%s'" % (url)
+        try:
+            self.dbcur.execute(sql_select)
+            matchedrow = self.dbcur.fetchone()
+            return matchedrow
+        except Exception, e:
+            VSlog('SQL ERROR GET valide: ' + str(e.message))
+            return None
+
+    def get_valide(self):
+        sql_select = "SELECT * FROM valide"
+        try:
+            self.dbcur.execute(sql_select)
+            matchedrow = self.dbcur.fetchall()
+            return matchedrow
+        except Exception, e:
+            VSlog('SQL ERROR GET valide: ' + str(e.message))
+            return None
+
+    def del_valide(self):
+        sql_delete = "DELETE FROM valide"
+        try:
+            self.dbcur.execute(sql_delete)
+            self.db.commit()
+            VSlog('SQL DELETE valide Successfully')
+        except Exception, e:
+            VSlog('SQL ERROR valide history: ' + str(e.message))

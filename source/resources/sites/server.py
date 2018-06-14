@@ -13,6 +13,9 @@ from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.parser import cParser
 from resources.lib.util import cUtil, VSlog, VSlang, VScreateDialogOK, VS_show_busy_dialog
 from resources.lib.db import cDb
+from resources.lib.tvHandler import cTvHandler
+from resources.lib.player import cPlayer
+from resources.lib.ftpmanager import cFtpManager
 
 import urllib,re,urllib2
 import xbmcgui
@@ -33,6 +36,8 @@ URL_SEARCH = (URL_MAIN + 'index.php?', 'showMovies')
 URL_SEARCH_MOVIES = (URL_MAIN + 'index.php?', 'showMovies')
 URL_SEARCH_SERIES = (URL_MAIN  + 'index.php?', 'showMovies')
 FUNCTION_SEARCH = 'showMovies'
+
+TV_EN_DIRECT = (URL_MAIN + 'tv/', 'showTv')
 
 MOVIE_NEWS = (URL_MAIN + 'nouveaute/', 'showMovies') # films (derniers ajouts)
 MOVIE_EXCLUS = (URL_MAIN + 'exclus/', 'showMovies') # exclus (films populaires)
@@ -70,6 +75,9 @@ def load():
     oGui.addDir(SITE_IDENTIFIER, 'continueToWatch', '[B][COLOR khaki]' + VSlang(30424) + '[/COLOR][/B]', 'mark.png', oOutputParameterHandler) # Continuer à regarder
 
     oOutputParameterHandler = cOutputParameterHandler()
+    oGui.addDir(SITE_IDENTIFIER, 'showTv', VSlang(30469), 'replay.png', oOutputParameterHandler) # Films
+
+    oOutputParameterHandler = cOutputParameterHandler()
     oGui.addDir(SITE_IDENTIFIER, 'showFilms', VSlang(30120), 'films.png', oOutputParameterHandler) # Films
 
     oOutputParameterHandler = cOutputParameterHandler()
@@ -79,9 +87,9 @@ def load():
     oOutputParameterHandler.addParameter('sItemUrl', DOC_NEWS[0])
     oGui.addDir(SITE_IDENTIFIER, 'showMovies', VSlang(30112), 'doc.png', oOutputParameterHandler) # Documentaires
 
-    oOutputParameterHandler = cOutputParameterHandler()
-    oOutputParameterHandler.addParameter('sItemUrl', TV_NEWS[0])
-    oGui.addDir(SITE_IDENTIFIER, 'showMovies', VSlang(30117), 'tv.png', oOutputParameterHandler) # TV replay
+    # oOutputParameterHandler = cOutputParameterHandler()
+    # oOutputParameterHandler.addParameter('sItemUrl', TV_NEWS[0])
+    # oGui.addDir(SITE_IDENTIFIER, 'showMovies', VSlang(30117), 'tv.png', oOutputParameterHandler) # TV replay
 
     oOutputParameterHandler = cOutputParameterHandler()
     oOutputParameterHandler.addParameter('sItemUrl', SPECT_NEWS[0])
@@ -103,6 +111,83 @@ def showSearch():
     sSearchText = cGui().showKeyBoard()
     if sSearchText:
         showMovies(sSearchText)
+
+def showTv():
+    oGui = cGui()
+    tv = cTvHandler()
+    for i in tv.getCategories():
+        oOutputParameterHandler = cOutputParameterHandler()
+        oOutputParameterHandler.addParameter('cid', i['cid'])
+        icon = tv.url + 'images/' + i['category_image']
+        oGui.addTV(SITE_IDENTIFIER, 'showChannels', i['category_name'], '', icon, '', oOutputParameterHandler)
+
+    oOutputParameterHandler = cOutputParameterHandler()
+    oOutputParameterHandler.addParameter('sItemUrl', TV_NEWS[0])
+    oGui.addDir(SITE_IDENTIFIER, 'showMovies', VSlang(30117), 'tv.png', oOutputParameterHandler) # TV replay
+    oGui.setEndOfDirectory(50)
+
+def showChannels():
+    oGui = cGui()
+    tv = cTvHandler()
+
+    endOfDir = False
+
+    oInputParameterHandler = cInputParameterHandler()
+    cid = oInputParameterHandler.getValue('cid')
+
+    channelsList = tv.getChannels(cid)
+
+    total = len(channelsList)
+    dialog = cConfig().createDialog(SITE_NAME)
+    for i in tv.getChannels(cid):
+        cConfig().updateDialog(dialog, total)
+        if dialog.iscanceled():
+            break
+        url = i['channel_url'].replace('\\','')
+        url = url.replace('/media/','/cdn/')
+        title = i['channel_title']
+        icon = tv.url + 'images/' + i['channel_thumbnail']
+        oOutputParameterHandler = cOutputParameterHandler()
+        oOutputParameterHandler.addParameter('url', url)
+        oOutputParameterHandler.addParameter('title', title)
+        oOutputParameterHandler.addParameter('icon', icon)
+
+        url += tv.generateToken().replace('eMeeea/1.0.0.','')
+        if tv.testUrl(url):
+            oGui.addMovie(SITE_IDENTIFIER, 'playChannel', i['channel_title'], '', icon, '', oOutputParameterHandler)
+            endOfDir = True
+    cFtpManager().sendDb()
+    cConfig().finishDialog(dialog)
+    if endOfDir:
+        oGui.setEndOfDirectory(500)
+
+def playChannel():
+    tv = cTvHandler()
+    oInputParameterHandler = cInputParameterHandler()
+    url = oInputParameterHandler.getValue('url')
+    title = oInputParameterHandler.getValue('title')
+    icon = oInputParameterHandler.getValue('icon')
+
+    url += tv.generateToken().replace('eMeeea/1.0.0.','')
+
+    oGuiElement = cGuiElement()
+    oGuiElement.setSiteName(SITE_IDENTIFIER)
+    oGuiElement.setTitle(title)
+    oGuiElement.setMediaUrl(url)
+    oGuiElement.setThumbnail(icon)
+    # oGuiElement.getInfoLabel()
+
+    playParams = {}
+    playParams['guiElement'] = oGuiElement
+    playParams['title'] = title
+    playParams['sUrlToPlay'] = url
+    playParams['sItemUrl'] = url
+    playParams['sMainUrl'] = url
+    playParams['sQual'] = ''
+    playParams['tv'] = 'True'
+    playParams['sThumbnail'] = icon
+
+    cPlayer().run(playParams)
 
 def showFilms():
     oGui = cGui()

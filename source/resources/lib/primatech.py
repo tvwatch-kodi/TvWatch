@@ -1,6 +1,6 @@
 #-*- coding: utf-8 -*-
 # Primatech.
-# https://github.com/Kodi-TvWatch/primatech-xbmc-addons
+
 #
 from resources . lib . config import cConfig
 from resources . lib . util import VSlang , uc , VSlog

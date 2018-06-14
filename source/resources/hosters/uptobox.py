@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-# https://github.com/Kodi-TvWatch/primatech-xbmc-addons
+
 #
 from resources.lib.handler.premiumHandler import cPremiumHandler
 from resources.lib.handler.requestHandler import cRequestHandler

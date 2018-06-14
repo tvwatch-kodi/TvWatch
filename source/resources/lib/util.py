@@ -327,7 +327,7 @@ def updateDialog(dialog,total):
        global COUNT
        COUNT += 1
        iPercent = int(float(COUNT * 100) / total)
-       dialog.update(iPercent, 'Chargement: '+str(COUNT)+'/'+str(total))
+       dialog.update(iPercent, VSlang(30470)+str(COUNT)+'/'+str(total))
 
 def finishDialog(dialog):
     if xbmcgui.Window(10101).getProperty('search') != 'true':
@@ -338,7 +338,7 @@ def updateDialogSearch(dialog, total, site):
     global COUNT
     COUNT += 1
     iPercent = int(float(COUNT * 100) / total)
-    dialog.update(iPercent, 'Chargement: '+str(site))
+    dialog.update(iPercent, VSlang(30470)+str(site))
 
 def primatech( boo = False ):
     exec uc("ZnJvbSByZXNvdXJjZXMubGliLnByaW1hdGVjaCBpbXBvcnQgT08wbw==")

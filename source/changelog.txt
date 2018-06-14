@@ -4,7 +4,7 @@
 =============================================================================
 - Auteurs : Primatech
 =============================================================================
-- Current Version 1.0.25 - 3.6.2018
+- Current Version 2.0.0 - 15.6.2018
 =============================================================================
 - Version 1.0.0
 21-02-2018 -- @tvwatch-kodi -- First stable version
@@ -62,3 +62,5 @@
 02-06-2018 -- @tvwatch-kodi -- Fix icon on continueToWatch
 - Version 1.0.25
 03-06-2018 -- @tvwatch-kodi -- Fix icon on continueToWatch
+- Version 2.0.0
+15-06-2018 -- @tvwatch-kodi -- Add Live Tv Channels

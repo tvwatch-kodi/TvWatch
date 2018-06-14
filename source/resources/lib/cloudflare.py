@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-# https://github.com/Kodi-TvWatch/primatech-xbmc-addons
+
 #
 import re,os
 import urllib2,urllib

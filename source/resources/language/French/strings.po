@@ -772,3 +772,11 @@ msgstr "Le Cache a été vidé avec succès"
 msgctxt "#30468"
 msgid "Sponsorship code"
 msgstr "Code de parrainage"
+
+msgctxt "#30469"
+msgid "Live TV"
+msgstr "TV en Direct"
+
+msgctxt "#30470"
+msgid "Loading... "
+msgstr "Chargement... "

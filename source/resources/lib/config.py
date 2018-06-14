@@ -286,7 +286,7 @@ class cConfig():
     def updateDialog(self, dialog, total):
         if xbmcgui.Window(10101).getProperty('search') != 'true':
             iPercent = int(float(cConfig.COUNT * 100) / total)
-            dialog.update(iPercent, 'Chargement: '+str(cConfig.COUNT)+'/'+str(total))
+            dialog.update(iPercent, self.getlanguage(30470)+str(cConfig.COUNT)+'/'+str(total))
             cConfig.COUNT += 1
 
     def updateDialogSearch(self, dialog, total, site, resetCount = False):
@@ -295,11 +295,11 @@ class cConfig():
             cConfig.COUNT=0
 
         iPercent = int(float(cConfig.COUNT * 100) / total)
-        dialog.update(iPercent, 'Chargement: '+str(site))
+        dialog.update(iPercent, self.getlanguage(30470)+str(site))
         cConfig.COUNT += 1
 
     def updateDialog2(self, dialog, label = ''):
-        dialog.update(0, 'Chargement: '+str(label))
+        dialog.update(0, self.getlanguage(30470)+str(label))
 
     def finishDialog(self, dialog):
         if xbmcgui.Window(10101).getProperty('search') != 'true':
