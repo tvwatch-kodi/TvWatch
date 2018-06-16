@@ -4,7 +4,7 @@
 =============================================================================
 - Auteurs : Primatech
 =============================================================================
-- Current Version 2.0.1 - 16.6.2018
+- Current Version 2.0.2 - 16.6.2018
 =============================================================================
 - Version 1.0.0
 21-02-2018 -- @tvwatch-kodi -- First stable version
@@ -66,3 +66,5 @@
 15-06-2018 -- @tvwatch-kodi -- Add Live Tv Channels
 - Version 2.0.1
 16-06-2018 -- @tvwatch-kodi -- Add Sports Tv Channels
+- Version 2.0.2
+16-06-2018 -- @tvwatch-kodi -- Add BEIN FR Tv Channels

@@ -37,7 +37,7 @@ URL_SEARCH_MOVIES = (URL_MAIN + 'index.php?', 'showMovies')
 URL_SEARCH_SERIES = (URL_MAIN  + 'index.php?', 'showMovies')
 FUNCTION_SEARCH = 'showMovies'
 
-TV_EN_DIRECT = (URL_MAIN + 'tv/', 'showTv')
+TV_EN_DIRECT = (URL_MAIN + 'tv/', 'showTvGroup')
 
 MOVIE_NEWS = (URL_MAIN + 'nouveaute/', 'showMovies') # films (derniers ajouts)
 MOVIE_EXCLUS = (URL_MAIN + 'exclus/', 'showMovies') # exclus (films populaires)
@@ -76,11 +76,11 @@ def load():
 
     oOutputParameterHandler = cOutputParameterHandler()
     oOutputParameterHandler.addParameter('mode', '1')
-    oGui.addDir(SITE_IDENTIFIER, 'showTv', VSlang(30469), 'replay.png', oOutputParameterHandler) # Films
+    oGui.addDir(SITE_IDENTIFIER, 'showTvGroup', VSlang(30469), 'replay.png', oOutputParameterHandler) # Films
 
     oOutputParameterHandler = cOutputParameterHandler()
     oOutputParameterHandler.addParameter('mode', '2')
-    oGui.addDir(SITE_IDENTIFIER, 'showTv', VSlang(30471), 'replay.png', oOutputParameterHandler) # Films
+    oGui.addDir(SITE_IDENTIFIER, 'showTvGroup', VSlang(30471), 'replay.png', oOutputParameterHandler) # Films
 
     oOutputParameterHandler = cOutputParameterHandler()
     oGui.addDir(SITE_IDENTIFIER, 'showFilms', VSlang(30120), 'films.png', oOutputParameterHandler) # Films
@@ -117,19 +117,37 @@ def showSearch():
     if sSearchText:
         showMovies(sSearchText)
 
-def showTv():
+def showTvGroup():
     oGui = cGui()
 
     oInputParameterHandler = cInputParameterHandler()
     mode = int(oInputParameterHandler.getValue('mode'))
 
     tv = cTvHandler(mode)
-    for i in tv.getCategories():
-        oOutputParameterHandler = cOutputParameterHandler()
-        oOutputParameterHandler.addParameter('cid', i['cid'])
-        oOutputParameterHandler.addParameter('mode', str(mode))
-        icon = tv.url + 'images/' + i['category_image']
-        oGui.addTV(SITE_IDENTIFIER, 'showChannels', i['category_name'], '', icon, '', oOutputParameterHandler)
+    catLists = tv.getCategories()
+    found = False
+    cat = ''
+    for i in catLists:
+        if 'SPORTS' in i['category_name']:
+            for i in tv.getChannels(i['cid']):
+                if 'FR' in i['channel_title'].upper():
+                    cat = i['cid']
+                    found = True
+                    break
+            if found:
+                oOutputParameterHandler = cOutputParameterHandler()
+                oOutputParameterHandler.addParameter('cid', cat)
+                oOutputParameterHandler.addParameter('mode', str(mode))
+                icon = 'https://www.airysat.com/blog/wp-content/uploads/2017/04/bein-france-iptv.jpg'
+                oGui.addTV(SITE_IDENTIFIER, 'showBeinFR', 'BEIN FR', '', icon, '', oOutputParameterHandler)
+                break
+    for i in catLists:
+        if 'World Cup' not in i['category_name']:
+            oOutputParameterHandler = cOutputParameterHandler()
+            oOutputParameterHandler.addParameter('cid', i['cid'])
+            oOutputParameterHandler.addParameter('mode', str(mode))
+            icon = tv.url + 'images/' + i['category_image']
+            oGui.addTV(SITE_IDENTIFIER, 'showChannels', i['category_name'], '', icon, '', oOutputParameterHandler)
 
     if mode == 1:
         oOutputParameterHandler = cOutputParameterHandler()
@@ -150,7 +168,7 @@ def showChannels():
 
     total = len(channelsList)
     dialog = cConfig().createDialog(SITE_NAME)
-    for i in tv.getChannels(cid):
+    for i in channelsList:
         cConfig().updateDialog(dialog, total)
         if dialog.iscanceled():
             break
@@ -173,6 +191,35 @@ def showChannels():
     if endOfDir:
         oGui.setEndOfDirectory(50)
 
+def showBeinFR():
+    oGui = cGui()
+    endOfDir = False
+
+    oInputParameterHandler = cInputParameterHandler()
+    cid = oInputParameterHandler.getValue('cid')
+    mode = int(oInputParameterHandler.getValue('mode'))
+
+    tv = cTvHandler(mode)
+
+    for i in tv.getChannels(cid):
+        title = i['channel_title']
+        if ('BEIN' in title.upper()) and ('FR' in title.upper()):
+            url = i['channel_url'].replace('\\','')
+            url = url.replace('/media/','/cdn/')
+            icon = tv.url + 'images/' + i['channel_thumbnail']
+            oOutputParameterHandler = cOutputParameterHandler()
+            oOutputParameterHandler.addParameter('url', url)
+            oOutputParameterHandler.addParameter('title', title)
+            oOutputParameterHandler.addParameter('icon', icon)
+            oOutputParameterHandler.addParameter('mode', str(mode))
+
+            url += tv.generateToken().replace('eMeeea/1.0.0.','')
+            if tv.testUrl(url):
+                oGui.addTV(SITE_IDENTIFIER, 'playChannel', i['channel_title'], '', icon, '', oOutputParameterHandler)
+                endOfDir = True
+    if endOfDir:
+        oGui.setEndOfDirectory(50)
+
 def playChannel():
     oInputParameterHandler = cInputParameterHandler()
     url = oInputParameterHandler.getValue('url')
@@ -188,7 +235,6 @@ def playChannel():
     oGuiElement.setTitle(title)
     oGuiElement.setMediaUrl(url)
     oGuiElement.setThumbnail(icon)
-    # oGuiElement.getInfoLabel()
 
     playParams = {}
     playParams['guiElement'] = oGuiElement

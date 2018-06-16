@@ -34,9 +34,9 @@ class cTvHandler:
         elif self.mode == 2:
             self.url = 'http://swiftstream.aprolibro.com/apps/'
 
-        if self.isResetCheck():
-            cDb().del_valide()
-            cFtpManager().sendDb()
+        # if self.isResetCheck():
+        #     cDb().del_valide()
+        #     cFtpManager().sendDb()
 
 
     def generateToken(self):
@@ -100,24 +100,25 @@ class cTvHandler:
         return result['LIVETV']
 
     def testUrl(self, url):
-        oDb = cDb()
-        match = oDb.get_valideFromUrl(url)
-        if match != None:
-            if match[2] == '1':
-                return True
-            elif match[2] == '0':
-                return False
+        # oDb = cDb()
+        # if not force:
+        #     match = oDb.get_valideFromUrl(url)
+        #     if match != None:
+        #         if match[2] == '1':
+        #             return True
+        #         elif match[2] == '0':
+        #             return False
         code = 0
         try:
-            res = requests.get(url, timeout = 0.5)
+            res = requests.get(url, timeout = 1)
             code = res.status_code
         except Exception, e:
             VSlog("ERROR " + str(e.message))
         if code == 200:
-            oDb.insert_valide(url, '1')
+            # oDb.insert_valide(url, '1')
             return True
-        else:
-            oDb.insert_valide(url, '0')
+        # else:
+            # oDb.insert_valide(url, '0')
         return False
 
     #bug python
@@ -138,7 +139,7 @@ class cTvHandler:
             test_time = '2000-09-23 10:59:50.877000'
 
         if (test_time):
-            time_sleep = datetime.timedelta(days=1)
+            time_sleep = datetime.timedelta(hours=1)
             time_now = datetime.datetime.now()
             time_service = self.__strptime(test_time, "%Y-%m-%d %H:%M:%S.%f")
             if (time_now - time_service > time_sleep):
