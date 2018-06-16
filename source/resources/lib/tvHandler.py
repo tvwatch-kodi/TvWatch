@@ -20,11 +20,9 @@ SITE_NAME = 'TVHANDLER'
 UA = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:47.0) Gecko/20100101 Firefox/47.0'
 headers = { 'User-Agent' : UA }
 
-MODE = 1
-
 class cTvHandler:
 
-    def __init__(self):
+    def __init__(self, MODE):
         self.key = "QVRoTFgyMVJOUS9DQlFZMDZnSmE5dz09"
 
         self.tokens = []
@@ -144,6 +142,7 @@ class cTvHandler:
             time_now = datetime.datetime.now()
             time_service = self.__strptime(test_time, "%Y-%m-%d %H:%M:%S.%f")
             if (time_now - time_service > time_sleep):
+                oConfig.setSetting('test_time', str(datetime.datetime.now()))
                 VSlog('Reset Check URL NOW')
                 return True
             else:

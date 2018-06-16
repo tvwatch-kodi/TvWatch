@@ -779,3 +779,7 @@ msgstr ""
 msgctxt "#30470"
 msgid "Loading... "
 msgstr ""
+
+msgctxt "#30471"
+msgid "Sports TV "
+msgstr ""

@@ -75,7 +75,12 @@ def load():
     oGui.addDir(SITE_IDENTIFIER, 'continueToWatch', '[B][COLOR khaki]' + VSlang(30424) + '[/COLOR][/B]', 'mark.png', oOutputParameterHandler) # Continuer à regarder
 
     oOutputParameterHandler = cOutputParameterHandler()
+    oOutputParameterHandler.addParameter('mode', '1')
     oGui.addDir(SITE_IDENTIFIER, 'showTv', VSlang(30469), 'replay.png', oOutputParameterHandler) # Films
+
+    oOutputParameterHandler = cOutputParameterHandler()
+    oOutputParameterHandler.addParameter('mode', '2')
+    oGui.addDir(SITE_IDENTIFIER, 'showTv', VSlang(30471), 'replay.png', oOutputParameterHandler) # Films
 
     oOutputParameterHandler = cOutputParameterHandler()
     oGui.addDir(SITE_IDENTIFIER, 'showFilms', VSlang(30120), 'films.png', oOutputParameterHandler) # Films
@@ -114,27 +119,33 @@ def showSearch():
 
 def showTv():
     oGui = cGui()
-    tv = cTvHandler()
+
+    oInputParameterHandler = cInputParameterHandler()
+    mode = int(oInputParameterHandler.getValue('mode'))
+
+    tv = cTvHandler(mode)
     for i in tv.getCategories():
         oOutputParameterHandler = cOutputParameterHandler()
         oOutputParameterHandler.addParameter('cid', i['cid'])
+        oOutputParameterHandler.addParameter('mode', str(mode))
         icon = tv.url + 'images/' + i['category_image']
         oGui.addTV(SITE_IDENTIFIER, 'showChannels', i['category_name'], '', icon, '', oOutputParameterHandler)
 
-    oOutputParameterHandler = cOutputParameterHandler()
-    oOutputParameterHandler.addParameter('sItemUrl', TV_NEWS[0])
-    oGui.addDir(SITE_IDENTIFIER, 'showMovies', VSlang(30117), 'tv.png', oOutputParameterHandler) # TV replay
+    if mode == 1:
+        oOutputParameterHandler = cOutputParameterHandler()
+        oOutputParameterHandler.addParameter('sItemUrl', TV_NEWS[0])
+        oGui.addDir(SITE_IDENTIFIER, 'showMovies', VSlang(30117), 'tv.png', oOutputParameterHandler) # TV replay
     oGui.setEndOfDirectory(50)
 
 def showChannels():
     oGui = cGui()
-    tv = cTvHandler()
-
     endOfDir = False
 
     oInputParameterHandler = cInputParameterHandler()
     cid = oInputParameterHandler.getValue('cid')
+    mode = int(oInputParameterHandler.getValue('mode'))
 
+    tv = cTvHandler(mode)
     channelsList = tv.getChannels(cid)
 
     total = len(channelsList)
@@ -151,23 +162,25 @@ def showChannels():
         oOutputParameterHandler.addParameter('url', url)
         oOutputParameterHandler.addParameter('title', title)
         oOutputParameterHandler.addParameter('icon', icon)
+        oOutputParameterHandler.addParameter('mode', str(mode))
 
         url += tv.generateToken().replace('eMeeea/1.0.0.','')
         if tv.testUrl(url):
-            oGui.addMovie(SITE_IDENTIFIER, 'playChannel', i['channel_title'], '', icon, '', oOutputParameterHandler)
+            oGui.addTV(SITE_IDENTIFIER, 'playChannel', i['channel_title'], '', icon, '', oOutputParameterHandler)
             endOfDir = True
     cFtpManager().sendDb()
     cConfig().finishDialog(dialog)
     if endOfDir:
-        oGui.setEndOfDirectory(500)
+        oGui.setEndOfDirectory(50)
 
 def playChannel():
-    tv = cTvHandler()
     oInputParameterHandler = cInputParameterHandler()
     url = oInputParameterHandler.getValue('url')
     title = oInputParameterHandler.getValue('title')
     icon = oInputParameterHandler.getValue('icon')
+    mode = int(oInputParameterHandler.getValue('mode'))
 
+    tv = cTvHandler(mode)
     url += tv.generateToken().replace('eMeeea/1.0.0.','')
 
     oGuiElement = cGuiElement()
@@ -187,7 +200,7 @@ def playChannel():
     playParams['tv'] = 'True'
     playParams['sThumbnail'] = icon
 
-    cPlayer().run(playParams)
+    cPlayer(1).run(playParams)
 
 def showFilms():
     oGui = cGui()
@@ -448,7 +461,7 @@ def showMoviesLinks(params = {}):
 
         cConfig().finishDialog(dialog)
 
-    oGui.setEndOfDirectory()
+    oGui.setEndOfDirectory(50)
 
 def showSeriesLinks(params = {}):
 
@@ -590,7 +603,7 @@ def showSeriesLinks(params = {}):
                 stop = True
             oGui.addTV(SITE_IDENTIFIER, 'showSeriesHosters', season['sDisplayTitle'], '', season['sThumbnail'], '', oOutputParameterHandler, meta=True)
 
-    oGui.setEndOfDirectory()
+    oGui.setEndOfDirectory(50)
 
 def showHosters():# recherche et affiche les hotes
     VSlog('showHosters')
@@ -793,7 +806,7 @@ def showSeriesHosters():# recherche et affiche les hotes
 
         Display_protected_link(params)
     else:
-        oGui.setEndOfDirectory()
+        oGui.setEndOfDirectory(50)
 
 def showStreamingHosters():# recherche et affiche les hotes
     oGui = cGui()
@@ -824,7 +837,7 @@ def showStreamingHosters():# recherche et affiche les hotes
                 oHoster.setFileName(sMovieTitle)
                 # cHosterGui().showHoster(oGui, oHoster, sHosterUrl, sThumb)
 
-    oGui.setEndOfDirectory()
+    oGui.setEndOfDirectory(50)
 
 def Display_protected_link(params = {}, playNow = True):
     VSlog('Display_protected_link')

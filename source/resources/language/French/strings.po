@@ -780,3 +780,7 @@ msgstr "TV en Direct"
 msgctxt "#30470"
 msgid "Loading... "
 msgstr "Chargement... "
+
+msgctxt "#30471"
+msgid "Sports TV "
+msgstr "Sports TV"

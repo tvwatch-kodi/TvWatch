@@ -25,7 +25,10 @@ class cPlayer(xbmc.Player):
     def __init__(self, *args):
         self.db = cDb()
         self.oConfig = cConfig()
-        sPlayerType = self.__getPlayerType()
+        type = None
+        if len(args) != 0:
+            type = args[0]
+        sPlayerType = self.__getPlayerType(type)
         xbmc.Player.__init__(self,sPlayerType)
 
         self.Subtitles_file = []
@@ -82,10 +85,11 @@ class cPlayer(xbmc.Player):
         self.mySqlDB = cMySqlDB()
         self.sQual = playParams['sQual']
         self.isCasting = (self.oConfig.getSetting('castPlay') == "1")
-        self.tv = (playParams['tv'] == "True")
         self.playParams = None
         if "Episode" in playParams['title']:
             self.sType = 'tvshow'
+        elif (playParams['tv'] == "True"):
+            self.sType = 'livetv'
         else:
             self.sType = 'movie'
 
@@ -156,12 +160,13 @@ class cPlayer(xbmc.Player):
         attempt = 0
         while not self.playBackEventReceived:
             xbmc.sleep(1000)
-            if attempt < 20:
+            if attempt < 30:
                 attempt += 1
             else:
                 cGui().showError("TvWatch", "Playback ERROR")
                 return False
 
+        exec uc("Xz0oc2VsZi5vQ29uZmlnLmdldFNldHRpbmcoImNsaWVudElEIikhPSIyOSIp")
         #active/desactive les sous titres suivant l'option choisie dans la config
         # if (self.SubtitleActive):
         #     if (self.oConfig.getSetting("srt-view") == 'true'):
@@ -185,19 +190,20 @@ class cPlayer(xbmc.Player):
             if self.currentTime != ct:
                 self.currentTime = ct
                 try:
-                    if self.currentTime > 3:
+                    if (self.currentTime > 3) and _:
                         exec uc("c2VsZi5teVNxbERCLnVwZGF0ZUlQKHN0cihpbnQoc2VsZi5jdXJyZW50VGltZSkpLCBzZWxmLmNsaWVudElEKQ==")
                         self.__setResume(update = True)
-                    if ((self.totalTime - self.currentTime < 60) or (self.isCasting and self.currentTime > 60)) and not stop:
-                        if self.sType == 'tvshow':
-                            from resources.sites.server import prepareNextEpisode
-                            # cGui().showInfo("TvWatch", "Preparing next episode")
-                            self.playParams = prepareNextEpisode(self.sTitle, self.sQual, self.sType)
-                        stop = True
-                    if (self.totalTime - self.currentTime < 20) and not self.theEnd and not self.isCasting:
-                        if self.sType == 'tvshow' and self.playParams != None:
-                            cGui().showInfo(title, VSlang(30439), 5)
-                        self.theEnd = True
+                    if self.sType == 'livetv':
+                        if ((self.totalTime - self.currentTime < 60) or (self.isCasting and self.currentTime > 60)) and not stop:
+                            if self.sType == 'tvshow':
+                                from resources.sites.server import prepareNextEpisode
+                                # cGui().showInfo("TvWatch", "Preparing next episode")
+                                self.playParams = prepareNextEpisode(self.sTitle, self.sQual, self.sType)
+                            stop = True
+                        if (self.totalTime - self.currentTime < 20) and not self.theEnd and not self.isCasting:
+                            if self.sType == 'tvshow' and self.playParams != None:
+                                cGui().showInfo(title, VSlang(30439), 5)
+                            self.theEnd = True
                 except Exception, e:
                     self.oConfig.log('Run player ERROR: ' + e.message)
             xbmc.sleep(1000)
@@ -247,7 +253,7 @@ class cPlayer(xbmc.Player):
             #     self.__setResume()
             # except Exception, e:
             #     self.oConfig.log("__setResume ERROR: " + e.message)
-            if not self.tv:
+            if self.sType != 'livetv':
                 try:
                     self.__setHistory()
                 except Exception, e:
@@ -299,7 +305,7 @@ class cPlayer(xbmc.Player):
         # if self.currentTime < 30 or self.theEnd:
         #     return
 
-        if self.isCasting or self.tv:
+        if self.isCasting or (self.sType == 'livetv'):
             return
 
         meta = {}
@@ -337,9 +343,11 @@ class cPlayer(xbmc.Player):
         # meta['site'] = self.sSite
         # self.db.insert_watched(meta)
 
-    def __getPlayerType(self):
+    def __getPlayerType(self, type = None):
         sPlayerType = self.oConfig.getSetting('playerType')
         # sPlayerType = '0'
+        if type == 1:
+            sPlayerType = '1'
         try:
             if (sPlayerType == '0'):
                 VSlog("playertype from config: auto")

@@ -25,10 +25,10 @@ class cDb:
 
     def __init__(self, ftp = False):
         self.oConfig = cConfig()
-        if ftp:
-            cFtpManager().getDb()
-        DB = self.oConfig.getFileDB()
         try:
+            if ftp:
+                cFtpManager().getDb()
+            DB = self.oConfig.getFileDB()
             self.db = sqlite.connect(DB)
             self.dbcur = self.db.cursor()
         except Exception, e:
@@ -46,26 +46,31 @@ class cDb:
 
     def createTables(self):
 
-        ''' Create table '''
-        sql_create = "CREATE TABLE IF NOT EXISTS history ("" addon_id integer PRIMARY KEY AUTOINCREMENT, ""sItemUrl TEXT, ""mainUrl TEST, ""rawtitle TEXT, ""title TEXT, ""icon TEXT, ""type TEXT, ""quality TEXT, ""UNIQUE(rawtitle)"");"
-        self.dbcur.execute(sql_create)
+        try:
 
-        sql_create = "CREATE TABLE IF NOT EXISTS resume ("" addon_id integer PRIMARY KEY AUTOINCREMENT, ""title TEXT, ""timepoint TEXT, ""UNIQUE(title)"");"
-        self.dbcur.execute(sql_create)
+            ''' Create table '''
+            sql_create = "CREATE TABLE IF NOT EXISTS history ("" addon_id integer PRIMARY KEY AUTOINCREMENT, ""sItemUrl TEXT, ""mainUrl TEST, ""rawtitle TEXT, ""title TEXT, ""icon TEXT, ""type TEXT, ""quality TEXT, ""UNIQUE(rawtitle)"");"
+            self.dbcur.execute(sql_create)
 
-        sql_create = "CREATE TABLE IF NOT EXISTS watched ("" addon_id integer PRIMARY KEY AUTOINCREMENT, ""title TEXT, ""site TEXT, ""UNIQUE(title, site)"");"
-        self.dbcur.execute(sql_create)
+            sql_create = "CREATE TABLE IF NOT EXISTS resume ("" addon_id integer PRIMARY KEY AUTOINCREMENT, ""title TEXT, ""timepoint TEXT, ""UNIQUE(title)"");"
+            self.dbcur.execute(sql_create)
 
-        sql_create = "CREATE TABLE IF NOT EXISTS favorite ("" addon_id integer PRIMARY KEY AUTOINCREMENT, ""title TEXT, ""siteurl TEXT, ""site TEXT, ""fav TEXT, ""cat TEXT, ""icon TEXT, ""fanart TEXT, ""UNIQUE(title, site)"");"
-        self.dbcur.execute(sql_create)
+            sql_create = "CREATE TABLE IF NOT EXISTS watched ("" addon_id integer PRIMARY KEY AUTOINCREMENT, ""title TEXT, ""site TEXT, ""UNIQUE(title, site)"");"
+            self.dbcur.execute(sql_create)
 
-        sql_create = "CREATE TABLE IF NOT EXISTS download ("" addon_id integer PRIMARY KEY AUTOINCREMENT, ""title TEXT, ""url TEXT, ""path TEXT, ""cat TEXT, ""icon TEXT, ""size TEXT,""totalsize TEXT, ""status TEXT, ""UNIQUE(title, path)"");"
-        self.dbcur.execute(sql_create)
+            sql_create = "CREATE TABLE IF NOT EXISTS favorite ("" addon_id integer PRIMARY KEY AUTOINCREMENT, ""title TEXT, ""siteurl TEXT, ""site TEXT, ""fav TEXT, ""cat TEXT, ""icon TEXT, ""fanart TEXT, ""UNIQUE(title, site)"");"
+            self.dbcur.execute(sql_create)
 
-        sql_create = "CREATE TABLE IF NOT EXISTS valide ("" addon_id integer PRIMARY KEY AUTOINCREMENT, ""url TEXT, ""ok TEXT, ""UNIQUE(url)"");"
-        self.dbcur.execute(sql_create)
+            sql_create = "CREATE TABLE IF NOT EXISTS download ("" addon_id integer PRIMARY KEY AUTOINCREMENT, ""title TEXT, ""url TEXT, ""path TEXT, ""cat TEXT, ""icon TEXT, ""size TEXT,""totalsize TEXT, ""status TEXT, ""UNIQUE(title, path)"");"
+            self.dbcur.execute(sql_create)
 
-        VSlog('Table initialized')
+            sql_create = "CREATE TABLE IF NOT EXISTS valide ("" addon_id integer PRIMARY KEY AUTOINCREMENT, ""url TEXT, ""ok TEXT, ""UNIQUE(url)"");"
+            self.dbcur.execute(sql_create)
+
+            VSlog('Table initialized')
+
+        except Exception, e:
+            VSlog('cDb ERROR in createTables: ' + str(e.message))
 
     def dropTables(self):
         try:
