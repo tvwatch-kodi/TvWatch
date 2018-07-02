@@ -676,36 +676,13 @@ def showHosters():# recherche et affiche les hotes
         aResult = oParser.parse(sHtmlContent, sPattern)
         sHtmlContent = CutNonPremiumlinks(sHtmlContent)
 
-        #print sHtmlContent
-    oParser = cParser()
-
-    sPattern = '<font color=red>([^<]+?)</font>|<div style="font-weight:bold;[^"]+?">([^>]+?)</div></b><b><a target="_blank" href="([^<>"]+?)">Télécharger<\/a>|>\[(Liens Premium) \]<|<span style="color:#FF0000">(.+?)</div></b><b><a target="_blank" href=href="https://([^"]+)/([^"]+?)">'
-    aResult = oParser.parse(sHtmlContent, sPattern)
-
-    if (aResult[0] == True):
-        dialog = cConfig().createDialog(SITE_NAME)
-
-        for aEntry in aResult[1]:
-            if aEntry[1] == 'Uptobox' or aEntry[1] == '':
-                cConfig().updateDialog(dialog, len(aEntry))
-                if dialog.iscanceled():
-                    break
-
-                if aEntry[0]:
-                    if ('Interchangeables' not in aEntry[0]):
-                        oGui.addText(SITE_IDENTIFIER, '[COLOR red]' + aEntry[0] + '[/COLOR]')
-                        params['sItemUrl'] = sUrl
-
-                else:
-                    sTitle = '[COLOR skyblue]' + aEntry[1] + '[/COLOR] ' + sMovieTitle
-                    URL_DECRYPT = aEntry[3]
-                    if sUrl.startswith ('https') or sUrl.startswith ('http'):
-                        params['sItemUrl'] = aEntry[2]
-                    else:
-                        sUrl2 = 'https://' + aEntry[3] + '/' + aEntry[4]
-                        params['sItemUrl'] = sUrl2
-
-        cConfig().finishDialog(dialog)
+    if 'Uptobox' in sHtmlContent:
+        a = sHtmlContent.find('Uptobox')
+        sHtmlContent = sHtmlContent[a:]
+        if 'href="' in sHtmlContent:
+            a = sHtmlContent.find('href="') + 6
+            b = sHtmlContent[a:].find('">')
+            params['sItemUrl'] = sHtmlContent[a:a+b-1]
 
     params['sMainUrl'] = sMainUrl
     params['sMovieTitle'] = sMovieTitle

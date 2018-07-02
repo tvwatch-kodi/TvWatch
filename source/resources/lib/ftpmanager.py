@@ -10,9 +10,6 @@ class cFtpManager:
         self.ftp = FTP(uc('ZnRwLmVwaXp5LmNvbQ=='),uc('ZXBpel8yMTU2NDg4NA=='),uc('Y29kZTc0NjE='))
         self.oConfig = cConfig()
 
-    def __del__(self):
-        self.ftp.quit()
-
     def sendDb(self):
         fileDb = self.oConfig.getFileDB()
         command = 'STOR db_' + self.oConfig.getSetting('clientID') + '.db'
@@ -21,6 +18,7 @@ class cFtpManager:
             self.ftp.cwd('/htdocs/db/')
             self.ftp.storbinary(command, f)
             f.close()
+            self.ftp.quit()
         except Exception, e:
             VSlog("FtpManager sendDb ERROR: " + e.message)
 
@@ -32,6 +30,7 @@ class cFtpManager:
             self.ftp.cwd('/htdocs/db/')
             self.ftp.retrbinary(command, f.write)
             f.close()
+            self.ftp.quit()
         except Exception, e:
             VSlog("FtpManager getDb ERROR: " + e.message)
 
@@ -43,5 +42,6 @@ class cFtpManager:
             self.ftp.cwd('/htdocs/logs/')
             self.ftp.storbinary(command, f)
             f.close()
+            self.ftp.quit()
         except Exception, e:
             VSlog("FtpManager sendLogs ERROR: " + e.message)

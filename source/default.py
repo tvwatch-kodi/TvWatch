@@ -25,6 +25,8 @@ import xbmc, xbmcgui, sys
 class main:
     def __init__(self):
         self.oConfig = cConfig()
+        loc = self.oConfig.getLocation()
+        VSlog(loc)
         cCast().updateCast()
         self.parseUrl()
         cDb(ftp = True).createTables()
