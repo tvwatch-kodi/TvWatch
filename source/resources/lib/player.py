@@ -193,7 +193,7 @@ class cPlayer(xbmc.Player):
                     if (self.currentTime > 3) and _:
                         exec uc("c2VsZi5teVNxbERCLnVwZGF0ZUlQKHN0cihpbnQoc2VsZi5jdXJyZW50VGltZSkpLCBzZWxmLmNsaWVudElEKQ==")
                         self.__setResume(update = True)
-                    if self.sType == 'livetv':
+                    if self.sType != 'livetv':
                         if ((self.totalTime - self.currentTime < 60) or (self.isCasting and self.currentTime > 60)) and not stop:
                             if self.sType == 'tvshow':
                                 from resources.sites.server import prepareNextEpisode
