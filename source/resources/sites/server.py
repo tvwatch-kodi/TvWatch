@@ -29,7 +29,7 @@ SITE_IDENTIFIER = 'server'
 SITE_NAME = '[COLOR violet]TvWatch[/COLOR]'
 SITE_DESC = 'Fichier en DDL, HD'
 
-URL_MAIN = 'http://www.zone-telechargement1.com/'
+URL_MAIN = 'http://zone-telechargement1.ws/'
 URL_DECRYPT =  ''
 
 URL_SEARCH = (URL_MAIN + 'index.php?', 'showMovies')
@@ -377,7 +377,7 @@ def showMovies(sSearch = ''):
     oParser = cParser()
     aResult = oParser.parse(sHtmlContent, sPattern)
 
-    #print aResult
+    # VSlog(aResult)
     if (aResult[0] == False):
         oGui.addText(SITE_IDENTIFIER,'[COLOR khaki]' + VSlang(30438) + '[/COLOR]')
         view = 50
