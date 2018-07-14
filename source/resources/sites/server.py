@@ -367,6 +367,7 @@ def showMovies(sSearch = ''):
             movie = oInputParameterHandler.getValue('movie')
         except:
             pass
+        sUrl = fixUrl(sUrl)
         request = urllib2.Request(sUrl, None, headers)
         sPattern = '<div style="height:[0-9]{3}px;"> *<a href="([^"]+)"><img class="[^"]+?" data-newsid="[^"]+?" src="([^<"]+)".+?<div class="[^"]+?" style="[^"]+?"> *<a href="[^"]+?"> ([^<]+?)<'
 
@@ -456,6 +457,7 @@ def showMoviesLinks(params = {}):
 
     sItemUrl = sMainUrl
 
+    sItemUrl = fixUrl(sItemUrl)
     oRequestHandler = cRequestHandler(sItemUrl)
     sHtmlContent = oRequestHandler.request()
 
@@ -529,6 +531,7 @@ def showSeriesLinks(params = {}):
 
     seasons = []
 
+    sItemUrl = fixUrl(sItemUrl)
     oRequestHandler = cRequestHandler(sItemUrl)
     sHtmlContent = oRequestHandler.request()
 
@@ -663,6 +666,7 @@ def showHosters():# recherche et affiche les hotes
     sMainUrl = oInputParameterHandler.getValue('sMainUrl')
     sThumbnail = oInputParameterHandler.getValue('sThumbnail')
 
+    sUrl = fixUrl(sUrl)
     oRequestHandler = cRequestHandler(sUrl)
     oRequestHandler.addHeaderEntry('User-Agent','Mozilla/5.0 (Windows NT 6.1; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0')
     oRequestHandler.addHeaderEntry('Accept','text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8')
@@ -706,6 +710,7 @@ def showSeriesHosters():# recherche et affiche les hotes
     currentEpisode = oInputParameterHandler.getValue('currentEpisode')
     currentSeason = oInputParameterHandler.getValue('currentSeason')
 
+    sItemUrl = fixUrl(sItemUrl)
     oRequestHandler = cRequestHandler(sItemUrl)
     sHtmlContent = oRequestHandler.request()
 
@@ -838,6 +843,7 @@ def showStreamingHosters():# recherche et affiche les hotes
     sMovieTitle = oInputParameterHandler.getValue('sMovieTitle')
     sThumb = oInputParameterHandler.getValue('sThumb')
 
+    sUrl = fixUrl(sUrl)
     oRequestHandler = cRequestHandler(sUrl)
     sHtmlContent = oRequestHandler.request()
     oParser = cParser()
@@ -1025,6 +1031,7 @@ def getNextEpisode(title, sQual, nextSeason = False):
                 if qualAndLang:
                     VSlog("Quality and Language OK")
 
+                    sUrl = fixUrl(sUrl)
                     oRequestHandler = cRequestHandler(sUrl)
                     sHtmlContent = oRequestHandler.request()
 
@@ -1470,3 +1477,7 @@ def sortSeasonsAndGetCurrentSeason(seasons):
                 seasons[ind], seasons[i] = seasons[i], seasons[ind]
                 ind += 1
     return seasons, currentSeason, currentEpisode
+
+def fixUrl(url):
+    url = url.replace("://","")
+    return URL_MAIN + url[url.find("/")+1:]
