@@ -255,6 +255,7 @@ class cPlayer(xbmc.Player):
             #     self.oConfig.log("__setResume ERROR: " + e.message)
             if self.sType != 'livetv':
                 try:
+                    self.db.del_history(self.sTitle)
                     self.__setHistory()
                 except Exception, e:
                     self.oConfig.log("__setHistory ERROR: " + e.message)

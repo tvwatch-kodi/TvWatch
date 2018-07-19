@@ -355,9 +355,11 @@ def showMovies(sSearch = ''):
             bGlobal_Search = True
             sSearch=sSearch.replace(URL_SEARCH[0],'')
 
-        query_args = ( ( 'do' , 'search' ) , ('subaction' , 'search' ) , ('story' , sSearch ), ('titleonly' , '3' ))
+        query_args = ( ( 'do' , 'search' ) , ('subaction' , 'search' ) , ('story' , sSearch ))
         data = urllib.urlencode(query_args)
-        request = urllib2.Request(URL_SEARCH[0] + data, None, headers)
+        sUrl = URL_SEARCH[0] + data
+        sUrl = sUrl.replace('http://','https://')
+        request = urllib2.Request(sUrl, None, headers)
         sPattern = '<div style="height:[0-9]{3}px;"> *<a href="([^"]+)" *><img class="[^"]+?" data-newsid="[^"]+?" src="([^<"]+)".+?<div class="[^"]+?" style="[^"]+?"> *<a href="[^"]+?" *> ([^<]+?)<'
 
     else:
