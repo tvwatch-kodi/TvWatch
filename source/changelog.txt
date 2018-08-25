@@ -4,7 +4,7 @@
 =============================================================================
 - Auteurs : Primatech
 =============================================================================
-- Current Version 2.0.7 - 19.7.2018
+- Current Version 2.0.8 - 25.8.2018
 =============================================================================
 - Version 1.0.0
 21-02-2018 -- @tvwatch-kodi -- First stable version
@@ -78,3 +78,6 @@
 14-07-2018 -- @tvwatch-kodi -- Fix server's URL 2
 - Version 2.0.7
 19-07-2018 -- @tvwatch-kodi -- Fix search module
+- Version 2.0.8
+25-08-2018 -- @tvwatch-kodi -- Fix DL protect
+25-08-2018 -- @tvwatch-kodi -- Prevent error when same user is playing

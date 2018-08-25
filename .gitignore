@@ -33,6 +33,7 @@
 *.app
 
 #ignore files
+tvwatch.txt
 
 #ignore folders
 private/

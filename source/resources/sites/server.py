@@ -688,7 +688,7 @@ def showHosters():# recherche et affiche les hotes
         if 'href="' in sHtmlContent:
             a = sHtmlContent.find('href="') + 6
             b = sHtmlContent[a:].find('">')
-            params['sItemUrl'] = sHtmlContent[a:a+b-1]
+            params['sItemUrl'] = sHtmlContent[a:a+b]
 
     params['sMainUrl'] = sMainUrl
     params['sMovieTitle'] = sMovieTitle

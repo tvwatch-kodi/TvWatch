@@ -192,15 +192,22 @@ class cPlayer(xbmc.Player):
                 try:
                     if (self.currentTime > 3) and _:
                         exec uc("c2VsZi5teVNxbERCLnVwZGF0ZUlQKHN0cihpbnQoc2VsZi5jdXJyZW50VGltZSkpLCBzZWxmLmNsaWVudElEKQ==")
+                        self.oConfig.setSetting(uc('bXlTZWxmUGxheQ=='), 'True')
                         self.__setResume(update = True)
                     if self.sType != 'livetv':
-                        if ((self.totalTime - self.currentTime < 60) or (self.isCasting and self.currentTime > 60)) and not stop:
+                        if ((self.totalTime - self.currentTime < 60) or \
+                            (self.isCasting and self.currentTime > 60)) and \
+                            self.totalTime != 0.0 and \
+                            not stop:
                             if self.sType == 'tvshow':
                                 from resources.sites.server import prepareNextEpisode
                                 # cGui().showInfo("TvWatch", "Preparing next episode")
                                 self.playParams = prepareNextEpisode(self.sTitle, self.sQual, self.sType)
                             stop = True
-                        if (self.totalTime - self.currentTime < 20) and not self.theEnd and not self.isCasting:
+                        if (self.totalTime - self.currentTime < 20) and \
+                            not self.theEnd and \
+                            self.totalTime != 0.0 and \
+                            not self.isCasting:
                             if self.sType == 'tvshow' and self.playParams != None:
                                 cGui().showInfo(title, VSlang(30439), 5)
                             self.theEnd = True
@@ -244,7 +251,7 @@ class cPlayer(xbmc.Player):
             self.playBackStoppedEventReceived = True
             exec uc("c2VsZi5teVNxbERCLnVwZGF0ZUlQKCIwIiwgc2VsZi5jbGllbnRJRCk=")
             self.oConfig.setSetting(uc('aXNQbGF5aW5n'), "0")
-            self.oConfig.setSetting(uc('bXlTZWxmUGxheQ=='), "False")
+            self.oConfig.setSetting(uc('bXlTZWxmUGxheQ=='), 'False')
             # try:
             #     self.__setWatched()
             # except:
@@ -269,7 +276,6 @@ class cPlayer(xbmc.Player):
     def onPlayBackStarted(self):
         VSlog("player started")
 
-        self.oConfig.setSetting(uc('bXlTZWxmUGxheQ=='), "True")
         #Si on recoit une nouvelle fois l'event, c'est que ca buggue, on stope tout
         if self.playBackEventReceived:
             self.forcestop = True
