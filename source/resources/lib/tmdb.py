@@ -534,6 +534,13 @@ class cTMDb:
                 # meta['trailer'] = ''
         meta = self._format(meta, name)
 
+        try:
+            if meta['duration'] == '':
+                meta['duration'] = '0'
+            meta['duration'] = str(int(meta['duration']) * 60)
+        except:
+            pass
+
         return meta
 
     def getUrl(self, url, page=1, term= ''):

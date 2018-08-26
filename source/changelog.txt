@@ -4,7 +4,7 @@
 =============================================================================
 - Auteurs : Primatech
 =============================================================================
-- Current Version 2.0.8 - 25.8.2018
+- Current Version 2.0.9 - 26.8.2018
 =============================================================================
 - Version 1.0.0
 21-02-2018 -- @tvwatch-kodi -- First stable version
@@ -81,3 +81,7 @@
 - Version 2.0.8
 25-08-2018 -- @tvwatch-kodi -- Fix DL protect
 25-08-2018 -- @tvwatch-kodi -- Prevent error when same user is playing
+- Version 2.0.9
+26-08-2018 -- @tvwatch-kodi -- Fix display of item duration
+26-08-2018 -- @tvwatch-kodi -- Enhance logs
+26-08-2018 -- @tvwatch-kodi -- Fix bug due to cast to int

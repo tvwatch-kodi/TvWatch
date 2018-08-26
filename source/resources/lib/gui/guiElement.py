@@ -634,8 +634,8 @@ class cGuiElement:
             if self.__aItemValues['genre']:
                 additionalInfos = "[B]Rating : [/B]" + str(self.__aItemValues['rating']) + "\n"
                 additionalInfos += "[B]Year : [/B]" + str(self.__aItemValues['year']) + "\n"
-                additionalInfos += "[B]Duration : [/B]" + str(self.__aItemValues['duration']) + " min\n"
-                additionalInfos += "[B]Genre : [/B]" + self.__aItemValues['genre'] + "\n"
+                additionalInfos += "[B]Duration : [/B]" + self.formatDuration(str(self.__aItemValues['duration'])) + "\n"
+                additionalInfos += "[B]Genre : [/B]" + self.__aItemValues['genre'] + "\n\n"
                 self.__aItemValues['plot'] = additionalInfos + self.__aItemValues['plot']
         return self.__aItemValues
 
@@ -650,3 +650,19 @@ class cGuiElement:
 
     def getContextItems(self):
         return self.__aContextElements
+
+    def formatDuration(self, duration):
+        res = ""
+        try:
+            duration = int(duration)
+            from datetime import timedelta
+            td = timedelta(seconds=duration)
+            days = td.days
+            hours = td.seconds//3600
+            minutes = (td.seconds//60)%60
+            res = "%dh %dm" % (hours, minutes)
+            if days != 0:
+                res = str(days)+"days " + res
+        except:
+            res = "0h 0m"
+        return res

@@ -514,7 +514,7 @@ def showMoviesLinks(params = {}):
     oGui.setEndOfDirectory(50)
 
 def showSeriesLinks(params = {}):
-
+    VSlog('showSeriesLinks')
     oGui = cGui()
     oInputParameterHandler = cInputParameterHandler()
     sMovieTitle = oInputParameterHandler.getValue('sMovieTitle')
@@ -528,8 +528,8 @@ def showSeriesLinks(params = {}):
 
     sItemUrl = sMainUrl
 
-    sMovieTitle = sMovieTitle.replace('[COMPLETE]','')
-    sMovieTitle = sMovieTitle.rstrip()
+    sMovieTitle = sMovieTitle.replace('[COMPLETE]','').strip()
+    sMovieTitle = sMovieTitle.replace('COMPLETE','').strip()
 
     seasons = []
 
@@ -565,7 +565,7 @@ def showSeriesLinks(params = {}):
     meta['season'] = '0'
     if 'Saison ' in sMovieTitle:
         try:
-            meta['season'] = sMovieTitle[sMovieTitle.find('Saison ')+7:]
+            meta['season'] = sMovieTitle[sMovieTitle.find('Saison ')+7:].replace('COMPLETE','').strip()
             nb = int(meta['season'])
         except:
             meta['season'] = '0'
@@ -593,7 +593,10 @@ def showSeriesLinks(params = {}):
             meta['sDisplayTitle'] = sDisplayTitle
             meta['season'] = '0'
             if 'Saison ' in sMovieTitle:
-                meta['season'] = sMovieTitle[sMovieTitle.find('Saison ')+7:]
+                try:
+                    meta['season'] = sMovieTitle[sMovieTitle.find('Saison ')+7:].replace('COMPLETE','').strip()
+                except:
+                    meta['season'] = '0'
             seasons.append(meta)
 
     #on regarde si dispo d'autres saisons
@@ -626,7 +629,10 @@ def showSeriesLinks(params = {}):
             meta['sDisplayTitle'] = sTitle
             meta['season'] = '0'
             if 'Saison ' in sMovieTitle:
-                meta['season'] = sMovieTitle[sMovieTitle.find('Saison ')+7:]
+                try:
+                    meta['season'] = sMovieTitle[sMovieTitle.find('Saison ')+7:].replace('COMPLETE','').strip()
+                except:
+                    meta['season'] = '0'
             seasons.append(meta)
         cConfig().finishDialog(dialog)
 
@@ -763,7 +769,8 @@ def showSeriesHosters():# recherche et affiche les hotes
 
                 # if sName != '' and sName.find('pisode') != -1:
                 sTitle = sMovieTitle + ' ' + sName
-                sTitle = sTitle.replace('[COMPLETE] ','')
+                sTitle = sTitle.replace('[COMPLETE]','').strip()
+                sTitle = sTitle.replace('COMPLETE','').strip()
                 sDisplayTitle = sTitle
                 URL_DECRYPT = aEntry[1]
 
@@ -1071,7 +1078,8 @@ def getNextEpisode(title, sQual, nextSeason = False):
 
                                 if sName != '' and sName.find('pisode') != -1:
                                     sTitle = sMovieTitle + ' ' + sName
-                                    sTitle = sTitle.replace('[COMPLETE] ','')
+                                    sTitle = sTitle.replace('[COMPLETE]','').strip()
+                                    sTitle = sTitle.replace('COMPLETE','').strip()
                                     sDisplayTitle = sTitle
                                     URL_DECRYPT = aEntry[1]
 

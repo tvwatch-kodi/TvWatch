@@ -124,6 +124,11 @@ class cPlayer(xbmc.Player):
         player_conf = self.oConfig.getSetting("playerPlay")
         player_conf = '0'
 
+        VSlog('Run player. Version: ' + self.oConfig.getAddonVersion())
+        VSlog('Title: ' + self.sTitle)
+        VSlog('Item URL: ' + self.sItemUrl)
+        VSlog('Main URL: ' + self.mainUrl)
+
         #Si lien dash, methode prioritaire
         if playParams['sUrlToPlay'].endswith('.mpd'):
             if isKrypton() == True:

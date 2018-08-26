@@ -490,7 +490,7 @@
 					<aligny>center</aligny>
 					<textcolor>white</textcolor>
 				</control>
-                <control type="label" id="1">
+        <control type="label" id="1">
 					<description>header label</description>
 					<right>30</right>
 					<top>10</top>
@@ -502,7 +502,7 @@
 					<aligny>center</aligny>
 					<textcolor>white</textcolor>
 					<shadowcolor>black</shadowcolor>
-                    <visible>!IsEmpty(Window(Home).Property(ListItem.Duration))</visible>
+          <visible>!IsEmpty(Window(Home).Property(ListItem.Duration))</visible>
 				</control>
 			</control>
 
