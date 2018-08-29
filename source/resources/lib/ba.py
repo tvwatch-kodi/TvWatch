@@ -3,6 +3,7 @@
 from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.player import cPlayer
+from resources.lib.util import VSlog,VSlang,VSshowInfo
 import re, urllib2
 
 try:    import json
@@ -54,8 +55,8 @@ class cShowBA:
                 oPlayer.startPlayer()
 
             except Exception, e:
-                util.VSshowInfo('TvWatch',util.VSlang(30204))
-                util.VSlog("SearchBA ERROR " + e.message)
+                VSshowInfo('TvWatch',VSlang(30204))
+                VSlog("SearchBA ERROR " + e.message)
                 return
             return
 
