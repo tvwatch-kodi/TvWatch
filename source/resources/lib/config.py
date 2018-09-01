@@ -5,6 +5,7 @@ import xbmcplugin
 import xbmcgui
 import xbmcaddon
 import unicodedata
+import requests
 
 DIALOG2 = None
 
@@ -322,6 +323,15 @@ class cConfig():
 
         xbmcgui.Dialog().notification(str(sTitle), str(sDescription),self.__sIcon,iSeconds,sound)
         #xbmc.executebuiltin("Notification(%s,%s,%s,%s)" % (str(sTitle), (str(sDescription)), iSeconds, self.__sIcon))
+
+    def testUrl(self, url):
+        code = 0
+        try:
+            res = requests.get(url, timeout = 1)
+            code = res.status_code
+        except Exception, e:
+            self.log("ERROR " + str(e.message))
+        return (code == 200)
 
     def update(self):
         xbmc.executebuiltin("Container.Refresh")

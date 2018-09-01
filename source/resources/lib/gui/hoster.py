@@ -93,6 +93,7 @@ class cHosterGui:
         sThumbnail = oInputParameterHandler.getValue('sThumbnail')
         sQual = ''
         sMainUrl = ''
+        sType = ''
 
         if params != {}:
             sHosterIdentifier = params['sHosterIdentifier']
@@ -103,6 +104,7 @@ class cHosterGui:
             sTitle = params['title']
             sThumbnail = params['sThumbnail']
             sQual = params['sQual']
+            sType = params['sType']
 
         if not sTitle:
             sTitle = sFileName
@@ -127,9 +129,15 @@ class cHosterGui:
                 oGuiElement.setSiteName(self.SITE_NAME)
                 oGuiElement.setMediaUrl(aLink[1])
                 oGuiElement.setTitle(sTitle)
+                oGuiElement.setFileName(sTitle)
                 oGuiElement.setThumbnail(sThumbnail)
                 #oGuiElement.setTitle(oHoster.getFileName())
-                oGuiElement.getInfoLabel()
+                if sType == 'tvshow':
+                    oGuiElement.setMeta(2)
+                else:
+                    oGuiElement.setMeta(1)
+                oGuiElement.getMetadonne()
+                # oGuiElement.getInfoLabel()
 
                 oPlayer = cPlayer()
 
@@ -146,6 +154,9 @@ class cHosterGui:
                 playParams['sQual'] = sQual
                 playParams['sThumbnail'] = sThumbnail
                 playParams['tv'] = 'False'
+
+                if not cConfig().testUrl(sThumbnail):
+                    playParams['sThumbnail'] = oGuiElement.getThumbnail()
 
                 return oPlayer.run(playParams)
             else:

@@ -2,6 +2,7 @@
 #Primatech.
 from resources.lib.config import cConfig
 from resources.lib.db import cDb
+from resources.lib.util import VSlog
 
 import os, re, urllib, string, xbmc
 
@@ -159,6 +160,7 @@ class cGuiElement:
         return self.__sSiteName
 
     def setFileName(self, sFileName):
+        self.__sCleanTitle = sFileName
         self.__sFileName = self.str_conv(sFileName)
 
     def getFileName(self):
@@ -431,7 +433,7 @@ class cGuiElement:
 
 
     def setWatched(self, sId, sTitle):
-        cConfig().log("setWatched")
+        VSlog("setWatched")
         try:
             watched = {}
             #sTitle = self.getTitle()
@@ -474,8 +476,9 @@ class cGuiElement:
         data=data.replace('-','').replace('Saison','').replace('saison','').replace('Season','').replace('Episode','').replace('episode','')
         data = re.sub('[^%s]' % string.ascii_lowercase, ' ', data.lower())
         #data = urllib.quote_plus(data)
-
         #data = data.decode('string-escape')
+        while ("  " in data):
+            data = data.replace("  ", " ")
         return data
 
     def getInfoLabel(self):
@@ -529,7 +532,11 @@ class cGuiElement:
             from resources.lib.tmdb import cTMDb
             # grab = cTMDb(api_key=cConfig().getSetting('api_tmdb'))
             # grab = cTMDb()
-            args = (sType, self.__sFileName)
+            if ":" in self.__sCleanTitle:
+                a = self.__sCleanTitle.find(':')
+                self.__sCleanTitle = self.__sCleanTitle[:a]
+            self.__sCleanTitle = self.str_conv(self.__sCleanTitle)
+            args = (sType, self.__sCleanTitle)
             kwargs = {}
             if (self.__ImdbId):
                 kwargs['imdb_id'] = self.__ImdbId

@@ -32,6 +32,8 @@ SITE_DESC = 'Fichier en DDL, HD'
 URL_MAIN = 'http://zone-telechargement1.ws/'
 URL_DECRYPT =  ''
 
+URL_IMAGE = 'http://www.zone-image.com/'
+
 URL_SEARCH = (URL_MAIN + 'index.php?', 'showMovies')
 URL_SEARCH_MOVIES = (URL_MAIN + 'index.php?', 'showMovies')
 URL_SEARCH_SERIES = (URL_MAIN  + 'index.php?', 'showMovies')
@@ -75,12 +77,14 @@ def load():
     oGui.addDir(SITE_IDENTIFIER, 'continueToWatch', '[B][COLOR khaki]' + VSlang(30424) + '[/COLOR][/B]', 'mark.png', oOutputParameterHandler) # Continuer à regarder
 
     oOutputParameterHandler = cOutputParameterHandler()
-    oOutputParameterHandler.addParameter('mode', '1')
-    oGui.addDir(SITE_IDENTIFIER, 'showTvGroup', VSlang(30469), 'replay.png', oOutputParameterHandler) # Films
+    LiveTV = '1'
+    oOutputParameterHandler.addParameter('mode', LiveTV)
+    oGui.addDir(SITE_IDENTIFIER, 'showTvGroup', VSlang(30469), 'replay.png', oOutputParameterHandler) # LiveTV
 
     oOutputParameterHandler = cOutputParameterHandler()
-    oOutputParameterHandler.addParameter('mode', '2')
-    oGui.addDir(SITE_IDENTIFIER, 'showTvGroup', VSlang(30471), 'replay.png', oOutputParameterHandler) # Films
+    SportsTV = '2'
+    oOutputParameterHandler.addParameter('mode', SportsTV)
+    oGui.addDir(SITE_IDENTIFIER, 'showTvGroup', VSlang(30471), 'replay.png', oOutputParameterHandler) # SportsTV
 
     oOutputParameterHandler = cOutputParameterHandler()
     oGui.addDir(SITE_IDENTIFIER, 'showFilms', VSlang(30120), 'films.png', oOutputParameterHandler) # Films
@@ -183,7 +187,7 @@ def showChannels():
         oOutputParameterHandler.addParameter('mode', str(mode))
 
         url += tv.generateToken().replace('eMeeea/1.0.0.','')
-        if tv.testUrl(url):
+        if cConfig().testUrl(url):
             oGui.addTV(SITE_IDENTIFIER, 'playChannel', i['channel_title'], '', icon, '', oOutputParameterHandler)
             endOfDir = True
     cFtpManager().sendDb()
@@ -214,7 +218,7 @@ def showBeinFR():
             oOutputParameterHandler.addParameter('mode', str(mode))
 
             url += tv.generateToken().replace('eMeeea/1.0.0.','')
-            if tv.testUrl(url):
+            if cConfig().testUrl(url):
                 oGui.addTV(SITE_IDENTIFIER, 'playChannel', i['channel_title'], '', icon, '', oOutputParameterHandler)
                 endOfDir = True
     if endOfDir:
@@ -404,7 +408,11 @@ def showMovies(sSearch = ''):
             if 'http' in aEntry[1]:
                 sThumbnail = aEntry[1]
             else:
-                sThumbnail = URL_MAIN+aEntry[1]
+                sThumbnail = URL_IMAGE+aEntry[1]
+
+            sIcon = ''
+            if not cConfig().testUrl(sThumbnail):
+                sIcon = 'none.png'
 
             oOutputParameterHandler = cOutputParameterHandler()
             oOutputParameterHandler.addParameter('sMainUrl', str(sUrl2))
@@ -412,15 +420,15 @@ def showMovies(sSearch = ''):
             oOutputParameterHandler.addParameter('sThumbnail', sThumbnail)
 
             # Peut ne plus fonctionner !! (Fonctionne au 04/02/2018)
-            sThumbnail = sThumbnail.replace("zone-telechargement.ws","zone-telechargement1.com")
-            sThumbnail = sThumbnail.replace("https://ww1.zone-telechargement","https://www.zone-telechargement")
+            # sThumbnail = sThumbnail.replace("zone-telechargement.ws","zone-telechargement1.com")
+            # sThumbnail = sThumbnail.replace("https://ww1.zone-telechargement","https://www.zone-telechargement")
 
             sDisplayTitle = sTitle
 
             if 'films-gratuit' in sUrl2 or '4k' in sUrl2:
-                oGui.addMovie(SITE_IDENTIFIER, 'showMoviesLinks', sDisplayTitle, '', sThumbnail, '', oOutputParameterHandler)
+                oGui.addMovie(SITE_IDENTIFIER, 'showMoviesLinks', sDisplayTitle, sIcon, sThumbnail, '', oOutputParameterHandler)
             elif movie != "True":
-                oGui.addTV(SITE_IDENTIFIER, 'showSeriesLinks', sDisplayTitle, '', sThumbnail, '', oOutputParameterHandler)
+                oGui.addTV(SITE_IDENTIFIER, 'showSeriesLinks', sDisplayTitle, sIcon, sThumbnail, '', oOutputParameterHandler)
 
         cConfig().finishDialog(dialog)
         sNextPage = __checkForNextPage(sHtmlContent)
@@ -446,7 +454,6 @@ def __checkForNextPage(sHtmlContent):
 def showMoviesLinks(params = {}):
     VSlog('showMoviesLinks')
 
-    oGui = cGui()
     oInputParameterHandler = cInputParameterHandler()
     sMovieTitle = oInputParameterHandler.getValue('sMovieTitle')
     sThumbnail = oInputParameterHandler.getValue('sThumbnail')
@@ -463,9 +470,13 @@ def showMoviesLinks(params = {}):
     oRequestHandler = cRequestHandler(sItemUrl)
     sHtmlContent = oRequestHandler.request()
 
+    if sHtmlContent == '':
+        showMovies(sMovieTitle)
+
     oParser = cParser()
 
     #Affichage du menu
+    oGui = cGui()
     oGui.addText(SITE_IDENTIFIER,'[COLOR khaki]' + VSlang(30443) + '[/COLOR]')
 
     #on recherche d'abord la qualité courante
@@ -951,6 +962,7 @@ def Display_protected_link(params = {}, playNow = True):
                 playParams['sThumbnail'] = sThumbnail
                 playParams['sQual'] = sQual
                 playParams['refresh'] = refresh
+                playParams['sType'] = sType
 
                 if playNow:
                     oHosterGui.play(playParams)

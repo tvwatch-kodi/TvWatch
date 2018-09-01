@@ -99,28 +99,6 @@ class cTvHandler:
         response.close()
         return result['LIVETV']
 
-    def testUrl(self, url):
-        # oDb = cDb()
-        # if not force:
-        #     match = oDb.get_valideFromUrl(url)
-        #     if match != None:
-        #         if match[2] == '1':
-        #             return True
-        #         elif match[2] == '0':
-        #             return False
-        code = 0
-        try:
-            res = requests.get(url, timeout = 1)
-            code = res.status_code
-        except Exception, e:
-            VSlog("ERROR " + str(e.message))
-        if code == 200:
-            # oDb.insert_valide(url, '1')
-            return True
-        # else:
-            # oDb.insert_valide(url, '0')
-        return False
-
     #bug python
     def __strptime(self, date, format):
         try:

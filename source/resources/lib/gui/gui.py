@@ -10,6 +10,7 @@ from resources.lib.handler.inputParameterHandler import cInputParameterHandler
 from resources.lib.handler.pluginHandler import cPluginHandler
 from resources.lib.parser import cParser
 from resources.lib import util
+from resources.lib.util import VSlog
 
 import xbmc,sys
 import xbmcgui
@@ -62,8 +63,11 @@ class cGui():
         oGuiElement.setFunction(sFunction)
         oGuiElement.setTitle(sLabel)
         oGuiElement.setIcon(sIcon)
+        if sIcon == 'none.png':
+            sThumbnail = oGuiElement.getIcon()
+        else:
+            oGuiElement.setPoster(sThumbnail)
         oGuiElement.setThumbnail(sThumbnail)
-        oGuiElement.setPoster(sThumbnail)
         oGuiElement.setMeta(1)
         oGuiElement.setDescription(sDesc)
         oGuiElement.setMovieFanart()
@@ -76,7 +80,6 @@ class cGui():
 
         self.addFolder(oGuiElement, oOutputParameterHandler, continueToWatchFolder = continueToWatchFolder, _isFolder=isFolder)
 
-
     def addTV(self, sId, sFunction, sLabel, sIcon, sThumbnail, sDesc, oOutputParameterHandler = '', meta = False, continueToWatchFolder = False, isFolder=True):
         cGui.CONTENT = "tvshows"
         oGuiElement = cGuiElement()
@@ -84,8 +87,11 @@ class cGui():
         oGuiElement.setFunction(sFunction)
         oGuiElement.setTitle(sLabel)
         oGuiElement.setIcon(sIcon)
+        if sIcon == 'none.png':
+            sThumbnail = oGuiElement.getIcon()
+        else:
+            oGuiElement.setPoster(sThumbnail)
         oGuiElement.setThumbnail(sThumbnail)
-        oGuiElement.setPoster(sThumbnail)
         oGuiElement.setMeta(2)
         oGuiElement.setDescription(sDesc)
         oGuiElement.setTvFanart()
@@ -97,8 +103,8 @@ class cGui():
             # oGuiElement.addItemValues('Season', sSeason)
 
         # if oOutputParameterHandler.getValue('episode'):
-            # sSeason = oOutputParameterHandler.getValue('episode')
-            # oGuiElement.addItemValues('Episode', sSeason)
+            # sEpisode = oOutputParameterHandler.getValue('episode')
+            # oGuiElement.addItemValues('Episode', sEpisode)
 
         if oOutputParameterHandler.getValue('sMovieTitle'):
             sTitle = oOutputParameterHandler.getValue('sMovieTitle')
@@ -198,7 +204,6 @@ class cGui():
         oGuiElement.setMeta(0)
 
         oOutputParameterHandler = cOutputParameterHandler()
-
         self.addFolder(oGuiElement, oOutputParameterHandler)
 
     #non utiliser depuis le 22/04
@@ -272,7 +277,7 @@ class cGui():
             oListItem.addStreamInfo('video', { 'aspect': '1.50', 'width':1280 ,'height' : 720 })
         elif '2160'in oGuiElement.getTitle():
             oListItem.addStreamInfo('video', { 'aspect': '1.78', 'width':3840 ,'height' : 2160 })
-        #oListItem.addStreamInfo('audio', {'language': 'fr'})
+        # oListItem.addStreamInfo('audio', {'language': 'fr'})
 
         # if oGuiElement.getMeta():
         #oOutputParameterHandler.addParameter('sMeta', oGuiElement.getMeta())
@@ -495,7 +500,7 @@ class cGui():
         return oListItem
 
     def __ContextMenuPlay(self, oGuiElement, oListItem):
-        cConfig.log('__ContextMenuPlay')
+        VSlog('__ContextMenuPlay')
         sPluginPath = cPluginHandler().getPluginPath();
         aContextMenus = []
 

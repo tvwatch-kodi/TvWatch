@@ -3,6 +3,7 @@
 #Modif pour TvWatch
 
 from resources.lib.config import cConfig
+from resources.lib.util import VSlog
 
 import json, os, copy
 from urllib import quote_plus, urlopen, urlencode
@@ -10,14 +11,14 @@ import xbmc
 
 try:
     from sqlite3 import dbapi2 as sqlite
-    cConfig().log('SQLITE 3 as DB engine')
+    VSlog('SQLITE 3 as DB engine')
 except:
     from pysqlite2 import dbapi2 as sqlite
-    cConfig().log('SQLITE 2 as DB engine')
+    VSlog('SQLITE 2 as DB engine')
 
 
 # https://developers.themoviedb.org/3
-#cConfig().log(str(year), cConfig().logNOTICE)
+#VSlog(str(year), cConfig().logNOTICE)
 
 class cTMDb:
     URL = "http://api.themoviedb.org/3/"
@@ -39,14 +40,14 @@ class cTMDb:
                 self.dbcur = self.db.cursor()
                 self.__createdb()
         except Exception, e.message:
-            cConfig().log("cTMDb constructor ERROR: " + e.message)
+            VSlog("cTMDb constructor ERROR: " + e.message)
 
         try:
             self.db = sqlite.connect(self.cache)
             self.db.row_factory = sqlite.Row
             self.dbcur = self.db.cursor()
         except Exception, e.message:
-            cConfig().log("cTMDb constructor ERROR: " + e.message)
+            VSlog("cTMDb constructor ERROR: " + e.message)
 
     def __del__(self):
         ''' Cleanup db when object destroyed '''
@@ -54,7 +55,7 @@ class cTMDb:
             self.dbcur.close()
             self.db.close()
         except Exception, e:
-            cConfig().log('cTMDb ERROR in Destructor: ' + e.message)
+            VSlog('cTMDb ERROR in Destructor: ' + e.message)
 
     def __createdb(self):
 
@@ -85,7 +86,7 @@ class cTMDb:
         try:
             self.dbcur.execute(sql_create)
         except:
-            cConfig().log("non")
+            pass
 
         sql_create = "CREATE TABLE IF NOT EXISTS tvshow ("\
                            "imdb_id TEXT, "\
@@ -144,7 +145,7 @@ class cTMDb:
                            ");"
 
         self.dbcur.execute(sql_create)
-        cConfig().log("table creer")
+        VSlog("table creer")
 
     #cherche dans les films ou serie l'id par le nom return ID ou FALSE
     def get_idbyname(self, name, year='', type='movie', page=1):
@@ -321,7 +322,7 @@ class cTMDb:
             _meta['tagline'] = meta['tagline']
 
         # if 'cast' in meta:
-            # cConfig().log("passeeeeeeeeeeeeeeeeeee")
+            # VSlog("passeeeeeeeeeeeeeeeeeee")
             # _meta['cast'] = json.loads(_meta['cast'])
         if 'credits' in meta:
             meta['credits'] = eval(str(meta['credits']))
@@ -390,18 +391,18 @@ class cTMDb:
             self.dbcur.execute(sql_select)
             matchedrow = self.dbcur.fetchone()
         except Exception, e:
-            cConfig().log('************* Error selecting from cache db: %s' % e.message)
+            VSlog('************* Error selecting from cache db: %s' % e.message)
             return None
 
         if matchedrow:
-            cConfig().log('Found meta information by name in cache table')
+            VSlog('Found meta information by name in cache table')
             return dict(matchedrow)
         else:
-            cConfig().log('No match in local DB')
+            VSlog('No match in local DB')
             return None
 
     def _cache_save(self, meta, name, media_type, season, overlay):
-        cConfig().log('_cache_save')
+        VSlog('_cache_save')
         #metadb = copy.copy(meta)
         meta['title'] = name
 
@@ -453,26 +454,26 @@ class cTMDb:
             sql = "INSERT INTO %s (imdb_id, tmdb_id, title, year, credits, vote_average, vote_count, runtime, overview, mpaa, premiered, genre, studio, status, poster_path, trailer, backdrop_path, playcount) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)" % media_type
             self.dbcur.execute(sql, (meta['imdb_id'], meta['id'], meta['title'], meta['year'], meta['credits'], meta['vote_average'], meta['vote_count'], meta['runtime'], meta['overview'], meta['mpaa'], meta['premiered'], meta['genre'], meta['studio'], meta['status'], meta['poster_path'], meta['trailer'], meta['backdrop_path'], 6))
             self.db.commit()
-            cConfig().log('SQL INSERT meta film Successfully')
+            VSlog('SQL INSERT meta film Successfully')
         except Exception, e:
-            cConfig().log('SQL ERROR INSERT meta film: ' + e.message)
+            VSlog('SQL ERROR INSERT meta film: ' + e.message)
 
     def _cache_save_season(self, meta, season):
-        cConfig().log('_cache_save_season')
+        VSlog('_cache_save_season')
         for s in meta['seasons']:
             if  s['season_number'] != None and ("%02d" % int(s['season_number'])) == season:
                 meta['s_poster_path']= s['poster_path']
                 meta['s_premiered'] = s['air_date']
                 meta['s_year'] = s['air_date']
 
-            #cConfig().log(str(s['season_number'])+str(season))
+            #VSlog(str(s['season_number'])+str(season))
             try:
                 sql = "INSERT INTO season (imdb_id, tmdb_id, season, year, premiered, poster_path, playcount) VALUES (?, ?, ?, ?, ?, ?, ?)"
                 self.dbcur.execute(sql, (meta['imdb_id'], s['id'], s['season_number'], s['air_date'], s['air_date'], s['poster_path'], 6))
                 self.db.commit()
-                cConfig().log('SQL INSERT meta series Successfully')
+                VSlog('SQL INSERT meta series Successfully')
             except Exception, e:
-                cConfig().log('SQL ERROR INSERT meta series')
+                VSlog('SQL ERROR INSERT meta series')
 
     def get_meta(self, media_type, name, imdb_id='', tmdb_id='', year='', season='', episode='', overlay=6, update=False):
         '''
@@ -494,8 +495,7 @@ class cTMDb:
         Returns:
             DICT of meta data or None if cannot be found.
         '''
-
-        # cConfig().log('Attempting to retrieve meta data for %s: %s %s %s %s' % (media_type, name, year, imdb_id, tmdb_id))
+        # VSlog('Attempting to retrieve meta data for %s: name:%s year:%s imdb_id:%s tmdb_id:%s' % (media_type, name, year, imdb_id, tmdb_id))
         #recherche dans la base de donner
         if not update:
             meta = self._cache_search(media_type, self._clean_title(name), tmdb_id, year, season, episode)
@@ -557,7 +557,6 @@ class cTMDb:
 
     def _call(self, action, append_to_response):
         url = '%s%s?api_key=%s&%s&language=%s' % (self.URL, action, self.api_key, append_to_response, self.lang)
-        #cConfig().log(str(url), cConfig().logNOTICE)
         response = urlopen(url)
         data = json.loads(response.read())
         return data

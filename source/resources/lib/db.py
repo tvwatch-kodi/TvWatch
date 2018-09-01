@@ -475,7 +475,6 @@ class cDb:
             VSlog('SQL ERROR GET history: ' + str(e.message))
             return []
 
-
     def del_history(self, title):
         sRawtitle = title
         if 'Saison' in title:
