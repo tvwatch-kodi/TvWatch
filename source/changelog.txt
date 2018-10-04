@@ -4,7 +4,7 @@
 =============================================================================
 - Auteurs : Primatech
 =============================================================================
-- Current Version 2.0.11 - 2.9.2018
+- Current Version 2.0.12 - 4.10.2018
 =============================================================================
 - Version 1.0.0
 21-02-2018 -- @tvwatch-kodi -- First stable version
@@ -91,3 +91,5 @@
 02-09-2018 -- @tvwatch-kodi -- Fix missing covers
 02-09-2018 -- @tvwatch-kodi -- Fix old URL
 02-09-2018 -- @tvwatch-kodi -- Add meta data on continueToWatch URLs
+- Version 2.0.12
+04-10-2018 -- @tvwatch-kodi -- Fix loading timing

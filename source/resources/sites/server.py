@@ -411,8 +411,9 @@ def showMovies(sSearch = ''):
                 sThumbnail = URL_IMAGE+aEntry[1]
 
             sIcon = ''
-            if not cConfig().testUrl(sThumbnail):
-                sIcon = 'none.png'
+            if sSearch:
+                if not cConfig().testUrl(sThumbnail):
+                    sIcon = 'none.png'
 
             oOutputParameterHandler = cOutputParameterHandler()
             oOutputParameterHandler.addParameter('sMainUrl', str(sUrl2))
