@@ -784,3 +784,7 @@ msgstr "Chargement... "
 msgctxt "#30471"
 msgid "Sports TV "
 msgstr "Sports TV"
+
+msgctxt "#30472"
+msgid "NEXT >>> "
+msgstr "SUIVANT >>>"

@@ -1,11 +1,12 @@
 #-*- coding: utf-8 -*-
-
+#Primatech.
 #
 import urllib
 import urllib2
 
+from resources.lib.util import VSlang, VSlog
+
 from urllib2 import HTTPError, URLError
-from resources.lib.config import cConfig
 
 class cRequestHandler:
     REQUEST_TYPE_GET = 0
@@ -14,7 +15,7 @@ class cRequestHandler:
     def __init__(self, sUrl):
         self.__sUrl = sUrl
         self.__sRealUrl = ''
-        self.__cType = 0
+        self.__cType = self.REQUEST_TYPE_GET
         self.__aParamaters = {}
         self.__aParamatersLine = ''
         self.__aHeaderEntries = []
@@ -25,8 +26,7 @@ class cRequestHandler:
         self.__bRemoveNewLines = False
         self.__bRemoveBreakLines = False
         self.__sResponseHeader = ''
-
-        self.__HeaderReturn = ''
+        self.__enableSSL = True
 
     def removeNewLines(self, bRemoveNewLines):
         self.__bRemoveNewLines = bRemoveNewLines
@@ -39,6 +39,9 @@ class cRequestHandler:
 
     def setTimeout(self, valeur):
         self.__timeout = valeur
+
+    def enableSSL(self, valeur):
+        self.__enableSSL = valeur
 
     def addHeaderEntry(self, sHeaderKey, sHeaderValue):
         for sublist in self.__aHeaderEntries:
@@ -60,13 +63,9 @@ class cRequestHandler:
         self.addHeaderEntry('Content-Type', mpartdata[0] )
         self.addHeaderEntry('Content-Length', len(mpartdata[1]))
 
-    #Fonction la plus fiable
+    #Je sais plus si elle gere les doublons
     def getResponseHeader(self):
         return self.__sResponseHeader
-
-    #Ce n'est pas un doublon de getResponseHeader, si il y a des doublon, l'une des deux fonctions les zappe.
-    def GetHeaders(self):
-        return self.__HeaderReturn
 
     # url after redirects
     def getRealUrl(self):
@@ -128,7 +127,16 @@ class cRequestHandler:
 
         sContent = ''
         try:
-            oResponse = urllib2.urlopen(oRequest, timeout = self.__timeout)
+
+            if self.__enableSSL:
+                VSlog('USE SSL')
+                import ssl
+                # gcontext = ssl.SSLContext(ssl.PROTOCOL_TLS)
+                gcontext = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
+                oResponse = urllib2.urlopen(oRequest, timeout = self.__timeout,context=gcontext)
+            else:
+                oResponse = urllib2.urlopen(oRequest, timeout = self.__timeout)
+
             sContent = oResponse.read()
 
             self.__sResponseHeader = oResponse.info()
@@ -138,8 +146,9 @@ class cRequestHandler:
                 import zlib
                 sContent = zlib.decompress(sContent, zlib.MAX_WBITS|16)
 
+            #https://bugs.python.org/issue4773
             self.__sRealUrl = oResponse.geturl()
-            self.__HeaderReturn = oResponse.headers
+            self.__sResponseHeader = oResponse.info()
 
             oResponse.close()
 
@@ -152,14 +161,28 @@ class cRequestHandler:
 
                     cookies = self.GetCookies()
 
-                    print 'Page protegee par cloudflare'
+                    VSlog('Page protegee par cloudflare')
                     CF = cloudflare.CloudflareBypass()
+                    VSlog(self.__sUrl)
+                    VSlog(cookies)
+                    VSlog(sParameters)
+                    VSlog(oRequest.headers)
                     sContent = CF.GetHtml(self.__sUrl,e.read(),cookies,sParameters,oRequest.headers)
-                    self.__sRealUrl,self.__HeaderReturn = CF.GetReponseInfo()
+                    VSlog(sContent)
+                    self.__sRealUrl,self.__sResponseHeader = CF.GetReponseInfo()
+                    VSlog(self.__sRealUrl)
+                    VSlog(self.__sResponseHeader)
 
             if not sContent:
-                cConfig().log("%s (%d),%s" % (cConfig().getlanguage(30205), e.code , self.__sUrl))
+                VSlog("%s (%d),%s" % (VSlang(30205), e.code , self.__sUrl))
                 return ''
+
+        except urllib2.URLError, e:
+            if 'CERTIFICATE_VERIFY_FAILED' in str(e.reason) and self.__enableSSL == False:
+                self.__enableSSL = True
+                return self.__callRequest()
+            VSlog("%s (%s),%s" % (VSlang(30205), e.reason , self.__sUrl))
+            return ''
 
         if (self.__bRemoveNewLines == True):
             sContent = sContent.replace("\n","")

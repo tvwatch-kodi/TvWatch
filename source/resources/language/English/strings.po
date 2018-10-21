@@ -783,3 +783,7 @@ msgstr ""
 msgctxt "#30471"
 msgid "Sports TV "
 msgstr ""
+
+msgctxt "#30472"
+msgid "NEXT >>> "
+msgstr ""

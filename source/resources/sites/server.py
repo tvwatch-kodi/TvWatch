@@ -21,6 +21,7 @@ import urllib,re,urllib2
 import xbmcgui
 import xbmc
 import random
+import zlib
 
 UA = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:47.0) Gecko/20100101 Firefox/47.0'
 headers = { 'User-Agent' : UA }
@@ -29,7 +30,17 @@ SITE_IDENTIFIER = 'server'
 SITE_NAME = '[COLOR violet]TvWatch[/COLOR]'
 SITE_DESC = 'Fichier en DDL, HD'
 
-URL_MAIN = 'http://zone-telechargement1.ws/'
+URL_HOST = 'https://zone-telechargement1.org/'
+
+def GetURL_MAIN():
+    oRequestHandler = cRequestHandler(URL_HOST)
+    oRequestHandler.request()
+    URL = oRequestHandler.getRealUrl()
+    if not URL:
+        URL = URL_HOST
+    return URL
+
+URL_MAIN = GetURL_MAIN()
 URL_DECRYPT =  ''
 
 URL_IMAGE = 'http://www.zone-image.com/'
@@ -54,8 +65,8 @@ MOVIE_ANIME = (URL_MAIN + 'dessins-animes/', 'showMovies') # dessins animes
 SERIE_VFS = (URL_MAIN + 'series-vf/', 'showMovies') # serie VF
 SERIE_VOSTFRS = (URL_MAIN + 'series-vostfr/', 'showMovies') # serie VOSTFR
 
-ANIM_VFS = (URL_MAIN + 'animes-vf/', 'showMovies')
-ANIM_VOSTFRS = (URL_MAIN + 'animes-vostfr/', 'showMovies')
+ANIM_VFS = (URL_MAIN + 'animes-vf/', 'showMovies') # Anime VF
+ANIM_VOSTFRS = (URL_MAIN + 'animes-vostfr/', 'showMovies') # Anime VOSTFR
 
 DOC_NEWS = (URL_MAIN + 'documentaires-gratuit/', 'showMovies') # docs
 DOC_DOCS = ('http://', 'load')
@@ -353,6 +364,7 @@ def showMovies(sSearch = ''):
     bGlobal_Search = False
     view = 500
     movie = "False"
+    oParser = cParser()
 
     if sSearch:
         if URL_SEARCH[0] in sSearch:
@@ -360,11 +372,18 @@ def showMovies(sSearch = ''):
             sSearch=sSearch.replace(URL_SEARCH[0],'')
 
         query_args = ( ( 'do' , 'search' ) , ('subaction' , 'search' ) , ('story' , sSearch ))
+
+        #sPattern = '<div style="height:[0-9]{3}px;"> *<a href="([^"]+)" *><img class="[^"]+?" data-newsid="[^"]+?" src="([^<"]+)".+?<div class="[^"]+?" style="[^"]+?"> *<a href="[^"]+?" *> ([^<]+?)<'
+        sPattern = '<a href="(.+?)" *><img class="mainimg.+?src="(.+?)"(?:.|\s)+?<a href=".+?" *>(.+?)<'
+
         data = urllib.urlencode(query_args)
-        sUrl = URL_SEARCH[0] + data
-        sUrl = sUrl.replace('http://','https://')
-        request = urllib2.Request(sUrl, None, headers)
-        sPattern = '<div style="height:[0-9]{3}px;"> *<a href="([^"]+)" *><img class="[^"]+?" data-newsid="[^"]+?" src="([^<"]+)".+?<div class="[^"]+?" style="[^"]+?"> *<a href="[^"]+?" *> ([^<]+?)<'
+
+        oRequestHandler = cRequestHandler(URL_SEARCH[0])
+        # oRequestHandler.setRequestType(oRequestHandler.REQUEST_TYPE_POST)
+        oRequestHandler.addParametersLine(data)
+        oRequestHandler.addParameters('User-Agent', UA)
+        sHtmlContent = oRequestHandler.request()
+        sHtmlContent = oParser.abParse(sHtmlContent, 'de la recherche', 'Nous contacter')
 
     else:
         oInputParameterHandler = cInputParameterHandler()
@@ -374,17 +393,15 @@ def showMovies(sSearch = ''):
         except:
             pass
         sUrl = fixUrl(sUrl)
-        request = urllib2.Request(sUrl, None, headers)
-        sPattern = '<div style="height:[0-9]{3}px;"> *<a href="([^"]+)"><img class="[^"]+?" data-newsid="[^"]+?" src="([^<"]+)".+?<div class="[^"]+?" style="[^"]+?"> *<a href="[^"]+?"> ([^<]+?)<'
+        #request = urllib2.Request(sUrl, None, headers)
+        #sPattern = '<div style="height:[0-9]{3}px;"> *<a href="([^"]+)"><img class="[^"]+?" data-newsid="[^"]+?" src="([^<"]+)".+?<div class="[^"]+?" style="[^"]+?"> *<a href="[^"]+?"> ([^<]+?)<'
+        sPattern = '<div style="height:[0-9]{3}px;">\s*<a href="([^"]+)"><img class="[^"]+?" data-newsid="[^"]+?" src="([^<"]+)".+?<a href="[^"]+" *>([^<]+)<'
+        oRequestHandler = cRequestHandler(sUrl)
+        sHtmlContent = oRequestHandler.request()
 
-    reponse = urllib2.urlopen(request)
-    sHtmlContent = reponse.read()
-    reponse.close()
-
-    oParser = cParser()
     aResult = oParser.parse(sHtmlContent, sPattern)
 
-    # VSlog(aResult)
+    #VSlog(aResult)
     if (aResult[0] == False):
         oGui.addText(SITE_IDENTIFIER,'[COLOR khaki]' + VSlang(30438) + '[/COLOR]')
         view = 50
@@ -436,7 +453,7 @@ def showMovies(sSearch = ''):
         if (sNextPage != False):
             oOutputParameterHandler = cOutputParameterHandler()
             oOutputParameterHandler.addParameter('sItemUrl', sNextPage)
-            oGui.addNext(SITE_IDENTIFIER, 'showMovies', '[COLOR teal]Next >>>[/COLOR]', oOutputParameterHandler)
+            oGui.addNext(SITE_IDENTIFIER, 'showMovies', '[COLOR white]'+VSlang(30472)+'[/COLOR]', oOutputParameterHandler)
 
     oGui.setEndOfDirectory(view)
 
@@ -1268,81 +1285,53 @@ def CutPremiumlinks(sHtmlContent):
 def DecryptDlProtecte(url):
     VSlog('DecryptDlProtecte : ' + url)
 
+    url = url.replace('https', 'http')
+
     if not (url):
         return ''
+    #VSlog(url)
 
     #url=url.replace('https','http')
 
-    headersBase = {
-    'User-Agent' : 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:53.0) Gecko/20100101 Firefox/53.0',
-    'Referer' : url ,
-    #'Origin' : 'https://www.dl-protecte.com',
-    'Accept' : 'application/json, text/javascript, */*; q=0.01',
-    'Accept-Language': 'fr-FR,fr;q=0.8,en-US;q=0.6,en;q=0.4',
-    #'Pragma' : '',
-    #'Accept-Charset' : ''
-    }
+    #headersBase = {
+    #'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:53.0) Gecko/20100101 Firefox/53.0',
+    #'Referer': url,
+    #'Origin': 'https://www.dl-protecte.com',
+    #'Accept': 'application/json, text/javascript, */*; q=0.01',
+    #'Accept-Language': 'fr-FR,fr;q=0.8,en-US;q=0.6,en;q=0.4',
+    #'Pragma': '',
+    #'Accept-Charset': ''
+    #}
 
     #url2 = 'https://www.dl-protecte.org/php/Qaptcha.jquery.php'
     #url2 = 'https://www.protect-zt.com/php/Qaptcha.jquery.php'
-    url2 = 'https://' + url.split('/')[2] + '/php/Qaptcha.jquery.php'
+    #url2 = 'https://' + url.split('/')[2] + '/php/Qaptcha.jquery.php'
+
+    #VSlog(url2)
 
     #Make random key
-    s = "azertyupqsdfghjkmwxcvbn23456789AZERTYUPQSDFGHJKMWXCVBN_-#@";
-    RandomKey = ''.join(random.choice(s) for i in range(32))
+    #s = "azertyupqsdfghjkmwxcvbn23456789AZERTYUPQSDFGHJKMWXCVBN_-#@";
+    #RandomKey = ''.join(random.choice(s) for i in range(32))
 
-    query_args = ( ( 'action' , 'qaptcha' ) , ('qaptcha_key' , RandomKey ) )
-    data = urllib.urlencode(query_args)
+    #query_args = (('action' , 'qaptcha') , ('qaptcha_key' , RandomKey))
+    #data = urllib.urlencode(query_args)
 
     #Creation Header
-    headers1 = dict(headersBase)
-    headers1.update({'X-Requested-With':'XMLHttpRequest'})
-    headers1.update({'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'})
+    #headers1 = dict(headersBase)
+    #headers1.update({'X-Requested-With':'XMLHttpRequest'})
+    #headers1.update({'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'})
 
     #Requete
-    request = urllib2.Request(url2,data,headers1)
-    try:
-        reponse = urllib2.urlopen(request,timeout = 30)
-    except urllib2.URLError, e:
-        VSlog('DecryptDlProtecte: ' + e.read())
-        VSlog('DecryptDlProtecte: ' + e.reason)
-        return ''
-    except urllib2.HTTPError, e:
-        VSlog('DecryptDlProtecte: ' + e.read())
-        VSlog('DecryptDlProtecte: ' + e.reason)
-        return ''
-    except Exception, e:
-        VSlog('DecryptDlProtecte: ' + e.message)
-        return ''
+    oRequestHandler = cRequestHandler(url)
+    reponse = oRequestHandler.request()
+    sHtmlContent = reponse
 
-    sHtmlContent = reponse.read()
-
-    #VSlog( 'result'  + str(sHtmlContent))
-
-    #Recuperatioen et traitement cookies ???
-    cookies=reponse.info()['Set-Cookie']
-    c2 = re.findall('(?:^|,) *([^;,]+?)=([^;,\/]+?);',cookies)
-    if not c2:
-        VSlog( 'DecryptDlProtecte: Probleme de cookies' )
-        return ''
-    cookies = ''
-    for cook in c2:
-        cookies = cookies + cook[0] + '=' + cook[1] + ';'
+    # VSlog( 'result'  + str(sHtmlContent))
 
     #VSlog( 'Cookie'  + str(cookies))
 
-    reponse.close()
-
-    if not '"error":false' in sHtmlContent:
-        VSlog( 'DecryptDlProtecte: Captcha rate' )
-        VSlog( sHtmlContent )
-        return
-
-    #Creation Header
-    headers2 = dict(headersBase)
-
     #tempo pas necessaire
-    #cGui().showInfo("Patientez", 'Decodage en cours' , 2)
+    #cGui().showInfo("Patientez", 'DÃ©codage en cours', 2)
     #xbmc.sleep(1000)
 
     #Ancienne methode avec POST
@@ -1353,32 +1342,37 @@ def DecryptDlProtecte(url):
     #multipart_form_data = { RandomKey : '', 'submit' : 'Valider'  }
 
     import string
-    _BOUNDARY_CHARS = string.digits + string.ascii_letters
-    boundary = ''.join(random.choice(_BOUNDARY_CHARS) for i in range(30))
+    _BOUNDARY_CHARS = string.digits
+    boundary = ''.join(random.choice(_BOUNDARY_CHARS) for i in range(13))
 
-    multipart_form_data = { RandomKey : '', 'submit' : 'Valider' }
-    data, headersMulti = encode_multipart(multipart_form_data, {},boundary)
+    multipart_form_data = {'submit':'continuer','submit':'Continuer'}
+    data, headersMulti = encode_multipart(multipart_form_data, {}, boundary)
+
+    #Creation Header
+    headers2 = {}
+    headers2.update({'Host' : 'www.dl-protect1.com'})
     headers2.update(headersMulti)
-    #VSlog( 'header 2'  + str(headersMulti))
-    #VSlog( 'data 2'  + str(data))
-
-    #rajout des cookies
-    headers2.update({'Cookie': cookies})
-
-    #Modifications
+    headers2.update({'Referer': url})
     headers2.update({'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'})
+    headers2.update({'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:64.0) Gecko/20100101 Firefox/64.0'})
+    headers2.update({'Accept-Language': 'fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3'})
+    headers2.update({'Accept-Encoding': 'gzip, deflate, br'})
 
-    #VSlog( str(headers2) )
+    #VSlog( 'header2'  + str(headers2))
+    #VSlog( 'data2'  + str(data))
 
     #Requete
-    request = urllib2.Request(url,data,headers2)
-    try:
-        reponse = urllib2.urlopen(request)
-    except urllib2.URLError, e:
-        VSlog('DecryptDlProtecte: ' + e.read())
-        VSlog('DecryptDlProtecte: ' + e.reason)
+    request = urllib2.Request(url, data, headers2)
+    reponse = urllib2.urlopen(request)
 
-    sHtmlContent = reponse.read()
+    sHtmlContent = zlib.decompress(reponse.read(), 16+zlib.MAX_WBITS)
+
+    # VSlog(sHtmlContent)
+
+    #fh = open('d:\\test.txt', "w")
+    #fh.write(sHtmlContent)
+    #fh.close()
+
     reponse.close()
 
     return sHtmlContent
@@ -1388,7 +1382,7 @@ def DecryptDlProtecte(url):
 
 """Encode multipart form data to upload files via POST."""
 
-def encode_multipart(fields, files, boundary=None):
+def encode_multipart(fields, files, boundary = None):
     r"""Encode dict of form fields and dict of files as multipart/form-data.
     Return tuple of (body_string, headers_dict). Each value in files is a dict
     with required keys 'filename' and 'content', and optional 'mimetype' (if
@@ -1419,18 +1413,18 @@ def encode_multipart(fields, files, boundary=None):
     import random
     import string
 
-    _BOUNDARY_CHARS = string.digits + string.ascii_letters
+    _BOUNDARY_CHARS = string.digits
 
     def escape_quote(s):
         return s.replace('"', '\\"')
 
     if boundary is None:
-        boundary = ''.join(random.choice(_BOUNDARY_CHARS) for i in range(30))
+        boundary = ''.join(random.choice(_BOUNDARY_CHARS) for i in range(13))
     lines = []
 
     for name, value in fields.items():
         lines.extend((
-            '--{0}'.format(boundary),
+            '-----------------------------{0}'.format(boundary),
             'Content-Disposition: form-data; name="{0}"'.format(escape_quote(name)),
             '',
             str(value),
@@ -1444,7 +1438,7 @@ def encode_multipart(fields, files, boundary=None):
             mimetype = mimetypes.guess_type(filename)[0] or 'application/octet-stream'
         lines.extend((
             '--{0}'.format(boundary),
-            'Content-Disposition: form-data; name="{0}"; filename="{1}"'.format(
+            'Content-Disposition: form-data; name="{0}"'.format(
                     escape_quote(name), escape_quote(filename)),
             'Content-Type: {0}'.format(mimetype),
             '',
@@ -1452,15 +1446,16 @@ def encode_multipart(fields, files, boundary=None):
         ))
 
     lines.extend((
-        '--{0}--'.format(boundary),
+        '-----------------------------{0}--'.format(boundary),
         '',
     ))
     body = '\r\n'.join(lines)
 
     headers = {
-        'Content-Type': 'multipart/form-data; boundary={0}'.format(boundary),
+        'Content-Type': 'multipart/form-data; boundary=---------------------------{0}'.format(boundary),
         'Content-Length': str(len(body)),
     }
+
     return (body, headers)
 
 def showUpdate():
