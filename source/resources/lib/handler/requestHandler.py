@@ -26,7 +26,7 @@ class cRequestHandler:
         self.__bRemoveNewLines = False
         self.__bRemoveBreakLines = False
         self.__sResponseHeader = ''
-        self.__enableSSL = True
+        self.__enableSSL = False
 
     def removeNewLines(self, bRemoveNewLines):
         self.__bRemoveNewLines = bRemoveNewLines
@@ -59,7 +59,7 @@ class cRequestHandler:
     #egg addMultipartFiled('sess_id':sId,'upload_type':'url','srv_tmp_url':sTmp)
     def addMultipartFiled(self,fields ):
         mpartdata = MPencode(fields)
-        self.__aParamaters = mpartdata[1]
+        self.__aParamatersLine = mpartdata[1]
         self.addHeaderEntry('Content-Type', mpartdata[0] )
         self.addHeaderEntry('Content-Length', len(mpartdata[1]))
 
@@ -86,11 +86,13 @@ class cRequestHandler:
                 cookies = ''
                 for cook in c2:
                     cookies = cookies + cook[0] + '=' + cook[1]+ ';'
+                cookies = cookies[:-1]
                 return cookies
         return ''
 
     def request(self):
-        self.__sUrl = self.__sUrl.replace(' ', '+')
+        #Supprimee car deconne si url contient ' ' et '+' en meme temps
+        #self.__sUrl = self.__sUrl.replace(' ', '+')
         return self.__callRequest()
 
     def getRequestUri(self):
@@ -163,15 +165,8 @@ class cRequestHandler:
 
                     VSlog('Page protegee par cloudflare')
                     CF = cloudflare.CloudflareBypass()
-                    VSlog(self.__sUrl)
-                    VSlog(cookies)
-                    VSlog(sParameters)
-                    VSlog(oRequest.headers)
                     sContent = CF.GetHtml(self.__sUrl,e.read(),cookies,sParameters,oRequest.headers)
-                    VSlog(sContent)
                     self.__sRealUrl,self.__sResponseHeader = CF.GetReponseInfo()
-                    VSlog(self.__sRealUrl)
-                    VSlog(self.__sResponseHeader)
 
             if not sContent:
                 VSlog("%s (%d),%s" % (VSlang(30205), e.code , self.__sUrl))
