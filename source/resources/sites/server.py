@@ -31,7 +31,7 @@ SITE_IDENTIFIER = 'server'
 SITE_NAME = '[COLOR violet]TvWatch[/COLOR]'
 SITE_DESC = 'Fichier en DDL, HD'
 
-URL_HOST = 'https://zone-telechargement1.org/'
+URL_HOST = 'https://www.annuaire-telechargement.com/'
 
 def GetURL_MAIN():
     oRequestHandler = cRequestHandler(URL_HOST)
@@ -1184,6 +1184,10 @@ def continueToWatch():
 
         # VSlog(aEntry)
 
+        correctedURL = correctUrl(sMainUrl)
+        if correctedURL != '':
+            sMainUrl = URL_MAIN + correctedURL
+
         sFullTitle = sTitle
 
         if "Episode " in sTitle:
@@ -1442,3 +1446,12 @@ def sortSeasonsAndGetCurrentSeason(seasons):
 def fixUrl(url):
     url = url.replace("://","")
     return URL_MAIN + url[url.find("/")+1:]
+
+def correctUrl(url):
+    if '//' in url:
+        a = url.find('//')
+        url = url[a+2:]
+        if '/' in url:
+            a = url.find('/')
+            return url[a+1:]
+    return ''
