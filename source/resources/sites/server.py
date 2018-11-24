@@ -129,9 +129,14 @@ def load():
     oGui.setEndOfDirectory(50)
 
 def showSearch():
-    sSearchText = cGui().showKeyBoard()
-    if sSearchText:
-        showMovies(sSearchText)
+    oGui = cGui()
+
+    sSearchText = oGui.showKeyBoard()
+    if (sSearchText != False):
+        sUrl = sSearchText
+        showMovies(sUrl)
+        oGui.setEndOfDirectory()
+        return
 
 def showTvGroup():
     oGui = cGui()
@@ -384,7 +389,7 @@ def showMovies(sSearch = ''):
         oRequestHandler.addParametersLine(data)
         oRequestHandler.addParameters('User-Agent', UA)
         sHtmlContent = oRequestHandler.request()
-        sHtmlContent = oParser.abParse(sHtmlContent, 'de la recherche', 'Nous contacter')
+        # sHtmlContent = oParser.abParse(sHtmlContent, 'de la recherche', 'Nous contacter')
 
     else:
         oInputParameterHandler = cInputParameterHandler()

@@ -4,7 +4,7 @@
 =============================================================================
 - Auteurs : Primatech
 =============================================================================
-- Current Version 2.0.15 - 24.11.2018
+- Current Version 2.0.16 - 24.11.2018
 =============================================================================
 - Version 1.0.0
 21-02-2018 -- @tvwatch-kodi -- First stable version
@@ -99,3 +99,5 @@
 09-11-2018 -- @tvwatch-kodi -- Fix server due to cloudflare protection
 - Version 2.0.15
 24-11-2018 -- @tvwatch-kodi -- Fix server's URL
+- Version 2.0.16
+24-11-2018 -- @tvwatch-kodi -- Fix search module
