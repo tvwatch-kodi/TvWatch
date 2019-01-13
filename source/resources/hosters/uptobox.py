@@ -165,6 +165,7 @@ class cHoster(iHoster):
     def __getMediaLinkByPremiumUser(self):
         VSlog("__getMediaLinkByPremiumUser")
         if not self.oPremiumHandler.Authentificate():
+            VSlog("cannot Authentificate")
             return False, False
 
         sHtmlContent = self.oPremiumHandler.GetHtml(self.__sUrl)

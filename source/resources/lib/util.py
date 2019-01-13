@@ -8,6 +8,8 @@ import htmlentitydefs
 import unicodedata
 import sys,xbmcplugin
 import base64
+import os
+from resources.lib.config import cConfig
 
 COUNT = 0
 DIALOG2 = None
@@ -397,3 +399,11 @@ def VSshowYear(sUrl,start = '',end = '',endswithslash = ''):
         xbmcplugin.endOfDirectory(int(sys.argv[1]),True,False,False)
         xbmc.sleep(500) #sleep obligatoire
         xbmc.executebuiltin("Action(Back)") #back evite erreur du au clic sur un dossier qui mene nulle part
+
+def VSwriteInFile(filename, data):
+    Name = os.path.join(cConfig().getSettingCache(),str(filename))
+
+    file = open(Name,'w')
+    file.write(data)
+
+    file.close()

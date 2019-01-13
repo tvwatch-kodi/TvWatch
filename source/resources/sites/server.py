@@ -11,7 +11,7 @@ from resources.lib.handler.inputParameterHandler import cInputParameterHandler
 from resources.lib.handler.outputParameterHandler import cOutputParameterHandler
 from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.parser import cParser
-from resources.lib.util import cUtil, VSlog, VSlang, VScreateDialogOK, VS_show_busy_dialog
+from resources.lib.util import cUtil, VSlog, VSlang, VScreateDialogOK, VS_show_busy_dialog, VSwriteInFile
 from resources.lib.db import cDb
 from resources.lib.tvHandler import cTvHandler
 from resources.lib.player import cPlayer
@@ -88,15 +88,15 @@ def load():
     oOutputParameterHandler = cOutputParameterHandler()
     oGui.addDir(SITE_IDENTIFIER, 'continueToWatch', '[B][COLOR khaki]' + VSlang(30424) + '[/COLOR][/B]', 'mark.png', oOutputParameterHandler) # Continuer à regarder
 
-    oOutputParameterHandler = cOutputParameterHandler()
-    LiveTV = '1'
-    oOutputParameterHandler.addParameter('mode', LiveTV)
-    oGui.addDir(SITE_IDENTIFIER, 'showTvGroup', VSlang(30469), 'replay.png', oOutputParameterHandler) # LiveTV
+    # oOutputParameterHandler = cOutputParameterHandler()
+    # LiveTV = '1'
+    # oOutputParameterHandler.addParameter('mode', LiveTV)
+    # oGui.addDir(SITE_IDENTIFIER, 'showTvGroup', VSlang(30469), 'replay.png', oOutputParameterHandler) # LiveTV
 
-    oOutputParameterHandler = cOutputParameterHandler()
-    SportsTV = '2'
-    oOutputParameterHandler.addParameter('mode', SportsTV)
-    oGui.addDir(SITE_IDENTIFIER, 'showTvGroup', VSlang(30471), 'replay.png', oOutputParameterHandler) # SportsTV
+    # oOutputParameterHandler = cOutputParameterHandler()
+    # SportsTV = '2'
+    # oOutputParameterHandler.addParameter('mode', SportsTV)
+    # oGui.addDir(SITE_IDENTIFIER, 'showTvGroup', VSlang(30471), 'replay.png', oOutputParameterHandler) # SportsTV
 
     oOutputParameterHandler = cOutputParameterHandler()
     oGui.addDir(SITE_IDENTIFIER, 'showFilms', VSlang(30120), 'films.png', oOutputParameterHandler) # Films
@@ -371,25 +371,14 @@ def showMovies(sSearch = ''):
     view = 500
     movie = "False"
     oParser = cParser()
+    aResult = None
 
     if sSearch:
         if URL_SEARCH[0] in sSearch:
             bGlobal_Search = True
             sSearch=sSearch.replace(URL_SEARCH[0],'')
 
-        query_args = ( ( 'do' , 'search' ) , ('subaction' , 'search' ) , ('story' , sSearch ))
-
-        #sPattern = '<div style="height:[0-9]{3}px;"> *<a href="([^"]+)" *><img class="[^"]+?" data-newsid="[^"]+?" src="([^<"]+)".+?<div class="[^"]+?" style="[^"]+?"> *<a href="[^"]+?" *> ([^<]+?)<'
-        sPattern = '<a href="(.+?)" *><img class="mainimg.+?src="(.+?)"(?:.|\s)+?<a href=".+?" *>(.+?)<'
-
-        data = urllib.urlencode(query_args)
-
-        oRequestHandler = cRequestHandler(URL_SEARCH[0])
-        # oRequestHandler.setRequestType(oRequestHandler.REQUEST_TYPE_POST)
-        oRequestHandler.addParametersLine(data)
-        oRequestHandler.addParameters('User-Agent', UA)
-        sHtmlContent = oRequestHandler.request()
-        # sHtmlContent = oParser.abParse(sHtmlContent, 'de la recherche', 'Nous contacter')
+        sHtmlContent, aResult = searchOnServer(sSearch)
 
     else:
         oInputParameterHandler = cInputParameterHandler()
@@ -404,15 +393,13 @@ def showMovies(sSearch = ''):
         sPattern = '<div style="height:[0-9]{3}px;">\s*<a href="([^"]+)"><img class="[^"]+?" data-newsid="[^"]+?" src="([^<"]+)".+?<a href="[^"]+" *>([^<]+)<'
         oRequestHandler = cRequestHandler(sUrl)
         sHtmlContent = oRequestHandler.request()
-
-    aResult = oParser.parse(sHtmlContent, sPattern)
+        aResult = oParser.parse(sHtmlContent, sPattern)
 
     #VSlog(aResult)
     if (aResult[0] == False):
         oGui.addText(SITE_IDENTIFIER,'[COLOR khaki]' + VSlang(30438) + '[/COLOR]')
         view = 50
-
-    if (aResult[0] == True):
+    elif (aResult[0] == True):
         total = len(aResult[1])
         dialog = cConfig().createDialog(SITE_NAME)
         for aEntry in aResult[1]:
@@ -1027,20 +1014,9 @@ def getNextEpisode(title, sQual, nextSeason = False):
         VSlog("getNextEpisode ERROR: " + e.message)
 
     sSearch = title[:(title.find("Saison")-3)]
-    query_args = ( ( 'do' , 'search' ) , ('subaction' , 'search' ) , ('story' , sSearch ) , ('titleonly' , '3' ))
-    data = urllib.urlencode(query_args)
-    request = urllib2.Request(URL_SEARCH[0] + data, None, headers)
-    sPattern = '<div style="height:[0-9]{3}px;"> *<a href="([^"]+)" *><img class="[^"]+?" data-newsid="[^"]+?" src="([^<"]+)".+?<div class="[^"]+?" style="[^"]+?"> *<a href="[^"]+?" *> ([^<]+?)<'
-
-    reponse = urllib2.urlopen(request)
-    sHtmlContent = reponse.read()
-    reponse.close()
-
-    oParser = cParser()
-    aResult = oParser.parse(sHtmlContent, sPattern)
+    sHtmlContent, aResult = searchOnServer(sSearch, titleonly=True)
 
     sMainUrl = ''
-
     if (aResult[0] == True):
         sSeason = None
         sSeasonNum = 0
@@ -1460,3 +1436,25 @@ def correctUrl(url):
             a = url.find('/')
             return url[a+1:]
     return ''
+
+def searchOnServer(sSearch, titleonly=False):
+    query_args = ( ( 'do' , 'search' ) , ('subaction' , 'search' ) , ('story' , sSearch ) )
+    if titleonly:
+        query_args = ( ( 'do' , 'search' ) , ('subaction' , 'search' ) , ('story' , sSearch ) , ('titleonly' , '3' ))
+
+    sPattern = '<a href="([^"]+)" *><img class="mainimg.+?src="([^"]+)"(?:.|\s)+?<a href=".+?" *>([^"]+)</a>'
+    data = urllib.urlencode(query_args)
+    oRequestHandler = cRequestHandler(URL_SEARCH[0])
+    oRequestHandler.setRequestType(cRequestHandler.REQUEST_TYPE_POST)
+    oRequestHandler.addParametersLine(data)
+    oRequestHandler.addParameters('User-Agent', UA)
+    oRequestHandler.addParameters('Accept','text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8')
+    oRequestHandler.addParameters('Accept-Language','fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3')
+    oRequestHandler.addParameters('Accept-Encoding','gzip, deflate, br')
+    oRequestHandler.addParameters('Referer', URL_MAIN)
+    oRequestHandler.addParameters('Content-Type','application/x-www-form-urlencoded')
+    sHtmlContent = oRequestHandler.request()
+    oParser = cParser()
+    aResult = oParser.parse(sHtmlContent, sPattern)
+
+    return sHtmlContent, aResult
