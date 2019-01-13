@@ -122,9 +122,9 @@ def load():
     # oGui.addDir('cFav', 'getFavourites', VSlang(30423), 'star.png', oOutputParameterHandler) # Ma liste
 
     if (cConfig().getSetting('home_update') == 'true'):
-        oOutputParameterHandler = cOutputParameterHandler()
-        oOutputParameterHandler.addParameter('sItemUrl', 'http://primatech')
-        oGui.addDir(SITE_IDENTIFIER, 'showUpdate', VSlang(30418), 'update.png', oOutputParameterHandler)
+        oGui.addDir(SITE_IDENTIFIER, 'showUpdate', "[COLOR skyblue]"+VSlang(30418)+"[/COLOR]", 'update.png', oOutputParameterHandler)
+    else:
+        oGui.addDir(SITE_IDENTIFIER, 'checkUpdate', VSlang(30473), 'update.png', oOutputParameterHandler)
 
     oGui.setEndOfDirectory(50)
 
@@ -1390,6 +1390,15 @@ def showUpdate():
     try:
         from resources.lib.about import cAbout
         cAbout().checkdownload()
+    except:
+        pass
+    return
+
+def checkUpdate():
+    try:
+        from resources.lib.about import cAbout
+        if not cAbout().checkupdate():
+            cConfig().showInfo("TvWatch", VSlang(30474))
     except:
         pass
     return

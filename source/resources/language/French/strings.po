@@ -570,8 +570,8 @@ msgid "[COLOR orange]Search on Alluc_ee[/COLOR]"
 msgstr "[COLOR orange]Recherche sur Alluc_ee[/COLOR]"
 
 msgctxt "#30418"
-msgid "[COLOR skyblue]Update available[/COLOR]"
-msgstr "[COLOR skyblue]Mise à jour disponible[/COLOR]"
+msgid "Update available"
+msgstr "Mise à jour disponible"
 
 msgctxt "#30419"
 msgid "View: Visual search (recommended 500)"
@@ -782,9 +782,17 @@ msgid "Loading... "
 msgstr "Chargement... "
 
 msgctxt "#30471"
-msgid "Sports TV "
+msgid "Sports TV"
 msgstr "Sports TV"
 
 msgctxt "#30472"
-msgid "NEXT >>> "
+msgid "NEXT >>>"
 msgstr "SUIVANT >>>"
+
+msgctxt "#30473"
+msgid "Check for updates"
+msgstr "Vérifier les mises à jour"
+
+msgctxt "#30474"
+msgid "The addon is up to date"
+msgstr "L'addon est à jour"

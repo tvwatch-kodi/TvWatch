@@ -38,30 +38,6 @@ class cClear:
             xbmcaddon.Addon('script.module.metahandler').openSettings()
             return
 
-        elif (env == 'changelog'):
-            try:
-                sUrl = 'https://raw.githubusercontent.com/Kodi-TvWatch/primatech-xbmc-addons/master/plugin.video.tvwatch/changelog.txt'
-                oRequest =  urllib2.Request(sUrl)
-                oResponse = urllib2.urlopen(oRequest)
-                sContent = oResponse.read()
-                from about import cAbout
-                cAbout().TextBoxes('TvWatch Changelog', sContent)
-            except:
-                cConfig().error("%s,%s" % (cConfig().getlanguage(30205), sUrl))
-            return
-
-        elif (env == 'soutient'):
-            try:
-                sUrl = 'https://raw.githubusercontent.com/Kodi-TvWatch/primatech-xbmc-addons/master/plugin.video.tvwatch/soutient.txt'
-                oRequest =  urllib2.Request(sUrl)
-                oResponse = urllib2.urlopen(oRequest)
-                sContent = oResponse.read()
-                from about import cAbout
-                cAbout().TextBoxes('TvWatch Soutient', sContent)
-            except:
-                cConfig().error("%s,%s" % (cConfig().getlanguage(30205), sUrl))
-            return
-
         elif (env == 'addon'):
             dialog = xbmcgui.Dialog()
             if dialog.yesno('TvWatch', 'Êtes-vous sûr ?','','','Non', 'Oui'):

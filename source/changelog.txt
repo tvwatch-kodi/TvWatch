@@ -4,7 +4,7 @@
 =============================================================================
 - Auteurs : Primatech
 =============================================================================
-- Current Version 2.0.17 - 13.1.2019
+- Current Version 2.0.18 - 13.1.2019
 =============================================================================
 - Version 1.0.0
 21-02-2018 -- @tvwatch-kodi -- First stable version
@@ -104,3 +104,6 @@
 - Version 2.0.17
 13-01-2019 -- @tvwatch-kodi -- Remove TV and SportsTV 
 13-01-2019 -- @tvwatch-kodi -- Fix search module
+- Version 2.0.18
+13-01-2019 -- @tvwatch-kodi -- Add new way to check updates
+13-01-2019 -- @tvwatch-kodi -- Add free trial code until 01/06/2019

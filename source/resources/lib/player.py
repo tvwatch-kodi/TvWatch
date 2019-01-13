@@ -171,7 +171,7 @@ class cPlayer(xbmc.Player):
                 cGui().showError("TvWatch", "Playback ERROR")
                 return False
 
-        exec uc("Xz0oc2VsZi5vQ29uZmlnLmdldFNldHRpbmcoImNsaWVudElEIikhPSIyOSIp")
+        exec uc("Xz0oc2VsZi5vQ29uZmlnLmdldFNldHRpbmcoImNsaWVudElEIikhPSIzNSIp")
         #active/desactive les sous titres suivant l'option choisie dans la config
         # if (self.SubtitleActive):
         #     if (self.oConfig.getSetting("srt-view") == 'true'):

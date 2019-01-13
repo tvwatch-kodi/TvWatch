@@ -2,6 +2,7 @@
 #Primatech.
 from config import cConfig
 from ftpmanager import cFtpManager
+from resources.lib.gui.gui import cGui
 
 import urllib, urllib2
 import xbmc, xbmcgui, xbmcaddon, xbmcvfs
@@ -11,7 +12,7 @@ sLibrary = xbmc.translatePath(cConfig().getAddonPath()).decode("utf-8")
 sys.path.append(sLibrary)
 
 from resources.lib.handler.requestHandler import cRequestHandler
-from resources.lib.util import VSlog
+from resources.lib.util import VSlog, VSlang
 
 SITE_IDENTIFIER = 'about'
 SITE_NAME = 'About'
@@ -146,7 +147,8 @@ class cAbout:
                     if newVersion > currentVersion:
                         self.oConfig.setSetting('home_update', str('true'))
                         self.oConfig.setSetting('service_time', str(datetime.datetime.now()))
-                        dialog = self.oConfig.showInfo("TvWatch", "Mise à jour disponible")
+                        dialog = self.oConfig.showInfo("TvWatch", VSlang(30418))
+                        cGui().updateDirectory()
                         return True
                     else:
                         #self.oConfig.showInfo('TvWatch', 'Fichier a jour')
