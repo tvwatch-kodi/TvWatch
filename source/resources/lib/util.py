@@ -9,7 +9,6 @@ import unicodedata
 import sys,xbmcplugin
 import base64
 import os
-from resources.lib.config import cConfig
 
 COUNT = 0
 DIALOG2 = None
@@ -401,7 +400,8 @@ def VSshowYear(sUrl,start = '',end = '',endswithslash = ''):
         xbmc.executebuiltin("Action(Back)") #back evite erreur du au clic sur un dossier qui mene nulle part
 
 def VSwriteInFile(filename, data):
-    Name = os.path.join(cConfig().getSettingCache(),str(filename))
+    profile_path = xbmc.translatePath(xbmcaddon.Addon('plugin.video.tvwatch').getAddonInfo("profile"))
+    Name = os.path.join(profile_path, str(filename))
 
     file = open(Name,'w')
     file.write(data)
