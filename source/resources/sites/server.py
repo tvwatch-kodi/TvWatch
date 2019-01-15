@@ -481,8 +481,17 @@ def showMoviesLinks(params = {}):
     oRequestHandler = cRequestHandler(sItemUrl)
     sHtmlContent = oRequestHandler.request()
 
-    if sHtmlContent == '':
+    year = ""
+    findYearInHTML = sHtmlContent
+    if findYearInHTML == '':
         showMovies(sMovieTitle)
+    else:
+        findYearInHTML = findYearInHTML.replace(" ", "")
+        if "Datedesortie:" in findYearInHTML:
+            a = findYearInHTML.find("Datedesortie:") + 13
+            findYearInHTML = findYearInHTML[a:a+10] # YYY-MM-DD
+            year = findYearInHTML[:4]
+            VSlog("YEAR found: "+year)
 
     oParser = cParser()
 
@@ -506,7 +515,7 @@ def showMoviesLinks(params = {}):
         oOutputParameterHandler.addParameter('sMainUrl', sMainUrl)
         oOutputParameterHandler.addParameter('sMovieTitle', str(sMovieTitle))
         oOutputParameterHandler.addParameter('sThumbnail', str(sThumbnail))
-        oGui.addMovie(SITE_IDENTIFIER, 'showHosters', sTitle, '', sThumbnail, '', oOutputParameterHandler, meta=True, isFolder=True)
+        oGui.addMovie(SITE_IDENTIFIER, 'showHosters', sTitle, '', sThumbnail, '', oOutputParameterHandler, meta=True, isFolder=True, year=year)
 
     #on regarde si dispo dans d'autres qualités
     sPattern = '<a href="([^"]+)"><span class="otherquality"><span style="color:#.{6}"><b>([^<]+)<\/b><\/span><span style="color:#.{6}"><b>([^<]+)<\/b><\/span>'
@@ -529,7 +538,7 @@ def showMoviesLinks(params = {}):
             oOutputParameterHandler.addParameter('sMainUrl', sMainUrl)
             oOutputParameterHandler.addParameter('sMovieTitle', str(sMovieTitle))
             oOutputParameterHandler.addParameter('sThumbnail', str(sThumbnail))
-            oGui.addMovie(SITE_IDENTIFIER, 'showHosters', sTitle, '', sThumbnail, '', oOutputParameterHandler, meta=True, isFolder=True)
+            oGui.addMovie(SITE_IDENTIFIER, 'showHosters', sTitle, '', sThumbnail, '', oOutputParameterHandler, meta=True, isFolder=True, year=year)
 
         cConfig().finishDialog(dialog)
 
@@ -558,6 +567,18 @@ def showSeriesLinks(params = {}):
     sItemUrl = fixUrl(sItemUrl)
     oRequestHandler = cRequestHandler(sItemUrl)
     sHtmlContent = oRequestHandler.request()
+
+    year = ""
+    findYearInHTML = sHtmlContent
+    if findYearInHTML == '':
+        showMovies(sMovieTitle)
+    else:
+        findYearInHTML = findYearInHTML.replace(" ", "")
+        if "Datedesortie:" in findYearInHTML:
+            a = findYearInHTML.find("Datedesortie:") + 13
+            findYearInHTML = findYearInHTML[a:a+10] # YYY-MM-DD
+            year = findYearInHTML[:4]
+            VSlog("YEAR found: "+year)
 
     #Mise àjour du titre
     sPattern = 'content="Telecharger (.+?)Qualité [^\|]+?\| [^\|]+?\| (.+?)       la serie'
@@ -675,12 +696,12 @@ def showSeriesLinks(params = {}):
         oOutputParameterHandler.addParameter('currentEpisode', str(currentEpisode))
         oOutputParameterHandler.addParameter('currentSeason', str(currentSeason))
         if currentSeason == int(season['season']):
-            oGui.addTV(SITE_IDENTIFIER, 'showSeriesHosters', season['sDisplayTitle'], '', season['sThumbnail'], '', oOutputParameterHandler, meta=True)
+            oGui.addTV(SITE_IDENTIFIER, 'showSeriesHosters', season['sDisplayTitle'], '', season['sThumbnail'], '', oOutputParameterHandler, meta=True, year=year)
         else:
             if not stop:
                 oGui.addText(SITE_IDENTIFIER,'[COLOR khaki]' + VSlang(30445) + '[/COLOR]')
                 stop = True
-            oGui.addTV(SITE_IDENTIFIER, 'showSeriesHosters', season['sDisplayTitle'], '', season['sThumbnail'], '', oOutputParameterHandler, meta=True)
+            oGui.addTV(SITE_IDENTIFIER, 'showSeriesHosters', season['sDisplayTitle'], '', season['sThumbnail'], '', oOutputParameterHandler, meta=True, year=year)
 
     oGui.setEndOfDirectory(50)
 

@@ -56,7 +56,7 @@ class cGui():
         CONTENT = 'addons'
 
 
-    def addMovie(self, sId, sFunction, sLabel, sIcon, sThumbnail, sDesc, oOutputParameterHandler = '', meta = False, continueToWatchFolder = False, isFolder=True):
+    def addMovie(self, sId, sFunction, sLabel, sIcon, sThumbnail, sDesc, oOutputParameterHandler = '', meta = False, continueToWatchFolder = False, isFolder=True, year=""):
         cGui.CONTENT = "movies"
         oGuiElement = cGuiElement()
         oGuiElement.setSiteName(sId)
@@ -74,13 +74,16 @@ class cGui():
         oGuiElement.setCat(1)
         oGuiElement.setShowMeta(meta)
 
+        if year != "":
+            oGuiElement.setYear(year)
+
         if oOutputParameterHandler.getValue('sMovieTitle'):
             sTitle = oOutputParameterHandler.getValue('sMovieTitle')
             oGuiElement.setFileName(sTitle)
 
         self.addFolder(oGuiElement, oOutputParameterHandler, continueToWatchFolder = continueToWatchFolder, _isFolder=isFolder)
 
-    def addTV(self, sId, sFunction, sLabel, sIcon, sThumbnail, sDesc, oOutputParameterHandler = '', meta = False, continueToWatchFolder = False, isFolder=True):
+    def addTV(self, sId, sFunction, sLabel, sIcon, sThumbnail, sDesc, oOutputParameterHandler = '', meta = False, continueToWatchFolder = False, isFolder=True, year=""):
         cGui.CONTENT = "tvshows"
         oGuiElement = cGuiElement()
         oGuiElement.setSiteName(sId)
@@ -97,6 +100,9 @@ class cGui():
         oGuiElement.setTvFanart()
         oGuiElement.setCat(2)
         oGuiElement.setShowMeta(meta)
+
+        if year != "":
+            oGuiElement.setYear(year)
 
         # if oOutputParameterHandler.getValue('season'):
             # sSeason = oOutputParameterHandler.getValue('season')

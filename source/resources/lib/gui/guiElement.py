@@ -532,10 +532,13 @@ class cGuiElement:
             from resources.lib.tmdb import cTMDb
             # grab = cTMDb(api_key=cConfig().getSetting('api_tmdb'))
             # grab = cTMDb()
-            if ":" in self.__sCleanTitle:
-                a = self.__sCleanTitle.find(':')
-                self.__sCleanTitle = self.__sCleanTitle[:a]
-            self.__sCleanTitle = self.str_conv(self.__sCleanTitle)
+
+            # if ":" in self.__sCleanTitle:
+            #     a = self.__sCleanTitle.find(':')
+            #     self.__sCleanTitle = self.__sCleanTitle[:a]
+            # self.__sCleanTitle = self.str_conv(self.__sCleanTitle)
+            # args = (sType, self.__sCleanTitle)
+
             args = (sType, self.__sCleanTitle)
             kwargs = {}
             if (self.__ImdbId):
