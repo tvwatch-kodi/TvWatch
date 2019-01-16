@@ -489,10 +489,19 @@ def showMoviesLinks(params = {}):
         findYearInHTML = findYearInHTML.replace(" ", "")
         if "Datedesortie:" in findYearInHTML:
             a = findYearInHTML.find("Datedesortie:") + 13
-            findYearInHTML = findYearInHTML[a:a+10] # YYY-MM-DD
-            year = findYearInHTML[:4]
-            VSlog("YEAR found: "+year)
-
+            findYearInHTML = findYearInHTML[a:]
+            found = 0
+            count = 0
+            for char in findYearInHTML:
+                count += 1
+                if char.isdigit():
+                    found += 1
+                    if found == 4:
+                        year = findYearInHTML[count-4:count]
+                        VSlog("YEAR found: "+year)
+                        break
+                    if count > 30:
+                        break
     oParser = cParser()
 
     #Affichage du menu
@@ -576,9 +585,19 @@ def showSeriesLinks(params = {}):
         findYearInHTML = findYearInHTML.replace(" ", "")
         if "Datedesortie:" in findYearInHTML:
             a = findYearInHTML.find("Datedesortie:") + 13
-            findYearInHTML = findYearInHTML[a:a+10] # YYY-MM-DD
-            year = findYearInHTML[:4]
-            VSlog("YEAR found: "+year)
+            findYearInHTML = findYearInHTML[a:]
+            found = 0
+            count = 0
+            for char in findYearInHTML:
+                count += 1
+                if char.isdigit():
+                    found += 1
+                    if found == 4:
+                        year = findYearInHTML[count-4:count]
+                        VSlog("YEAR found: "+year)
+                        break
+                    if count > 30:
+                        break
 
     #Mise àjour du titre
     sPattern = 'content="Telecharger (.+?)Qualité [^\|]+?\| [^\|]+?\| (.+?)       la serie'
@@ -725,12 +744,17 @@ def showHosters():# recherche et affiche les hotes
     sHtmlContent = oRequestHandler.request()
 
     #Si ca ressemble aux lien premiums on vire les liens non premium
-    if 'Premium' in sHtmlContent or 'PREMIUM' in sHtmlContent:
-        oParser = cParser()
-        sPattern = '<font color=red>([^<]+?)</font>'
-        aResult = oParser.parse(sHtmlContent, sPattern)
-        sHtmlContent = CutNonPremiumlinks(sHtmlContent)
+    if 'Premium' in sHtmlContent:
+        a = sHtmlContent.find('Premium')
+        sHtmlContent = sHtmlContent[a:]
+    elif 'premium' in sHtmlContent:
+        a = sHtmlContent.find('premium')
+        sHtmlContent = sHtmlContent[a:]
+    elif 'PREMIUM' in sHtmlContent:
+        a = sHtmlContent.find('PREMIUM')
+        sHtmlContent = sHtmlContent[a:]
 
+    #Recupere les liens Uptobox uniquement
     if 'Uptobox' in sHtmlContent:
         a = sHtmlContent.find('Uptobox')
         sHtmlContent = sHtmlContent[a:]
@@ -1267,17 +1291,6 @@ def CutSais(sHtmlContent):
     if (aResult[0]):
         return aResult[1][0]
     return ''
-
-def CutNonPremiumlinks(sHtmlContent):
-    oParser = cParser()
-    sPattern = 'Lien Premium(.+?)Publie le '
-    aResult = oParser.parse(sHtmlContent, sPattern)
-    #print aResult
-    if (aResult[0]):
-        return aResult[1][0]
-
-    #Si ca marche pas on renvois le code complet
-    return sHtmlContent
 
 def CutPremiumlinks(sHtmlContent):
     oParser = cParser()

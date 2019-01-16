@@ -275,8 +275,8 @@ class cGuiElement:
 
         sTitle2 = sTitle2 + sTitle
 
-        if self.__Year:
-            sTitle2 = "%s [COLOR %s](%s)[/COLOR]"%(sTitle2,self.__sDecoColor,self.__Year)
+        #if self.__Year:
+            #sTitle2 = "%s [COLOR %s](%s)[/COLOR]"%(sTitle2,self.__sDecoColor,self.__Year)
 
         #xbmc.log('>>' + sTitle2, xbmc.LOGNOTICE)
 
