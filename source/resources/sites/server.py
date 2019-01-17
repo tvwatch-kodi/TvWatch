@@ -744,24 +744,10 @@ def showHosters():# recherche et affiche les hotes
     sHtmlContent = oRequestHandler.request()
 
     #Si ca ressemble aux lien premiums on vire les liens non premium
-    if 'Premium' in sHtmlContent:
-        a = sHtmlContent.find('Premium')
-        sHtmlContent = sHtmlContent[a:]
-    elif 'premium' in sHtmlContent:
-        a = sHtmlContent.find('premium')
-        sHtmlContent = sHtmlContent[a:]
-    elif 'PREMIUM' in sHtmlContent:
-        a = sHtmlContent.find('PREMIUM')
-        sHtmlContent = sHtmlContent[a:]
-
-    #Recupere les liens Uptobox uniquement
-    if 'Uptobox' in sHtmlContent:
-        a = sHtmlContent.find('Uptobox')
-        sHtmlContent = sHtmlContent[a:]
-        if 'href="' in sHtmlContent:
-            a = sHtmlContent.find('href="') + 6
-            b = sHtmlContent[a:].find('">')
-            params['sItemUrl'] = sHtmlContent[a:a+b]
+    sHtmlContent = CutPremiumlinks(sHtmlContent)
+    Links = ExtractUptoboxLinks(sHtmlContent)
+    if len(Links) > 0:
+        params['sItemUrl'] = Links[0]
 
     params['sMainUrl'] = sMainUrl
     params['sMovieTitle'] = sMovieTitle
@@ -787,14 +773,9 @@ def showSeriesHosters():# recherche et affiche les hotes
 
     sItemUrl = fixUrl(sItemUrl)
     oRequestHandler = cRequestHandler(sItemUrl)
-    sHtmlContent = oRequestHandler.request()
 
-    #Fonction pour recuperer uniquement les liens
-    #sHtmlContent = Cutlink(sHtmlContent)
-
-    #Pour les series on fait l'inverse des films on vire les liens premiums
-    if 'Premium' in sHtmlContent or 'PREMIUM' in sHtmlContent or 'premium' in sHtmlContent:
-        sHtmlContent = CutPremiumlinks(sHtmlContent)
+    #Si ca ressemble aux lien premiums on vire les liens non premium
+    sHtmlContent = CutPremiumlinks(sHtmlContent)
 
     oParser = cParser()
 
@@ -803,6 +784,7 @@ def showSeriesHosters():# recherche et affiche les hotes
 
     # VSlog(aResult)
 
+    episodes = []
     if (aResult[0] == True):
         dialog = cConfig().createDialog(SITE_NAME)
 
@@ -816,7 +798,6 @@ def showSeriesHosters():# recherche et affiche les hotes
             if stop == False:
                 entries.append(aEntry)
 
-        episodes = []
         for aEntry in entries:
             cConfig().updateDialog(dialog, len(entries))
 
@@ -1101,9 +1082,8 @@ def getNextEpisode(title, sQual, nextSeason = False):
                     oRequestHandler = cRequestHandler(sUrl)
                     sHtmlContent = oRequestHandler.request()
 
-                    #Pour les series on fait l'inverse des films on vire les liens premiums
-                    if 'Premium' in sHtmlContent or 'PREMIUM' in sHtmlContent or 'premium' in sHtmlContent:
-                        sHtmlContent = CutPremiumlinks(sHtmlContent)
+                    #Si ca ressemble aux lien premiums on vire les liens non premium
+                    sHtmlContent = CutPremiumlinks(sHtmlContent)
 
                     oParser = cParser()
                     sPattern = '<div style="font-weight:bold;color:[^"]+?">([^<]+)</div>|<a target="_blank" href="https://([^"]+)/([^"]+?)">([^<]+)<'
@@ -1293,14 +1273,35 @@ def CutSais(sHtmlContent):
     return ''
 
 def CutPremiumlinks(sHtmlContent):
-    oParser = cParser()
-    sPattern = '(?i) par .{1,2}pisode(.+?)$'
-    aResult = oParser.parse(sHtmlContent, sPattern)
-    if (aResult[0]):
-        sHtmlContent = aResult[1][0]
-
-    #Si ca marche pas on renvois le code complet
+    if 'Premium' in sHtmlContent:
+        a = sHtmlContent.find('Premium')
+        sHtmlContent = sHtmlContent[a:]
+    elif 'premium' in sHtmlContent:
+        a = sHtmlContent.find('premium')
+        sHtmlContent = sHtmlContent[a:]
+    elif 'PREMIUM' in sHtmlContent:
+        a = sHtmlContent.find('PREMIUM')
+        sHtmlContent = sHtmlContent[a:]
     return sHtmlContent
+
+def ExtractUptoboxLinks(sHtmlContent):
+    #Recupere les liens Uptobox uniquement
+    Links = []
+    if 'Uptobox' in sHtmlContent:
+        a = sHtmlContent.find('Uptobox')
+        sHtmlContent = sHtmlContent[a:]
+        stop = False
+        while not stop:
+            if 'href="' in sHtmlContent:
+                a = sHtmlContent.find('href="') + 6
+            if 'font-weight:bold' in sHtmlContent:
+                aa = sHtmlContent.find('font-weight:bold') + 16
+            if a < aa:
+                b = sHtmlContent[a:].find('">')
+                Links.append(sHtmlContent[a:a+b])
+                sHtmlContent = sHtmlContent[a+b:]
+            else:
+                stop = True
 
 def DecryptDlProtecte(url):
     VSlog('DecryptDlProtecte : ' + url)
