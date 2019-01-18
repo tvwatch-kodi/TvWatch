@@ -9,7 +9,7 @@ from resources.lib.gui.gui import cGui
 from resources.lib.db import cDb
 from resources.lib.mySqlDB import cMySqlDB
 from resources.lib.cast import cCast
-from resources.lib.util import VSlog,isKrypton,VSerror,VSlang,uc,VS_show_busy_dialog
+from resources.lib.util import VSlog,isKrypton,VSerror,VSlang,uc,VS_show_busy_dialog, VS_hide_busy_dialog
 
 import xbmc, xbmcgui, xbmcplugin
 
@@ -182,7 +182,7 @@ class cPlayer(xbmc.Player):
         #         cGui().showInfo("Sous titre charges, Vous pouvez les activer", "Sous-Titres", 15)
 
         # Remove buffering dialog !
-        self.oConfig.hide_busy_dialog()
+        VS_hide_busy_dialog()
 
         self.__setResume()
 
@@ -245,6 +245,7 @@ class cPlayer(xbmc.Player):
     def startPlayer(self):
         oPlayList = self.__getPlayList()
         self.play(oPlayList)
+        VS_hide_busy_dialog()
 
     def onPlayBackEnded(self):
         self.onPlayBackStopped()

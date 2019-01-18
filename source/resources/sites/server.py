@@ -42,7 +42,7 @@ def GetURL_MAIN():
     return URL
 
 URL_MAIN = GetURL_MAIN()
-URL_DECRYPT =  ''
+URL_DECRYPT =  'www.dl-protect1.com'
 
 URL_IMAGE = 'http://www.zone-image.com/'
 
@@ -744,11 +744,8 @@ def showHosters():# recherche et affiche les hotes
     sHtmlContent = oRequestHandler.request()
 
     #Si ca ressemble aux lien premiums on vire les liens non premium
-    sHtmlContent = CutPremiumlinks(sHtmlContent)
-    Links = ExtractUptoboxLinks(sHtmlContent)
-    if len(Links) > 0:
-        params['sItemUrl'] = Links[0]
 
+    params['sItemUrl'] = ExtractUptoboxLinksForMovies(sHtmlContent)
     params['sMainUrl'] = sMainUrl
     params['sMovieTitle'] = sMovieTitle
     params['sThumbnail'] = sThumbnail
@@ -773,78 +770,56 @@ def showSeriesHosters():# recherche et affiche les hotes
 
     sItemUrl = fixUrl(sItemUrl)
     oRequestHandler = cRequestHandler(sItemUrl)
+    sHtmlContent = oRequestHandler.request()
 
-    #Si ca ressemble aux lien premiums on vire les liens non premium
-    sHtmlContent = CutPremiumlinks(sHtmlContent)
+    VSlog(sItemUrl)
 
-    oParser = cParser()
-
-    sPattern = '<div style="font-weight:bold;color:[^"]+?">([^<]+)</div>|<a target="_blank" href="https://([^"]+)/([^"]+?)">([^<]+)<'
-    aResult = oParser.parse(sHtmlContent, sPattern)
-
-    # VSlog(aResult)
+    Links = ExtractUptoboxLinksForTvShows(sHtmlContent)
 
     episodes = []
-    if (aResult[0] == True):
+    if (len(Links) > 0):
         dialog = cConfig().createDialog(SITE_NAME)
 
-        stop = True
-        entries = []
-        for aEntry in aResult[1]:
-            if aEntry[0] == 'Uptobox':
-                stop = False
-            elif aEntry[0] != '':
-                stop = True
-            if stop == False:
-                entries.append(aEntry)
-
-        for aEntry in entries:
-            cConfig().updateDialog(dialog, len(entries))
+        for aEntry in Links:
+            cConfig().updateDialog(dialog, len(Links))
 
             if dialog.iscanceled():
                 break
 
-            if aEntry[0]:
-                oOutputParameterHandler = cOutputParameterHandler()
-                oOutputParameterHandler.addParameter('sItemUrl', aEntry[1])
-                oOutputParameterHandler.addParameter('sMovieTitle', sMovieTitle)
-                oOutputParameterHandler.addParameter('sThumbnail', sThumbnail)
-            else:
-                sName = aEntry[3]
-                sName = sName.replace('Télécharger','')
-                sName = sName.replace('pisodes','pisode')
-                sItemUrl = 'https://' + aEntry[1] +  '/' + aEntry[2]
+            sName = aEntry[1]
+            sName = sName.replace('Télécharger','')
+            sName = sName.replace('pisodes','pisode')
+            sItemUrl = aEntry[0]
 
-                # if sName != '' and sName.find('pisode') != -1:
-                sTitle = sMovieTitle + ' ' + sName
-                sTitle = sTitle.replace('[COMPLETE]','').strip()
-                sTitle = sTitle.replace('COMPLETE','').strip()
-                sDisplayTitle = sTitle
-                URL_DECRYPT = aEntry[1]
+            # if sName != '' and sName.find('pisode') != -1:
+            sTitle = sMovieTitle + ' ' + sName
+            sTitle = sTitle.replace('[COMPLETE]','').strip()
+            sTitle = sTitle.replace('COMPLETE','').strip()
+            sDisplayTitle = sTitle
 
-                meta = {}
-                meta['sItemUrl'] = sItemUrl
-                meta['sMovieTitle'] = sTitle
-                meta['sDisplayTitle']= sDisplayTitle
-                meta['sThumbnail'] = sThumbnail
-                meta['sType'] = 'tvshow'
-                meta['sQual'] = sQual
-                meta['refresh'] = "False"
-                meta['episode'] = '0'
-                if "Episode" in sTitle:
-                    episode = sTitle[sTitle.find("Episode")+7:].split(" ")
-                    meta['episode'] = episode[1]
-                    episodes.append(meta)
-                    if "Saison" in sTitle:
-                        season = sTitle[sTitle.find("Saison")+6:sTitle.find("Episode")].split(" ")
-                        try:
-                            if int(currentSeason) != int(season[1]):
-                                currentEpisode = '0'
-                        except Exception, e:
-                            VSlog("Issue on showSeriesHosters (season): " + e.message)
+            meta = {}
+            meta['sItemUrl'] = sItemUrl
+            meta['sMovieTitle'] = sTitle
+            meta['sDisplayTitle']= sDisplayTitle
+            meta['sThumbnail'] = sThumbnail
+            meta['sType'] = 'tvshow'
+            meta['sQual'] = sQual
+            meta['refresh'] = "False"
+            meta['episode'] = '0'
+            if "Episode" in sTitle:
+                episode = sTitle[sTitle.find("Episode")+7:].split(" ")
+                meta['episode'] = episode[1]
+                episodes.append(meta)
+                if "Saison" in sTitle:
+                    season = sTitle[sTitle.find("Saison")+6:sTitle.find("Episode")].split(" ")
+                    try:
+                        if int(currentSeason) != int(season[1]):
                             currentEpisode = '0'
-                elif "Episode" not in sTitle and "Saison" not in sTitle:
-                    episodes.append(meta)
+                    except Exception, e:
+                        VSlog("Issue on showSeriesHosters (season): " + e.message)
+                        currentEpisode = '0'
+            elif "Episode" not in sTitle and "Saison" not in sTitle:
+                episodes.append(meta)
 
         for i in range(len(episodes)):
             try:
@@ -1082,46 +1057,26 @@ def getNextEpisode(title, sQual, nextSeason = False):
                     oRequestHandler = cRequestHandler(sUrl)
                     sHtmlContent = oRequestHandler.request()
 
-                    #Si ca ressemble aux lien premiums on vire les liens non premium
-                    sHtmlContent = CutPremiumlinks(sHtmlContent)
+                    Links = ExtractUptoboxLinksForTvShows(sHtmlContent)
 
-                    oParser = cParser()
-                    sPattern = '<div style="font-weight:bold;color:[^"]+?">([^<]+)</div>|<a target="_blank" href="https://([^"]+)/([^"]+?)">([^<]+)<'
-                    aResult2 = oParser.parse(sHtmlContent, sPattern)
-
-                    if (aResult2[0] == True):
-                        entries = []
-                        for aEntry in aResult2[1]:
-                            if aEntry[0] == 'Uptobox':
-                                stop = False
-                            elif aEntry[0] != '':
-                                stop = True
-                            if stop == False:
-                                entries.append(aEntry)
-
+                    if (len(Links) > 0):
                         getNextOne = False
                         params = {}
-                        for aEntry in entries:
+                        for aEntry in Links:
                             foundUrl = None
                             foundTitle = None
-                            if aEntry[0]:
-                                foundUrl = aEntry[1]
-                                foundTitle = sMovieTitle
-                            else:
-                                sName = aEntry[3]
-                                sName = sName.replace('Télécharger','')
-                                sName = sName.replace('pisodes','pisode')
-                                sUrl2 = 'https://' + aEntry[1] +  '/' + aEntry[2]
+                            sName = aEntry[1]
+                            sName = sName.replace('Télécharger','')
+                            sName = sName.replace('pisodes','pisode')
+                            sUrl2 = aEntry[0]
 
-                                if sName != '' and sName.find('pisode') != -1:
-                                    sTitle = sMovieTitle + ' ' + sName
-                                    sTitle = sTitle.replace('[COMPLETE]','').strip()
-                                    sTitle = sTitle.replace('COMPLETE','').strip()
-                                    sDisplayTitle = sTitle
-                                    URL_DECRYPT = aEntry[1]
-
-                                    foundUrl = sUrl2
-                                    foundTitle = sTitle
+                            if sName != '' and sName.find('pisode') != -1:
+                                sTitle = sMovieTitle + ' ' + sName
+                                sTitle = sTitle.replace('[COMPLETE]','').strip()
+                                sTitle = sTitle.replace('COMPLETE','').strip()
+                                sDisplayTitle = sTitle
+                                foundUrl = sUrl2
+                                foundTitle = sTitle
 
                             if getNextOne:
                                 params['sItemUrl'] = foundUrl
@@ -1272,15 +1227,10 @@ def CutSais(sHtmlContent):
         return aResult[1][0]
     return ''
 
+#keep Premium links only
 def CutPremiumlinks(sHtmlContent):
-    if 'Premium' in sHtmlContent:
-        a = sHtmlContent.find('Premium')
-        sHtmlContent = sHtmlContent[a:]
-    elif 'premium' in sHtmlContent:
-        a = sHtmlContent.find('premium')
-        sHtmlContent = sHtmlContent[a:]
-    elif 'PREMIUM' in sHtmlContent:
-        a = sHtmlContent.find('PREMIUM')
+    if 'premium' in sHtmlContent.lower():
+        a = sHtmlContent.lower().find('premium')
         sHtmlContent = sHtmlContent[a:]
     return sHtmlContent
 
@@ -1298,10 +1248,38 @@ def ExtractUptoboxLinks(sHtmlContent):
                 aa = sHtmlContent.find('font-weight:bold') + 16
             if a < aa:
                 b = sHtmlContent[a:].find('">')
-                Links.append(sHtmlContent[a:a+b])
-                sHtmlContent = sHtmlContent[a+b:]
+                c = sHtmlContent[a+b:].find('</a>')
+                link = sHtmlContent[a:a+b]
+                name = sHtmlContent[a+b+2:a+b+c]
+                Links.append([link, name])
+                sHtmlContent = sHtmlContent[a+b+c+2:]
             else:
                 stop = True
+    return Links
+
+def ExtractUptoboxLinksForTvShows(sHtmlContent):
+    premiumLinks = ExtractUptoboxLinks(CutPremiumlinks(sHtmlContent)) # Premium Links only
+    nonPremiumLinks = ExtractUptoboxLinks(sHtmlContent) # Non premium links
+
+    Links = premiumLinks
+    if len(nonPremiumLinks) > len(premiumLinks):
+        Links = nonPremiumLinks
+
+    return Links
+
+def ExtractUptoboxLinksForMovies(sHtmlContent):
+    premiumLinks = ExtractUptoboxLinks(CutPremiumlinks(sHtmlContent)) # Premium Links only
+    nonPremiumLinks = ExtractUptoboxLinks(sHtmlContent) # Non premium links
+
+    Links = nonPremiumLinks
+    if len(premiumLinks) == 1:
+        Links = premiumLinks
+
+    link = ''
+    if len(Links) > 0:
+        link = Links[0][0]
+
+    return link
 
 def DecryptDlProtecte(url):
     VSlog('DecryptDlProtecte : ' + url)

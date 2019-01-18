@@ -795,3 +795,15 @@ msgstr ""
 msgctxt "#30474"
 msgid "The addon is up to date"
 msgstr ""
+
+msgctxt "#30475"
+msgid "Download"
+msgstr ""
+
+msgctxt "#30476"
+msgid "Streaming"
+msgstr ""
+
+msgctxt "#30477"
+msgid "Player Mode"
+msgstr ""

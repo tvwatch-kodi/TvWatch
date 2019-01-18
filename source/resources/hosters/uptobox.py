@@ -119,12 +119,12 @@ class cHoster(iHoster):
         #dialog3 = xbmcgui.Dialog()
         #ret = dialog3.select('Choissisez votre mode de fonctionnement',['Passer en Streaming (via Uptostream)','Rester en direct (via Uptobox)'])
 
-        ret = 1
+        sPlayerMode = self.oConfig.getSetting('playerMode')
         #mode DL
-        if ret == 1:
+        if sPlayerMode == '0':
             self.stream = False
         #mode stream
-        elif ret == 0:
+        elif sPlayerMode == '1':
             self.__sUrl = self.__sUrl.replace('http://uptobox.com/','http://uptostream.com/iframe/')
         else:
             return False

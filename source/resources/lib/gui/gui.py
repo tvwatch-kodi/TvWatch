@@ -680,7 +680,6 @@ class cGui():
         cBA.SetSearch(sFileName)
         cBA.SearchBA()
 
-
     def viewinfo(self):
         oGuiElement = cGuiElement()
         oInputParameterHandler = cInputParameterHandler()

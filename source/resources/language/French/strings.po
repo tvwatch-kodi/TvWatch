@@ -796,3 +796,15 @@ msgstr "Vérifier les mises à jour"
 msgctxt "#30474"
 msgid "The addon is up to date"
 msgstr "L'addon est à jour"
+
+msgctxt "#30475"
+msgid "Download"
+msgstr "Téléchargement"
+
+msgctxt "#30476"
+msgid "Streaming"
+msgstr "Streaming"
+
+msgctxt "#30477"
+msgid "Player Mode"
+msgstr "Mode de Lecture"
