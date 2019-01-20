@@ -4,7 +4,7 @@
 =============================================================================
 - Auteurs : Primatech
 =============================================================================
-- Current Version 2.0.23 - 19.1.2019
+- Current Version 2.0.24 - 20.1.2019
 =============================================================================
 - Version 1.0.0
 21-02-2018 -- @tvwatch-kodi -- First stable version
@@ -119,4 +119,6 @@
 - Version 2.0.23
 19-01-2019 -- @tvwatch-kodi -- Enhance premium link management
 19-01-2019 -- @tvwatch-kodi -- Add player mode: Download/Streaming
+- Version 2.0.24
+20-01-2019 -- @tvwatch-kodi -- Fix premium link management
 

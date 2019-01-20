@@ -1237,8 +1237,9 @@ def CutPremiumlinks(sHtmlContent):
 def ExtractUptoboxLinks(sHtmlContent):
     #Recupere les liens Uptobox uniquement
     Links = []
-    if 'Uptobox' in sHtmlContent:
-        a = sHtmlContent.find('Uptobox')
+    if 'uptobox' in sHtmlContent.lower():
+        a = sHtmlContent.lower().find('uptobox')
+        aa = a
         sHtmlContent = sHtmlContent[a:]
         stop = False
         while not stop:
@@ -1258,22 +1259,36 @@ def ExtractUptoboxLinks(sHtmlContent):
     return Links
 
 def ExtractUptoboxLinksForTvShows(sHtmlContent):
-    premiumLinks = ExtractUptoboxLinks(CutPremiumlinks(sHtmlContent)) # Premium Links only
-    nonPremiumLinks = ExtractUptoboxLinks(sHtmlContent) # Non premium links
+    LinksGroup = []
+    while 'uptobox' in sHtmlContent.lower():
+        a = sHtmlContent.lower().find('uptobox')
+        sHtmlContent = sHtmlContent[a:]
+        LinksGroup.append(ExtractUptoboxLinks(sHtmlContent))
+        sHtmlContent = sHtmlContent[7:]
 
-    Links = premiumLinks
-    if len(nonPremiumLinks) > len(premiumLinks):
-        Links = nonPremiumLinks
+    max = 0
+    Links = []
+    for l in LinksGroup:
+        if len(l) > max:
+            max = len(l)
+            Links = l
 
     return Links
 
 def ExtractUptoboxLinksForMovies(sHtmlContent):
-    premiumLinks = ExtractUptoboxLinks(CutPremiumlinks(sHtmlContent)) # Premium Links only
-    nonPremiumLinks = ExtractUptoboxLinks(sHtmlContent) # Non premium links
+    LinksGroup = []
+    while 'uptobox' in sHtmlContent.lower():
+        a = sHtmlContent.lower().find('uptobox')
+        sHtmlContent = sHtmlContent[a:]
+        LinksGroup.append(ExtractUptoboxLinks(sHtmlContent))
+        sHtmlContent = sHtmlContent[7:]
 
-    Links = nonPremiumLinks
-    if len(premiumLinks) == 1:
-        Links = premiumLinks
+    min = 10000
+    Links = []
+    for l in LinksGroup:
+        if len(l) < min and len(l) > 0:
+            min = len(l)
+            Links = l
 
     link = ''
     if len(Links) > 0:
