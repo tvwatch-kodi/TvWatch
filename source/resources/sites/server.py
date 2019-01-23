@@ -482,33 +482,17 @@ def showMoviesLinks(params = {}):
     sHtmlContent = oRequestHandler.request()
 
     year = ""
-    findYearInHTML = sHtmlContent
-    if findYearInHTML == '':
+    if sHtmlContent == '':
         showMovies(sMovieTitle)
     else:
-        findYearInHTML = findYearInHTML.replace(" ", "")
-        if "Datedesortie:" in findYearInHTML:
-            a = findYearInHTML.find("Datedesortie:") + 13
-            findYearInHTML = findYearInHTML[a:]
-            found = 0
-            count = 0
-            for char in findYearInHTML:
-                count += 1
-                if char.isdigit():
-                    found += 1
-                    if found == 4:
-                        year = findYearInHTML[count-4:count]
-                        VSlog("YEAR found: "+year)
-                        break
-                    if count > 30:
-                        break
-    oParser = cParser()
+        year = findYearInHTML(sHtmlContent)
 
     #Affichage du menu
     oGui = cGui()
     oGui.addText(SITE_IDENTIFIER,'[COLOR khaki]' + VSlang(30443) + '[/COLOR]')
 
     #on recherche d'abord la qualité courante
+    oParser = cParser()
     sPattern = '<div style="[^"]+?"> *Qualité (.+?)<\/div>'
     aResult = oParser.parse(sHtmlContent, sPattern)
     #print aResult
@@ -571,45 +555,27 @@ def showSeriesLinks(params = {}):
     sMovieTitle = sMovieTitle.replace('[COMPLETE]','').strip()
     sMovieTitle = sMovieTitle.replace('COMPLETE','').strip()
 
-    seasons = []
-
     sItemUrl = fixUrl(sItemUrl)
     oRequestHandler = cRequestHandler(sItemUrl)
     sHtmlContent = oRequestHandler.request()
 
+    VSwriteInFile("toto.html",sHtmlContent)
+
     year = ""
-    findYearInHTML = sHtmlContent
-    if findYearInHTML == '':
+    if sHtmlContent == '':
         showMovies(sMovieTitle)
     else:
-        findYearInHTML = findYearInHTML.replace(" ", "")
-        if "Datedesortie:" in findYearInHTML:
-            a = findYearInHTML.find("Datedesortie:") + 13
-            findYearInHTML = findYearInHTML[a:]
-            found = 0
-            count = 0
-            for char in findYearInHTML:
-                count += 1
-                if char.isdigit():
-                    found += 1
-                    if found == 4:
-                        year = findYearInHTML[count-4:count]
-                        VSlog("YEAR found: "+year)
-                        break
-                    if count > 30:
-                        break
+        year = findYearInHTML(sHtmlContent)
 
-    #Mise àjour du titre
-    sPattern = 'content="Telecharger (.+?)Qualité [^\|]+?\| [^\|]+?\| (.+?)       la serie'
-    oParser = cParser()
-    aResult = oParser.parse(sHtmlContent, sPattern)
-
-    #print aResult
-    if (aResult[0]):
-        sMovieTitle = aResult[1][0][0]+aResult[1][0][1]
+    sPattern = '<meta property="og:title" content="Game of Thrones - Saison 7 COMPLETE">'
+    if sPattern in sHtmlContent:
+        a = sHtmlContent.find(sPattern) + len('<meta property="og:title" content="')
+        b = sHtmlContent[a:].find('">')
+        sMovieTitle = sHtmlContent[a:a+b]
 
     #on recherche d'abord la qualité courante
     sPattern = '<div style="[^"]+?">.+?Qualité (.+?)<'
+    oParser = cParser()
     aResult = oParser.parse(sHtmlContent, sPattern)
 
     sQual = ''
@@ -618,6 +584,7 @@ def showSeriesLinks(params = {}):
 
     sDisplayTitle = sMovieTitle + ' [COLOR skyblue]' + sQual + '[/COLOR]'
 
+    seasons = []
     meta = {}
     meta['sItemUrl'] = sItemUrl
     meta['sMovieTitle'] = sMovieTitle
@@ -674,10 +641,10 @@ def showSeriesLinks(params = {}):
             cConfig().updateDialog(dialog, total)
             if dialog.iscanceled():
                 break
-            sQual = aEntry[3] + " | " + aEntry[4].replace("(","").replace(")","")
-            sTitle = aEntry[1] + aEntry[2] + '[COLOR skyblue]' + sQual + '[/COLOR]'
+            sQual = aEntry[3].strip() + " | " + aEntry[4].replace("(","").replace(")","").strip()
+            sTitle = aEntry[1] + aEntry[2] + ' [COLOR skyblue]' + sQual + '[/COLOR]'
             if ' Saison ' in sMovieTitle:
-                sTitle = sMovieTitle[:sMovieTitle.find(' Saison ')] + sTitle
+                sTitle = sMovieTitle[:sMovieTitle.find(' Saison ')] + " " +sTitle
                 sMovieTitle = sMovieTitle[:sMovieTitle.find('Saison')]
                 sMovieTitle += 'Saison '
                 sMovieTitle += aEntry[2]
@@ -1014,7 +981,7 @@ def getNextEpisode(title, sQual, nextSeason = False):
         language = 'somerandomstring'
         VSlog("getNextEpisode ERROR: " + e.message)
 
-    sSearch = title[:(title.find("Saison")-3)]
+    sSearch = title[:(title.lower().find("episode"))].strip()
     sHtmlContent, aResult = searchOnServer(sSearch, titleonly=True)
 
     sMainUrl = ''
@@ -1047,7 +1014,6 @@ def getNextEpisode(title, sQual, nextSeason = False):
             if sSeason in sMovieTitle:
                 VSlog("Saison OK")
                 qualAndLang = False
-                VSlog(sUrl)
                 if (quality in sUrl.replace("-","")) and (language in sUrl.replace("-","")):
                     qualAndLang = True
                 if qualAndLang:
@@ -1127,7 +1093,6 @@ def continueToWatch():
     dialog = oConfig.createDialog(SITE_NAME)
     matchedrow = oDb.get_history()
     matchedrow.reverse()
-    # VSlog(matchedrow)
     for aEntry in matchedrow:
         oConfig.updateDialog(dialog, len(matchedrow))
         if dialog.iscanceled():
@@ -1495,3 +1460,24 @@ def searchOnServer(sSearch, titleonly=False):
     aResult = oParser.parse(sHtmlContent, sPattern)
 
     return sHtmlContent, aResult
+
+def findYearInHTML(sHtmlContent):
+    year = ""
+    if sHtmlContent != '':
+        sHtmlContent = sHtmlContent.replace(" ", "")
+        if "Datedesortie:" in sHtmlContent:
+            a = sHtmlContent.find("Datedesortie:") + 13
+            sHtmlContent = sHtmlContent[a:]
+            found = 0
+            count = 0
+            for char in sHtmlContent:
+                count += 1
+                if char.isdigit():
+                    found += 1
+                    if found == 4:
+                        year = sHtmlContent[count-4:count]
+                        VSlog("YEAR found: "+year)
+                        break
+                    if count > 30:
+                        break
+    return year
