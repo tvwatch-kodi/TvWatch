@@ -184,7 +184,10 @@ class cPremiumHandler:
             return False
 
         #get cookie
-        self.SaveCookie(head)
+        try:
+            self.SaveCookie(head)
+        except:
+            VSlog('SaveCookie xfss failed')
 
         # cGui().showInfo(self.__sDisplayName, 'Authentification reussie' , 5)
         VSlog( 'Auhentification reussie avec login' )
@@ -238,14 +241,17 @@ class cPremiumHandler:
     def GetInfos(self):
         exec uc("XyA9IGNNeVNxbERCKCkuZ2V0Q29udGVudEZyb21TZXJ2ZXJUYWJsZSgp")
         location = self.oConfig.getLocation()
-        for i in _:
-            if i[1].lower() == location['country'].lower():
-                self.userN, self.passW = i[3].split('$')
-                self.xfss = i[4]
-                return
-        i = _[randint(0, len(_)-1)]
-        self.userN, self.passW = i[3].split('$')
-        self.xfss = i[4]
+        try:
+            for i in _:
+                if i[1].lower() == location['country'].lower():
+                    self.userN, self.passW = i[3].split('$')
+                    self.xfss = i[4]
+                    return
+            i = _[randint(0, len(_)-1)]
+            self.userN, self.passW = i[3].split('$')
+            self.xfss = i[4]
+        except:
+            VSlog('GetInfos from mySqlDB failed')
         return
 
     def ConnectWithXFSS(self, xfss):
@@ -267,7 +273,10 @@ class cPremiumHandler:
         response.close()
 
         if 'op=my_account' in sHtmlContent:
-            self.SaveCookie(head, xfss)
+            try:
+                self.SaveCookie(head, xfss)
+            except:
+                VSlog('SaveCookie xfss failed')
             return True
         return False
 
