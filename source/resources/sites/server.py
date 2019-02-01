@@ -559,8 +559,6 @@ def showSeriesLinks(params = {}):
     oRequestHandler = cRequestHandler(sItemUrl)
     sHtmlContent = oRequestHandler.request()
 
-    VSwriteInFile("toto.html",sHtmlContent)
-
     year = ""
     if sHtmlContent == '':
         showMovies(sMovieTitle)
@@ -738,8 +736,6 @@ def showSeriesHosters():# recherche et affiche les hotes
     sItemUrl = fixUrl(sItemUrl)
     oRequestHandler = cRequestHandler(sItemUrl)
     sHtmlContent = oRequestHandler.request()
-
-    VSlog(sItemUrl)
 
     Links = ExtractUptoboxLinksForTvShows(sHtmlContent)
 

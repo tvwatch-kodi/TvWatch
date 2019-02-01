@@ -663,6 +663,7 @@ class cGui():
         xbmc.executebuiltin( 'Container.Refresh' )
 
     def playNow(self):
+        util.VS_show_busy_dialog()
         oInputParameterHandler = cInputParameterHandler()
         sFullTitle = oInputParameterHandler.getValue('sFullTitle')
         from resources.sites.server import playContinueToWatch

@@ -142,7 +142,9 @@ class cPlayer(xbmc.Player):
                 return
         #1 er mode de lecture
         elif (player_conf == '0'):
-            self.play(playParams['sUrlToPlay'],item)
+            windowed = False
+            startPos = -1
+            self.play(playParams['sUrlToPlay'], item, windowed, startPos)
             VSlog('Player use Play() method')
         #2 eme mode non utilise
         elif (player_conf == 'neverused'):
@@ -181,11 +183,13 @@ class cPlayer(xbmc.Player):
         #         self.showSubtitles(False)
         #         cGui().showInfo("Sous titre charges, Vous pouvez les activer", "Sous-Titres", 15)
 
-        # Remove buffering dialog !
-        VS_hide_busy_dialog()
+        # Add Movie to DB
+        meta = {}
+        meta['title'] = self.sTitle
+        if self.db.get_resume(meta) == []:
+            self.__setResume()
 
-        self.__setResume()
-
+        seek = True
         stop = False
         while self.isPlaying() and not self.forcestop:
             tt = self.__getTotalTime()
@@ -195,6 +199,12 @@ class cPlayer(xbmc.Player):
             if self.currentTime != ct:
                 self.currentTime = ct
                 try:
+                    if seek:
+                        seekTime = self.__getResume()
+                        self.seekTime(seekTime)
+                        # Remove buffering dialog !
+                        VS_hide_busy_dialog()
+                        seek = False
                     if (self.currentTime > 3) and _:
                         exec uc("c2VsZi5teVNxbERCLnVwZGF0ZUlQKHN0cihpbnQoc2VsZi5jdXJyZW50VGltZSkpLCBzZWxmLmNsaWVudElEKQ==")
                         self.oConfig.setSetting(uc('bXlTZWxmUGxheQ=='), 'True')
@@ -252,20 +262,12 @@ class cPlayer(xbmc.Player):
 
     #Attention pas de stop, si on lance une seconde video sans fermer la premiere
     def onPlayBackStopped(self):
-        VSlog("player stoped")
+        VSlog("player stopped")
         if not self.playBackStoppedEventReceived:
             self.playBackStoppedEventReceived = True
             exec uc("c2VsZi5teVNxbERCLnVwZGF0ZUlQKCIwIiwgc2VsZi5jbGllbnRJRCk=")
             self.oConfig.setSetting(uc('aXNQbGF5aW5n'), "0")
             self.oConfig.setSetting(uc('bXlTZWxmUGxheQ=='), 'False')
-            # try:
-            #     self.__setWatched()
-            # except:
-            #     pass
-            # try:
-            #     self.__setResume()
-            # except Exception, e:
-            #     self.oConfig.log("__setResume ERROR: " + e.message)
             if self.sType != 'livetv':
                 try:
                     self.db.del_history(self.sTitle)
@@ -288,32 +290,26 @@ class cPlayer(xbmc.Player):
             return
 
         self.playBackEventReceived = True
-        self.__getResume()
-
 
     def __getResume(self):
         self.oConfig.log('__getResume')
         meta = {}
         meta['title'] = self.sTitle
+        time = 0.0
         try:
             data = self.db.get_resume(meta)
             if data != []:
-                time = float(data[0][2])
-                self.seekTime(time)
+                time = int(float(data[0][2]))
+                self.oConfig.log('seekTime ' + str(time) + 's')
                 if self.isCasting:
                     m, s = divmod(time, 60)
                     h, m = divmod(m, 60)
                     cGui().showInfo("TvWatch", VSlang(30453) + " %d:%02d:%02d" % (h, m, s))
-                # label = '%s %.2f minutes' % ('Reprendre:', time / 60)
-                # oDialog = self.oConfig.createDialogYesNo(label)
-                # if (oDialog == 1):
-                #     self.seekTime(time)
         except Exception, e:
             self.oConfig.log('__getResume ERROR: ' + e.message)
+        return time
 
     def __setResume(self, update = False):
-        # self.oConfig.log('__setResume')
-
         #Faut pas deconner quand meme
         # if self.currentTime < 30 or self.theEnd:
         #     return
