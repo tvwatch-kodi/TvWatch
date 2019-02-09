@@ -273,8 +273,17 @@ class CloudflareBypass(object):
                 xbmc.log("******  Decodage *****", xbmc.LOGNOTICE)
 
                 #recuperation parametres
-                hash = re.findall('<input type="hidden" name="jschl_vc" value="(.+?)"\/>',htmlcontent)[0]
-                passe = re.findall('<input type="hidden" name="pass" value="(.+?)"\/>',htmlcontent)[0]
+                hash = ''
+                passe = ''
+                try:
+                    hash = re.findall('<input type="hidden" name="jschl_vc" value="(.+?)"\/>',htmlcontent)[0]
+                except:
+                    hash = ''
+                try:
+                    passe = re.findall('<input type="hidden" name="pass" value="(.+?)"\/>',htmlcontent)[0]
+                except:
+                    passe = ''
+
 
                 #calcul de la reponse
                 rep = self.GetResponse(htmlcontent)
@@ -306,6 +315,8 @@ class CloudflareBypass(object):
             #    opener.addheaders.append(('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'))
 
             xbmc.log("Url demandee " + str(url), xbmc.LOGNOTICE )
+            if not url.startswith('http'):
+                url = self.hostComplet+ url
 
             try:
                 if postdata:
@@ -337,7 +348,7 @@ class CloudflareBypass(object):
                 #fh.write(htmlcontent)
                 #fh.close()
                 xbmc.log("Probleme protection Cloudflare : Protection captcha", xbmc.LOGNOTICE)
-                showInfo("Erreur", 'Probleme CloudFlare, pls Retry' , 5)
+                # showInfo("Erreur", 'Probleme CloudFlare, pls Retry' , 5)
                 return ''
 
             if not CheckIfActive(htmlcontent):
@@ -392,5 +403,5 @@ class CloudflareBypass(object):
 
 
         xbmc.log("Probleme protection Cloudflare : Cookies manquants", xbmc.LOGNOTICE)
-        showInfo("Erreur", 'Probleme protection CloudFlare' , 5)
+        # showInfo("Erreur", 'Probleme protection CloudFlare' , 5)
         return ''
