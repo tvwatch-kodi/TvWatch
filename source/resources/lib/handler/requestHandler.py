@@ -166,6 +166,9 @@ class cRequestHandler:
                     VSlog('Page protegee par cloudflare')
                     CF = cloudflare.CloudflareBypass()
                     sContent = CF.GetHtml(self.__sUrl,e.read(),cookies,sParameters,oRequest.headers)
+                    if sContent == 'CLOUDFLARE_ISSUE':
+                        VSlog("GetHtml failed due to CloudFlare protection. Retrying once...")
+                        sContent = CF.GetHtml(self.__sUrl,e.read(),cookies,sParameters,oRequest.headers)
                     self.__sRealUrl,self.__sResponseHeader = CF.GetReponseInfo()
 
             if not sContent:

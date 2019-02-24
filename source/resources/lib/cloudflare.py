@@ -349,7 +349,7 @@ class CloudflareBypass(object):
                 #fh.close()
                 xbmc.log("Probleme protection Cloudflare : Protection captcha", xbmc.LOGNOTICE)
                 # showInfo("Erreur", 'Probleme CloudFlare, pls Retry' , 5)
-                return ''
+                return 'CLOUDFLARE_ISSUE'
 
             if not CheckIfActive(htmlcontent):
                 # ok no more protection
@@ -404,4 +404,4 @@ class CloudflareBypass(object):
 
         xbmc.log("Probleme protection Cloudflare : Cookies manquants", xbmc.LOGNOTICE)
         # showInfo("Erreur", 'Probleme protection CloudFlare' , 5)
-        return ''
+        return 'CLOUDFLARE_ISSUE'
