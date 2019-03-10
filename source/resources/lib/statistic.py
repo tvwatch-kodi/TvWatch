@@ -1,7 +1,6 @@
 from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.handler.inputParameterHandler import cInputParameterHandler
 from resources.lib.config import cConfig
-from ctypes import *
 import time
 import random
 
