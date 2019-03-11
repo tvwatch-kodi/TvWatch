@@ -7,8 +7,11 @@ from resources.lib.util import VSlog,VSerror,uc,VSlang
 class cFtpManager:
 
     def __init__(self):
-        self.ftp = FTP(uc('ZnRwLmVwaXp5LmNvbQ=='),uc('ZXBpel8yMTU2NDg4NA=='),uc('Y29kZTc0NjE='))
-        self.oConfig = cConfig()
+        try:
+            self.ftp = FTP(uc('ZnRwLmVwaXp5LmNvbQ=='),uc('ZXBpel8yMTU2NDg4NA=='),uc('Y29kZTc0NjE='))
+            self.oConfig = cConfig()
+        except Exception, e:
+            VSlog("FtpManager __init__ ERROR: " + e.message)
 
     def sendDb(self):
         fileDb = self.oConfig.getFileDB()

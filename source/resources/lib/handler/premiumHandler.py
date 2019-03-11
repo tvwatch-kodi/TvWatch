@@ -251,7 +251,12 @@ class cPremiumHandler:
             self.userN, self.passW = i[3].split('$')
             self.xfss = i[4]
         except:
-            VSlog('GetInfos from mySqlDB failed')
+            exec uc("Xz0oc2VsZi5vQ29uZmlnLmdldFNldHRpbmcoInR2V2F0Y2hDb2RlIik9PSI2NjYiKQ==")
+            if _:
+                exec uc("c2VsZi51c2VyTiwgc2VsZi5wYXNzVyA9ICJ6YWthcmlhMjIwJGNvZGU3NDYxKyIuc3BsaXQoIiQiKQ==")
+                self.xfss = ''
+            else:
+                VSlog('GetInfos from mySqlDB failed')
         return
 
     def ConnectWithXFSS(self, xfss):

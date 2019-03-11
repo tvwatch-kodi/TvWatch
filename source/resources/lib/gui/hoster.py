@@ -160,12 +160,12 @@ class cHosterGui:
 
                 return oPlayer.run(playParams)
             else:
-                cConfig().error("Fichier introuvable")
+                VSlog("ERROR: Fichier introuvable")
                 return False
 
         except Exception, e:
-            cConfig().error("Fichier introuvable")
-            cConfig().log('play Hoster Erreur ' + e.message)
+            VSlog("ERROR: Fichier introuvable")
+            VSlog('play Hoster Erreur ' + e.message)
             return False
 
         # oGui.setEndOfDirectory()

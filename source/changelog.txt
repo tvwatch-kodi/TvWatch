@@ -4,7 +4,7 @@
 =============================================================================
 - Auteurs : Primatech
 =============================================================================
-- Current Version 2.1.03 - 10.3.2019
+- Current Version 2.1.04 - 11.3.2019
 =============================================================================
 - Version 1.0.0
 21-02-2018 -- @tvwatch-kodi -- First stable version
@@ -132,4 +132,6 @@
 - Version 2.1.02
 24-02-2019 -- @tvwatch-kodi -- Retry in case of Cloudflare issue
 - Version 2.1.03
-10-03-2019 -- @tvwatch-kodi -- Add Xbox One compatibility 
+10-03-2019 -- @tvwatch-kodi -- Add Xbox One compatibility
+- Version 2.1.04
+11-03-2019 -- @tvwatch-kodi -- Workaround to fix mySql issue 
