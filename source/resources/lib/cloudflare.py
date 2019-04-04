@@ -9,6 +9,7 @@ import urllib2,urllib
 import xbmc
 import xbmcaddon
 
+from resources.lib.util import VSlog
 from resources.lib.config import GestionCookie
 
 Mode_Debug = False
@@ -198,9 +199,7 @@ class CloudflareBypass(object):
         return head
 
     def GetResponse(self,htmlcontent):
-
         line1 = re.findall('var s,t,o,p,b,r,e,a,k,i,n,g,f, (.+?)={"(.+?)":\+*(.+?)};',htmlcontent)
-
         varname = line1[0][0] + '.' + line1[0][1]
         calcul = parseInt(line1[0][2])
 
@@ -275,6 +274,7 @@ class CloudflareBypass(object):
                 #recuperation parametres
                 hash = ''
                 passe = ''
+                s = ''
                 try:
                     hash = re.findall('<input type="hidden" name="jschl_vc" value="(.+?)"\/>',htmlcontent)[0]
                 except:
@@ -283,7 +283,10 @@ class CloudflareBypass(object):
                     passe = re.findall('<input type="hidden" name="pass" value="(.+?)"\/>',htmlcontent)[0]
                 except:
                     passe = ''
-
+                try:
+                    s = re.findall('<input type="hidden" name="s" value="([^"]+)"',htmlcontent, re.DOTALL)[0]
+                except:
+                    s = ''
 
                 #calcul de la reponse
                 rep = self.GetResponse(htmlcontent)
@@ -292,7 +295,7 @@ class CloudflareBypass(object):
                 #showInfo("Information", 'Decodage protection CloudFlare' , 5)
                 xbmc.sleep(6000)
 
-                url = self.hostComplet + '/cdn-cgi/l/chk_jschl?jschl_vc='+ urllib.quote_plus(hash) +'&pass=' + urllib.quote_plus(passe) + '&jschl_answer=' + rep
+                url = self.hostComplet + '/cdn-cgi/l/chk_jschl?s=' + urllib.quote_plus(s) + '&jschl_vc='+ urllib.quote_plus(hash) +'&pass=' + urllib.quote_plus(passe) + '&jschl_answer=' + rep
 
                 #No post data here
                 postdata = None
