@@ -88,6 +88,12 @@ def load():
     oOutputParameterHandler = cOutputParameterHandler()
     oGui.addDir(SITE_IDENTIFIER, 'continueToWatch', '[B][COLOR khaki]' + VSlang(30424) + '[/COLOR][/B]', 'mark.png', oOutputParameterHandler) # Continuer à regarder
 
+    oOutputParameterHandler = cOutputParameterHandler()
+    oGui.addDir(SITE_IDENTIFIER, 'showTheMovieDB', 'The Movie DB', 'host.png', oOutputParameterHandler) # The Movie DB
+
+    # oOutputParameterHandler = cOutputParameterHandler()
+    # oGui.addDir(SITE_IDENTIFIER, 'showTopIMDB', 'Top IMDB', 'host.png', oOutputParameterHandler) # The Movie DB
+
     # oOutputParameterHandler = cOutputParameterHandler()
     # LiveTV = '1'
     # oOutputParameterHandler.addParameter('mode', LiveTV)
@@ -121,6 +127,7 @@ def load():
     # oOutputParameterHandler.addParameter('sItemUrl', 'http://primatech')
     # oGui.addDir('cFav', 'getFavourites', VSlang(30423), 'star.png', oOutputParameterHandler) # Ma liste
 
+    oOutputParameterHandler = cOutputParameterHandler()
     if (cConfig().getSetting('home_update') == 'true'):
         oGui.addDir(SITE_IDENTIFIER, 'showUpdate', "[COLOR skyblue]"+VSlang(30418)+"[/COLOR]", 'update.png', oOutputParameterHandler)
     else:
@@ -1390,6 +1397,22 @@ def checkUpdate():
             cConfig().showInfo("TvWatch", VSlang(30474))
     except:
         pass
+    return
+
+def showTheMovieDB():
+    try:
+        from themoviedb_org import start
+        start()
+    except Exception, e:
+        VSlog('ERROR showTheMovieDB: '+e.message)
+    return
+
+def showTopIMDB():
+    try:
+        from topimdb import start
+        start()
+    except Exception, e:
+        VSlog('ERROR showTopIMDB: '+e.message)
     return
 
 def sortSeasonsAndGetCurrentSeason(seasons):

@@ -10,10 +10,10 @@ class cMySqlDB:
 
     def __init__(self):
         try:
-            self.db = mysql.connector.connect(host=uc("c3FsMTEuZnJlZW15c3FsaG9zdGluZy5uZXQ="), \
-                                              user=uc("c3FsMTEyMTc1NjE="), \
-                                              password=uc("V2RmcXJqZmZraw=="), \
-                                              database=uc("c3FsMTEyMTc1NjE="), \
+            self.db = mysql.connector.connect(host=uc("cmVtb3RlbXlzcWwuY29t"), \
+                                              user=uc("SXUzNzhqalpDRA=="), \
+                                              password=uc("eFZZbzJNNmJyTw=="), \
+                                              database=uc("SXUzNzhqalpDRA=="), \
                                               connection_timeout=10)
             self.dbcur = self.db.cursor()
             # VSlog("Init cMySqlDB SUCCESS")

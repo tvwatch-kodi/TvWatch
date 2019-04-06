@@ -807,3 +807,107 @@ msgstr ""
 msgctxt "#30477"
 msgid "Player Mode"
 msgstr ""
+
+msgctxt "#30478"
+msgid "Movies (Popular)"
+msgstr ""
+
+msgctxt "#30479"
+msgid "Movies (Theater)"
+msgstr ""
+
+msgctxt "#30480"
+msgid "Movies (Top Rated)"
+msgstr ""
+
+msgctxt "#30481"
+msgid "Movies (Kinds)"
+msgstr ""
+
+msgctxt "#30482"
+msgid "TV Shows (Popular)"
+msgstr ""
+
+msgctxt "#30483"
+msgid "TV Shows (on TV)"
+msgstr ""
+
+msgctxt "#30484"
+msgid "TV Shows (Top Rated)"
+msgstr ""
+
+msgctxt "#30485"
+msgid "TV Shows (Kinds)"
+msgstr ""
+
+msgctxt "#30486"
+msgid "Popular Actors"
+msgstr ""
+
+msgctxt "#30487"
+msgid "Search (Movies)"
+msgstr ""
+
+msgctxt "#30488"
+msgid "Search (TV Shows)"
+msgstr ""
+
+msgctxt "#30489"
+msgid "Search (Actor, Actress)"
+msgstr ""
+
+msgctxt "#30490"
+msgid "Movies (Favorites)"
+msgstr ""
+
+msgctxt "#30491"
+msgid "Movies (Rated)"
+msgstr ""
+
+msgctxt "#30492"
+msgid "Movies (Watched)"
+msgstr ""
+
+msgctxt "#30493"
+msgid "TV Shows (Favorites)"
+msgstr ""
+
+msgctxt "#30494"
+msgid "TV Shows (Rated)"
+msgstr ""
+
+msgctxt "#30495"
+msgid "Episodes (Rated)"
+msgstr ""
+
+msgctxt "#30496"
+msgid "TV Shows (Watched)"
+msgstr ""
+
+msgctxt "#30497"
+msgid "My Lists"
+msgstr ""
+
+msgctxt "#30498"
+msgid "You must be logged in"
+msgstr ""
+
+msgctxt "#30499"
+msgid "Add: rated"
+msgstr ""
+
+msgctxt "#30500"
+msgid "Add: Watched"
+msgstr ""
+
+msgctxt "#30501"
+msgid "Add: Favorites"
+msgstr ""
+
+msgctxt "#30502"
+msgid "[COLOR red]Delete: Watched[/COLOR]"
+msgstr ""
+
+msgctxt "#30503"
+msgid "[COLOR red]Delete: Favorites[/COLOR]"
+msgstr ""

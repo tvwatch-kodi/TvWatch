@@ -197,78 +197,13 @@ def isTrakt(sSiteName, sFunction):
     return False
 
 def searchGlobal():
-    cancel = False
-    oGui = cGui()
     oInputParameterHandler = cInputParameterHandler()
-
-    #print xbmc.getInfoLabel('ListItem.Property(Category)')
-
     sSearchText = oInputParameterHandler.getValue('searchtext')
     sCat = oInputParameterHandler.getValue('sCat')
 
-    oHandler = cRechercheHandler()
-    oHandler.setText(sSearchText)
-    oHandler.setCat(sCat)
-    aPlugins = oHandler.getAvailablePlugins()
-    if not aPlugins: return True
-    total = len(aPlugins)
+    from resources.sites.server import showMovies
+    showMovies(sSearchText) #server
 
-    #xbmc.log(str(aPlugins), xbmc.LOGNOTICE)
-
-    dialog = self.oConfig.createDialog("TvWatch")
-    #kodi 17 vire la fenetre busy qui ce pose au dessus de la barre de Progress
-    try:
-        xbmc.executebuiltin("Dialog.Close(busydialog)")
-    except: pass
-    xbmcgui.Window(10101).setProperty('search', 'true')
-
-    oGui.addText('globalSearch', self.oConfig.getlanguage(30081) % (sSearchText), 'none.png')
-
-    for count, plugin in enumerate(aPlugins):
-
-        text = '%s/%s - %s' % ((count+1), total, plugin['name'])
-        self.oConfig.updateDialogSearch(dialog, total, text)
-        if dialog.iscanceled():
-            cancel = True
-            dialog.close()
-            break
-
-        #nom du site
-        oGui.addText(plugin['identifier'], '%s. [COLOR khaki]%s[/COLOR]' % ((count+1), plugin['name']), 'sites/%s.png' % (plugin['identifier']))
-        #recherche import
-        _pluginSearch(plugin, sSearchText)
-
-    xbmcgui.Window(10101).setProperty('search', 'false')
-
-    #affichage
-    total=len(oGui.searchResults)
-    #filtre
-    int_1 = cUtil().CheckOrd(sSearchText)
-
-    for count,result in enumerate(oGui.searchResults):
-        text = '%s/%s - %s' % ((count+1/total), total, result['guiElement'].getTitle())
-
-        if(count == 0):
-            self.oConfig.updateDialogSearch(dialog, total, text,True)
-        else:
-            self.oConfig.updateDialogSearch(dialog, total, text)
-
-        #result['params'].addParameter('VSTRMSEARCH','True')
-
-        oGui.addFolder(result['guiElement'],result['params'])
-        #xbmc.log('%s - %s' % (middle,old_label),  xbmc.LOGNOTICE)
-
-        if dialog.iscanceled():
-            if cancel == True:
-                continue
-            else:
-                break
-
-    self.oConfig.finishDialog(dialog)
-
-    oGui.setEndOfDirectory()
-
-    return True
 
 def _pluginSearch(plugin, sSearchText):
     try:
