@@ -83,7 +83,7 @@ class cFtpManager:
                 f.close()
                 # self.ftp.quit()
         except Exception, e:
-            VSlog("FtpManager sendDb ERROR: " + e.message)
+            VSlog("FtpManager getDb ERROR: " + e.message)
 
     def sendLogs(self):
         fileLog = self.oConfig.getLogFile()

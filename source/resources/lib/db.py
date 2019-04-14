@@ -57,7 +57,7 @@ class cDb:
 
             ''' Create table '''
             sql_create = "CREATE TABLE IF NOT EXISTS history ("" addon_id integer PRIMARY KEY AUTOINCREMENT, ""sItemUrl TEXT, ""mainUrl TEST, ""rawtitle TEXT, ""title TEXT, ""icon TEXT, ""type TEXT, ""quality TEXT, ""UNIQUE(rawtitle)"");"
-            a = self.dbcur.execute(sql_create)
+            self.dbcur.execute(sql_create)
 
             sql_create = "CREATE TABLE IF NOT EXISTS resume ("" addon_id integer PRIMARY KEY AUTOINCREMENT, ""title TEXT, ""timepoint TEXT, ""UNIQUE(title)"");"
             self.dbcur.execute(sql_create)

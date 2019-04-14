@@ -39,8 +39,7 @@ def GetURL_MAIN():
         URL = URL_HOST
     return URL
 
-# URL_MAIN = GetURL_MAIN()
-URL_MAIN = URL_HOST
+URL_MAIN = GetURL_MAIN()
 URL_DECRYPT =  'www.dl-protect1.com'
 
 URL_IMAGE = 'http://www.zone-image.com/'
@@ -725,21 +724,21 @@ def showHosters(params = {}, playNow = True):# recherche et affiche les hotes
     sHtmlContent = oRequestHandler.request()
 
     #Si ca ressemble aux lien premiums on vire les liens non premium
-    params = {}
-    params['sItemUrl'] = ExtractUptoboxLinksForMovies(sHtmlContent)
-    params['sMainUrl'] = sMainUrl
-    params['sMovieTitle'] = sMovieTitle
-    params['sThumbnail'] = sThumbnail
-    params['sType'] = 'movie'
-    params['sQual'] = 'osef'
-    params['refresh'] = "False"
+    meta = {}
+    meta['sItemUrl'] = ExtractUptoboxLinksForMovies(sHtmlContent)
+    meta['sMainUrl'] = sMainUrl
+    meta['sMovieTitle'] = sMovieTitle
+    meta['sThumbnail'] = sThumbnail
+    meta['sType'] = 'movie'
+    meta['sQual'] = 'osef'
+    meta['refresh'] = "False"
 
-    params = {}
+    res = {}
     try:
-        params = Display_protected_link(params, playNow)
+        res = Display_protected_link(meta, playNow)
     except Exception, e:
         VSlog("showHosters ERROR: " + e.message)
-    return params
+    return res
 
 def showSeriesHosters():# recherche et affiche les hotes
     VSlog('showSeriesHosters')

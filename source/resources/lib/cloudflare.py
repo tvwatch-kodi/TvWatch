@@ -267,7 +267,7 @@ class CloudflareBypass(object):
 
             opener.addheaders = self.SetHeader()
 
-            if (('cf_clearance' not in cookies) and htmlcontent and ('__cfduid=' in cookies)):
+            if ('cf_clearance' not in cookies) and htmlcontent and ('__cfduid=' in cookies):
 
                 xbmc.log("******  Decodage *****", xbmc.LOGNOTICE)
 

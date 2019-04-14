@@ -4,7 +4,7 @@
 =============================================================================
 - Auteurs : Primatech
 =============================================================================
-- Current Version 2.3.01 - 15.4.2019
+- Current Version 2.3.02 - 15.4.2019
 =============================================================================
 - Version 1.0.0
 21-02-2018 -- @tvwatch-kodi -- First stable version
@@ -143,3 +143,5 @@
 14-04-2019 -- @tvwatch-kodi -- Add Download and offline streaming feature
 - Version 2.3.01
 15-04-2019 -- @tvwatch-kodi -- Fix Cloudflare issue
+- Version 2.3.02
+15-04-2019 -- @tvwatch-kodi -- Minor issue dl-protect

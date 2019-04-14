@@ -9,9 +9,6 @@ import unicodedata
 import sys,xbmcplugin
 import base64
 import os
-import urllib2
-import time
-from threading import Thread
 
 COUNT = 0
 DIALOG2 = None
