@@ -4,7 +4,7 @@
 =============================================================================
 - Auteurs : Primatech
 =============================================================================
-- Current Version 2.3.00 - 14.4.2019
+- Current Version 2.3.01 - 15.4.2019
 =============================================================================
 - Version 1.0.0
 21-02-2018 -- @tvwatch-kodi -- First stable version
@@ -141,3 +141,5 @@
 06-04-2019 -- @tvwatch-kodi -- Add The Movie DB and IMDB integration
 - Version 2.3.00
 14-04-2019 -- @tvwatch-kodi -- Add Download and offline streaming feature
+- Version 2.3.01
+15-04-2019 -- @tvwatch-kodi -- Fix Cloudflare issue

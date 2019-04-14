@@ -508,25 +508,15 @@ def showMoviesLinks(params = {}):
         sQual = aResult[1][0]
         sTitle = sMovieTitle + ' [COLOR skyblue]' + sQual + '[/COLOR]'
 
-        params = {}
-        params['sItemUrl'] = sItemUrl
-        params['sMainUrl'] = sMainUrl
-        params['sMovieTitle'] = sMovieTitle
-        params['sThumbnail'] = sThumbnail
-
-        params = showHosters(params)
-
         oOutputParameterHandler = cOutputParameterHandler()
-        oOutputParameterHandler.addParameter('sItemUrl', params['sItemUrl'])
-        oOutputParameterHandler.addParameter('sMainUrl', params['sMainUrl'])
-        oOutputParameterHandler.addParameter('sMovieTitle', params['sMovieTitle'])
-        oOutputParameterHandler.addParameter('sThumbnail', params['sThumbnail'])
-        oOutputParameterHandler.addParameter('sType', params['sType'])
-        oOutputParameterHandler.addParameter('sQual', params['sQual'])
-        oOutputParameterHandler.addParameter('refresh', params['refresh'])
+        oOutputParameterHandler.addParameter('sItemUrl', sItemUrl)
+        oOutputParameterHandler.addParameter('sMainUrl', sMainUrl)
+        oOutputParameterHandler.addParameter('sMovieTitle', str(sMovieTitle))
+        oOutputParameterHandler.addParameter('sThumbnail', str(sThumbnail))
         oOutputParameterHandler.addParameter('status', 'NotStarted')
+        oOutputParameterHandler.addParameter('needShowHosters', 'True')
 
-        oGui.addMovie(SITE_IDENTIFIER, 'Display_protected_link', sTitle, '', sThumbnail, '', oOutputParameterHandler, \
+        oGui.addMovie(SITE_IDENTIFIER, 'showHosters', sTitle, '', sThumbnail, '', oOutputParameterHandler, \
                       meta=True, isFolder=True, year=year, download=True)
 
     #on regarde si dispo dans d'autres qualités
@@ -551,6 +541,7 @@ def showMoviesLinks(params = {}):
             oOutputParameterHandler.addParameter('sMovieTitle', str(sMovieTitle))
             oOutputParameterHandler.addParameter('sThumbnail', str(sThumbnail))
             oOutputParameterHandler.addParameter('status', 'NotStarted')
+            oOutputParameterHandler.addParameter('needShowHosters', 'True')
 
             oGui.addMovie(SITE_IDENTIFIER, 'showHosters', sTitle, '', sThumbnail, '', oOutputParameterHandler, \
                           meta=True, isFolder=True, year=year, download=True)
@@ -711,7 +702,7 @@ def showSeriesLinks(params = {}):
 
     oGui.setEndOfDirectory(50)
 
-def showHosters(params = {}):# recherche et affiche les hotes
+def showHosters(params = {}, playNow = True):# recherche et affiche les hotes
     VSlog('showHosters')
 
     oInputParameterHandler = cInputParameterHandler()
@@ -743,6 +734,11 @@ def showHosters(params = {}):# recherche et affiche les hotes
     params['sQual'] = 'osef'
     params['refresh'] = "False"
 
+    params = {}
+    try:
+        params = Display_protected_link(params, playNow)
+    except Exception, e:
+        VSlog("showHosters ERROR: " + e.message)
     return params
 
 def showSeriesHosters():# recherche et affiche les hotes
@@ -855,7 +851,10 @@ def showSeriesHosters():# recherche et affiche les hotes
         params['sQual'] = episodes[0]['sQual']
         params['refresh'] = episodes[0]['refresh']
 
-        Display_protected_link(params)
+        try:
+            Display_protected_link(params)
+        except Exception, e:
+            VSlog("showSeriesHosters ERROR: " + e.message)
     else:
         oGui.setEndOfDirectory(50)
 
@@ -973,14 +972,17 @@ def Display_protected_link(params = {}, playNow = True):
                         cGui().updateDirectory()
                 else:
                     return playParams
-                return None
+    # cConfig().showInfo('TvWatch', VSlang(30513))
 
 def prepareNextEpisode(sMovieTitle, sQual, sType):
     VSlog("Début prepareNextEpisode")
     if sType == 'tvshow':
         params = getNextEpisode(sMovieTitle, sQual)
         if params != {}:
-            res = Display_protected_link(params, False)
+            try:
+                res = Display_protected_link(params, False)
+            except Exception, e:
+                VSlog("prepareNextEpisode ERROR: " + e.message)
             VSlog("Fin prepareNextEpisode")
             return res
     return None
@@ -1263,7 +1265,10 @@ def playContinueToWatch(sFullTitle):
         params['sQual'] = sQual
         params['refresh'] = "True"
 
-        Display_protected_link(params)
+        try:
+            Display_protected_link(params)
+        except Exception, e:
+            VSlog("playContinueToWatch ERROR: " + e.message)
 
 def CutQual(sHtmlContent):
     oParser = cParser()
@@ -1340,7 +1345,8 @@ def ExtractUptoboxLinksForMovies(sHtmlContent):
     while 'uptobox' in sHtmlContent.lower():
         a = sHtmlContent.lower().find('uptobox')
         sHtmlContent = sHtmlContent[a:]
-        LinksGroup.append(ExtractUptoboxLinks(sHtmlContent))
+        if '</div>' in sHtmlContent[:len('uptobox')+10]:
+            LinksGroup.append(ExtractUptoboxLinks(sHtmlContent))
         sHtmlContent = sHtmlContent[7:]
 
     min = 10000
@@ -1539,7 +1545,8 @@ def sortSeasonsAndGetCurrentSeason(seasons):
 
 def fixUrl(url):
     url = url.replace("://","")
-    return URL_MAIN + url[url.find("/")+1:]
+    url = URL_MAIN + url[url.find("/")+1:]
+    return url
 
 def correctUrl(url):
     if '//' in url:

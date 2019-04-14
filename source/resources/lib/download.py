@@ -10,7 +10,6 @@ from resources.lib.gui.gui import cGui
 from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.db import cDb
 from resources.lib.util import cUtil, VSlog, VSGetCachePath, uc, VS_str_conv, VSlang
-from resources.sites.server import Display_protected_link
 
 import urllib2,urllib
 import xbmcplugin, xbmc
@@ -285,18 +284,35 @@ class cDownload:
         meta['sQual'] = ''
         meta['refresh'] = ''
 
-        xbmcgui.Window(10101).setProperty('SimpleDownloaderQueue', '0')
+        needShowHosters = oInputParameterHandler.getValue('needShowHosters')
 
-        params = Display_protected_link(meta, False)
-        sUrl = params['sMediaUrl']
-        # sFileName = params['sFileName']
-        sFileName = meta['sMovieTitle']
-        sThumbnail = params['sThumbnail']
-        sMainUrl = params['sMainUrl']
+        if needShowHosters == 'True':
+            try:
+                from resources.sites.server import showHosters
+                params = showHosters(meta, False)
+            except Exception, e:
+                VSlog("StartDownloadOneFile showHosters ERROR: " + e.message)
+        else:
+            try:
+                from resources.sites.server import Display_protected_link
+                params = Display_protected_link(meta, False)
+            except Exception, e:
+                VSlog("StartDownloadOneFile Display_protected_link ERROR: " + e.message)
 
-        path = os.path.join(VSGetCachePath(), VS_str_conv(sFileName)).decode("utf-8")
+        try:
+            sUrl = params['sMediaUrl']
+            sFileName = meta['sMovieTitle']
+            sThumbnail = params['sThumbnail']
+            sMainUrl = params['sMainUrl']
 
-        self.download(sUrl, sFileName, path, sThumbnail, sMainUrl)
+            path = os.path.join(VSGetCachePath(), VS_str_conv(sFileName)).decode("utf-8")
+
+            xbmcgui.Window(10101).setProperty('SimpleDownloaderQueue', '0')
+
+            self.download(sUrl, sFileName, path, sThumbnail, sMainUrl)
+        except Exception, e:
+            self.__oConfig.showInfo('TvWatch', VSlang(30508))
+            VSlog("StartDownloadOneFile ERROR: " + e.message)
 
     def RemoveDownload(self):
         oInputParameterHandler = cInputParameterHandler()

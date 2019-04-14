@@ -947,3 +947,7 @@ msgstr ""
 msgctxt "#30512"
 msgid "Please confirm file deletion"
 msgstr ""
+
+msgctxt "#30513"
+msgid "An error occured. Please retry !"
+msgstr ""

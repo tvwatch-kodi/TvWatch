@@ -931,7 +931,7 @@ msgstr "Téléchargement terminé"
 
 msgctxt "#30508"
 msgid "Download failed. Please retry !"
-msgstr "Le téléchargement à échouer. Réessayer SVP !"
+msgstr "Le téléchargement à échouer. Réessayez SVP !"
 
 msgctxt "#30509"
 msgid "A download is in progress"
@@ -948,3 +948,7 @@ msgstr "Fichier supprimé avec succès"
 msgctxt "#30512"
 msgid "Please confirm item deletion"
 msgstr "Confirmez la suppresion du fichier SVP"
+
+msgctxt "#30513"
+msgid "An error occured. Please retry !"
+msgstr "Une erreur s'est produite. Réessayez SVP !"

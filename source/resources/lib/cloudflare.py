@@ -267,7 +267,7 @@ class CloudflareBypass(object):
 
             opener.addheaders = self.SetHeader()
 
-            if ('cf_clearance' not in cookies) and htmlcontent and ('__cfduid=' in cookies):
+            if (('cf_clearance' not in cookies) and htmlcontent and ('__cfduid=' in cookies)):
 
                 xbmc.log("******  Decodage *****", xbmc.LOGNOTICE)
 
@@ -288,15 +288,19 @@ class CloudflareBypass(object):
                 except:
                     s = ''
 
-                #calcul de la reponse
-                rep = self.GetResponse(htmlcontent)
+                try:
+                    #calcul de la reponse
+                    rep = self.GetResponse(htmlcontent)
+                except:
+                    rep = ''
 
                 #Temporisation
                 # showInfo("Information", 'Please wait...' , 5)
                 # xbmc.sleep(6000)
                 xbmc.sleep(3000)
 
-                url = self.hostComplet + '/cdn-cgi/l/chk_jschl?s=' + urllib.quote_plus(s) + '&jschl_vc='+ urllib.quote_plus(hash) +'&pass=' + urllib.quote_plus(passe) + '&jschl_answer=' + rep
+                url = self.hostComplet + '/cdn-cgi/l/chk_jschl?s=' + urllib.quote_plus(s) + \
+                '&jschl_vc='+ urllib.quote_plus(hash) +'&pass=' + urllib.quote_plus(passe) + '&jschl_answer=' + rep
 
                 #No post data here
                 postdata = None
@@ -304,10 +308,6 @@ class CloudflareBypass(object):
                 #To avoid captcha
                 if not "'Accept'" in str(opener.addheaders):
                     opener.addheaders.append(('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'))
-
-                #opener.addheaders.append(('Connection', 'keep-alive'))
-                #opener.addheaders.append(('Accept-Encoding', 'gzip, deflate, br'))
-                #opener.addheaders.append(('Cache-Control', 'max-age=0'))
 
             #Add cookies
             if cookies:
