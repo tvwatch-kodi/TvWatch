@@ -23,11 +23,14 @@ except:
 
 class cDb:
 
-    def __init__(self, ftp = False):
+    def __init__(self, ftp = True):
         self.oConfig = cConfig()
+        self.enableFtp = ftp
         try:
-            if ftp:
-                cFtpManager().getDb()
+            if self.enableFtp:
+                self.ftp = cFtpManager()
+                VSlog("Retrieve DB from server")
+                self.ftp.getDb()
             DB = self.oConfig.getFileDB()
             self.db = sqlite.connect(DB)
             self.dbcur = self.db.cursor()
@@ -41,16 +44,20 @@ class cDb:
         try:
             self.dbcur.close()
             self.db.close()
+            if self.enableFtp:
+                VSlog("sendDb to server")
+                self.ftp.sendDb()
+                self.ftp.quit()
         except Exception, e:
             VSlog('cDb ERROR in Destructor: ' + str(e.message))
 
     def createTables(self):
-
+        # self.dropTables()
         try:
 
             ''' Create table '''
             sql_create = "CREATE TABLE IF NOT EXISTS history ("" addon_id integer PRIMARY KEY AUTOINCREMENT, ""sItemUrl TEXT, ""mainUrl TEST, ""rawtitle TEXT, ""title TEXT, ""icon TEXT, ""type TEXT, ""quality TEXT, ""UNIQUE(rawtitle)"");"
-            self.dbcur.execute(sql_create)
+            a = self.dbcur.execute(sql_create)
 
             sql_create = "CREATE TABLE IF NOT EXISTS resume ("" addon_id integer PRIMARY KEY AUTOINCREMENT, ""title TEXT, ""timepoint TEXT, ""UNIQUE(title)"");"
             self.dbcur.execute(sql_create)
@@ -61,7 +68,7 @@ class cDb:
             sql_create = "CREATE TABLE IF NOT EXISTS favorite ("" addon_id integer PRIMARY KEY AUTOINCREMENT, ""title TEXT, ""siteurl TEXT, ""site TEXT, ""fav TEXT, ""cat TEXT, ""icon TEXT, ""fanart TEXT, ""UNIQUE(title, site)"");"
             self.dbcur.execute(sql_create)
 
-            sql_create = "CREATE TABLE IF NOT EXISTS download ("" addon_id integer PRIMARY KEY AUTOINCREMENT, ""title TEXT, ""url TEXT, ""path TEXT, ""cat TEXT, ""icon TEXT, ""size TEXT,""totalsize TEXT, ""status TEXT, ""UNIQUE(title, path)"");"
+            sql_create = "CREATE TABLE IF NOT EXISTS downloaded ("" addon_id integer PRIMARY KEY AUTOINCREMENT, ""title TEXT, ""path TEXT, ""icon TEXT, ""status TEXT, ""mainUrl TEXT, ""UNIQUE(title, path)"");"
             self.dbcur.execute(sql_create)
 
             sql_create = "CREATE TABLE IF NOT EXISTS valide ("" addon_id integer PRIMARY KEY AUTOINCREMENT, ""url TEXT, ""ok TEXT, ""UNIQUE(url)"");"
@@ -78,7 +85,7 @@ class cDb:
             self.dbcur.execute("DROP TABLE IF EXISTS %s" %('resume'))
             self.dbcur.execute("DROP TABLE IF EXISTS %s" %('watched'))
             self.dbcur.execute("DROP TABLE IF EXISTS %s" %('favorite'))
-            self.dbcur.execute("DROP TABLE IF EXISTS %s" %('download'))
+            self.dbcur.execute("DROP TABLE IF EXISTS %s" %('downloaded'))
             self.dbcur.execute("DROP TABLE IF EXISTS %s" %('valide'))
             VSlog('Tables dropped successfully')
         except:
@@ -95,20 +102,11 @@ class cDb:
     #     return data
 
     def str_conv(self, data):
-        # data = data.replace("'", "")
-        # data = data.replace("-", "")
         data = data.rstrip()
-        # data = data.replace(" ", "_")
-        # data = data.decode('utf-8')
         data = base64.b16encode(data)
         return data
 
     def str_deconv(self, data):
-        # data = data.replace("'", "")
-        # data = data.replace("-", "")
-        # data = data.rstrip()
-        # data = data.replace(" ", "_")
-        # data = data.encode('utf-8')
         data = base64.b16decode(data)
         data = data.rstrip()
         return data
@@ -147,6 +145,8 @@ class cDb:
         try:
             self.dbcur.execute(sql_select)
             matchedrow = self.dbcur.fetchall()
+            if not matchedrow:
+                matchedrow = []
             return matchedrow
         except Exception, e:
             VSlog('SQL ERROR EXECUTE resume: ' + str(e.message))
@@ -229,6 +229,8 @@ class cDb:
         try:
             self.dbcur.execute(sql_select)
             matchedrow = self.dbcur.fetchall()
+            if not matchedrow:
+                matchedrow = []
         except Exception, e:
             VSlog('SQL ERROR EXECUTE favorite: ' + str(e.message))
         return matchedrow
@@ -299,106 +301,6 @@ class cDb:
         self.oConfig.showInfo('Marque-Page', sTitle)
 
     #***********************************
-    #   Download fonctions
-    #***********************************
-
-    def insert_download(self, meta):
-        title = self.str_conv(meta['title'])
-        url = urllib.quote_plus(meta['url'])
-        sIcon = urllib.quote_plus(meta['icon'])
-        sPath = meta['path']
-
-        ex = "INSERT INTO download (title, url, path, cat, icon, size, totalsize, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
-        self.dbcur.execute(ex, (title,url, sPath,meta['cat'],sIcon, '', '', 0))
-
-        try:
-            self.db.commit()
-            VSlog('SQL INSERT download Successfully')
-            self.oConfig.showInfo(meta['title'], 'Enregistré avec succés')
-        except Exception, e:
-            VSlog('SQL ERROR INSERT download: ' + str(e.message))
-            pass
-
-    def get_Download(self, meta = ''):
-        if meta == '':
-            sql_select = "SELECT * FROM download"
-        else:
-            url = urllib.quote_plus(meta['url'])
-            sql_select = "SELECT * FROM download WHERE url = '%s' AND status = '0'" % (url)
-
-        try:
-            self.dbcur.execute(sql_select)
-            matchedrow = self.dbcur.fetchall()
-            return matchedrow
-        except Exception, e:
-            VSlog('SQL ERROR EXECUTE download: ' + str(e.message))
-            return None
-
-    def clean_download(self):
-        sql_select = "DELETE FROM download WHERE status = '2'"
-        try:
-            self.dbcur.execute(sql_select)
-            self.db.commit()
-            return False, False
-        except Exception, e:
-            VSlog('SQL ERROR EXECUTE download: ' + str(e.message))
-            return False, False
-
-    def reset_download(self, meta):
-        url = urllib.quote_plus(meta['url'])
-        sql_select = "UPDATE download SET status = '0' WHERE status = '2' AND url = '%s'" % (url)
-        try:
-            self.dbcur.execute(sql_select)
-            self.db.commit()
-            return False, False
-        except Exception, e:
-            VSlog('SQL ERROR EXECUTE download: ' + str(e.message))
-            return False, False
-
-    def del_download(self, meta):
-        if len(meta['url']) > 1:
-            url = urllib.quote_plus(meta['url'])
-            sql_select = "DELETE FROM download WHERE url = '%s'" % (url)
-        elif len(meta['path']) > 1:
-            path = meta['path']
-            sql_select = "DELETE FROM download WHERE path = '%s'" % (path)
-        else:
-            return
-
-        try:
-            self.dbcur.execute(sql_select)
-            self.db.commit()
-            return False, False
-        except Exception, e:
-            VSlog('SQL ERROR EXECUTE download: ' + str(e.message))
-            return False, False
-
-    def Cancel_download(self):
-        sql_select = "UPDATE download SET status = '0' WHERE status = '1'"
-        try:
-            self.dbcur.execute(sql_select)
-            self.db.commit()
-            return False, False
-        except Exception, e:
-            VSlog('SQL ERROR EXECUTE download: ' + str(e.message))
-            return False, False
-
-    def update_download(self, meta):
-        path = meta['path']
-        size = meta['size']
-        totalsize = meta['totalsize']
-        status = meta['status']
-
-        sql_select = "UPDATE download set size = '%s', totalsize = '%s', status= '%s' WHERE path = '%s'" % (size, totalsize, status, path)
-        try:
-            self.dbcur.execute(sql_select)
-            self.db.commit()
-            return False, False
-        except Exception, e:
-            VSlog('SQL ERROR EXECUTE download: ' + str(e.message))
-            return False, False
-
-    #***********************************
     #   history fonctions
     #***********************************
 
@@ -450,9 +352,8 @@ class cDb:
         try:
             self.dbcur.execute(sql_select)
             matchedrow = self.dbcur.fetchall()
-            # for i in range(len(matchedrow)):
-            #     matchedrow[i][3] = self.str_deconv(matchedrow[i][3])
-            #     matchedrow[i][2] = self.str_deconv(matchedrow[i][2])
+            if not matchedrow:
+                matchedrow = []
             return matchedrow
         except Exception, e:
             VSlog('SQL ERROR GET history: ' + str(e.message))
@@ -467,9 +368,8 @@ class cDb:
         try:
             self.dbcur.execute(sql_select)
             matchedrow = self.dbcur.fetchone()
-            # for i in range(len(matchedrow)):
-            #     matchedrow[i][3] = self.str_deconv(matchedrow[i][3])
-            #     matchedrow[i][2] = self.str_deconv(matchedrow[i][2])
+            if not matchedrow:
+                matchedrow = []
             return matchedrow
         except Exception, e:
             VSlog('SQL ERROR GET history: ' + str(e.message))
@@ -534,3 +434,112 @@ class cDb:
             VSlog('SQL DELETE valide Successfully')
         except Exception, e:
             VSlog('SQL ERROR valide history: ' + str(e.message))
+
+    #***********************************
+    #   downloaded fonctions
+    #***********************************
+
+    def insert_download(self, meta):
+        mainUrl = meta['sMainUrl']
+        title = meta['title']
+        path = meta['path']
+        sIcon = meta['icon']
+        status = meta['status']
+        # sRawtitle = title
+        title = self.str_conv(title)
+        path = self.str_conv(path)
+        # if sType == 'tvshow' and 'Saison' in sRawtitle:
+        #     sRawtitle = sRawtitle[:sRawtitle.find('Saison')]
+        # sRawtitle = self.str_conv(sRawtitle)
+        try:
+            ex = "INSERT INTO downloaded (title, path, icon, status, mainUrl) VALUES (?, ?, ?, ?, ?)"
+            self.dbcur.execute(ex, (title, path, sIcon, status, mainUrl))
+            self.db.commit()
+            VSlog('SQL INSERT downloaded Successfully')
+        except Exception, e:
+            VSlog('SQL ERROR INSERT downloaded: ' + str(e.message))
+            if 'UNIQUE constraint failed' in str(e.message):
+                self.update_download(meta)
+
+    def update_download(self, meta):
+        mainUrl = meta['sMainUrl']
+        title = meta['title']
+        path = meta['path']
+        sIcon = meta['icon']
+        status = meta['status']
+        # sRawtitle = title
+        title = self.str_conv(title)
+        path = self.str_conv(path)
+        # if sType == 'tvshow' and 'Saison' in sRawtitle:
+        #     sRawtitle = sRawtitle[:sRawtitle.find('Saison')]
+        # sRawtitle = self.str_conv(sRawtitle)
+        try:
+            ex = "UPDATE downloaded SET icon='%s', status='%s', mainUrl='%s' WHERE title='%s' AND path='%s'" % (sIcon, status, mainUrl, title, path)
+            self.dbcur.execute(ex)
+            self.db.commit()
+            VSlog('SQL UPDATE downloaded Successfully')
+        except Exception, e:
+            VSlog('SQL UPDATE downloaded: ' + str(e.message))
+
+
+    def get_download(self):
+        sql_select = "SELECT * FROM downloaded"
+        try:
+            self.dbcur.execute(sql_select)
+            matchedrow = self.dbcur.fetchall()
+            if not matchedrow:
+                matchedrow = []
+            return matchedrow
+        except Exception, e:
+            VSlog('SQL ERROR GET downloaded: ' + str(e.message))
+            return []
+
+    def get_downloadFromTitle(self, title):
+        # sRawtitle = title
+        # if 'Saison' in title:
+        #     sRawtitle = title[:title.find('Saison')]
+        title = self.str_conv(title)
+        sql_select = "SELECT * FROM downloaded WHERE title = '%s'" % (title)
+        try:
+            self.dbcur.execute(sql_select)
+            matchedrow = self.dbcur.fetchone()
+            if not matchedrow:
+                matchedrow = []
+            return matchedrow
+        except Exception, e:
+            VSlog('SQL ERROR GET downloaded: ' + str(e.message))
+            return []
+
+    def get_downloadFromStatus(self, status):
+        sql_select = "SELECT * FROM downloaded WHERE status = '%s'" % (status)
+        try:
+            self.dbcur.execute(sql_select)
+            matchedrow = self.dbcur.fetchone()
+            if not matchedrow:
+                matchedrow = []
+            return matchedrow
+        except Exception, e:
+            VSlog('SQL ERROR GET downloaded: ' + str(e.message))
+            return []
+
+    def del_downloadByStatus(self, status):
+        sql_delete = "DELETE FROM downloaded WHERE status = '%s'" % (status)
+        try:
+            self.dbcur.execute(sql_delete)
+            self.db.commit()
+            VSlog('SQL DELETE downloaded Successfully')
+        except Exception, e:
+            VSlog('SQL ERROR DELETE downloaded: ' + str(e.message))
+
+    def del_download(self, title):
+        # sRawtitle = title
+        # if 'Saison' in title:
+        #     sRawtitle = title[:title.find('Saison')]
+        title = self.str_conv(title)
+        sql_delete = "DELETE FROM downloaded WHERE title = '%s'" % (title)
+        try:
+            self.dbcur.execute(sql_delete)
+            self.db.commit()
+            VSlog('SQL DELETE downloaded Successfully')
+        except Exception, e:
+            VSlog('SQL ERROR DELETE downloaded: ' + str(e.message))

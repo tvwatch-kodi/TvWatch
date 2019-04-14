@@ -81,6 +81,7 @@ class OO0o :
   if i11 < I11 :
    VSlog ( 'iEDV NOK !' )
    cGui ( ) . showInfo ( uc ( 'QXV0aGVudGlmaWNhdGlvbg==' ) , VSlang ( int(uc ( 'MzA0NTA=' )) ) , 3 )
+   self . oConfig . setSetting ( uc ( 'dHZXYXRjaENvZGU=' ), '0' )
    return False
   else :
    if 98 - 98: I1111 * o0o0Oo0oooo0 / I1I1i1 * I1I1i1 / ooO0OO000o

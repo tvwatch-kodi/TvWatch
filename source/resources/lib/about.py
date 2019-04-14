@@ -53,7 +53,9 @@ class cAbout:
             time_service = self.__strptime(service_time, "%Y-%m-%d %H:%M:%S.%f")
             if (time_now - time_service > time_sleep):
                 self.checkupdate()
-                cFtpManager().sendLogs()
+                ftp = cFtpManager()
+                ftp.sendLogs()
+                ftp.quit()
             else:
                 VSlog('Prochaine verification de MAJ le : ' + str(time_sleep + time_service) )
                 #Pas besoin de memoriser la date, a cause du cache kodi > pas fiable.

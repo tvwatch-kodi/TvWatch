@@ -15,12 +15,10 @@ from resources.lib.util import cUtil, VSlog, VSlang, VScreateDialogOK, VS_show_b
 from resources.lib.db import cDb
 from resources.lib.tvHandler import cTvHandler
 from resources.lib.player import cPlayer
-from resources.lib.ftpmanager import cFtpManager
 from resources.lib.config import GestionCookie
 
 import urllib,re,urllib2
-import xbmcgui
-import xbmc
+import xbmc, xbmcgui, xbmcplugin
 import random
 
 # UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:64.0) Gecko/20100101 Firefox/64.0'
@@ -41,7 +39,8 @@ def GetURL_MAIN():
         URL = URL_HOST
     return URL
 
-URL_MAIN = GetURL_MAIN()
+# URL_MAIN = GetURL_MAIN()
+URL_MAIN = URL_HOST
 URL_DECRYPT =  'www.dl-protect1.com'
 
 URL_IMAGE = 'http://www.zone-image.com/'
@@ -85,7 +84,6 @@ def load():
     oOutputParameterHandler.addParameter('sItemUrl', 'http://primatech/')
     oGui.addDir(SITE_IDENTIFIER, 'showSearch', VSlang(30076), 'search.png', oOutputParameterHandler) # Recherche
 
-    oOutputParameterHandler = cOutputParameterHandler()
     oGui.addDir(SITE_IDENTIFIER, 'continueToWatch', '[B][COLOR khaki]' + VSlang(30424) + '[/COLOR][/B]', 'mark.png', oOutputParameterHandler) # Continuer à regarder
 
     oOutputParameterHandler = cOutputParameterHandler()
@@ -126,6 +124,8 @@ def load():
     # oOutputParameterHandler = cOutputParameterHandler()
     # oOutputParameterHandler.addParameter('sItemUrl', 'http://primatech')
     # oGui.addDir('cFav', 'getFavourites', VSlang(30423), 'star.png', oOutputParameterHandler) # Ma liste
+
+    oGui.addDir(SITE_IDENTIFIER, 'getDownload', VSlang(30145), 'mark.png', oOutputParameterHandler) # Fichiers téléchargé
 
     oOutputParameterHandler = cOutputParameterHandler()
     if (cConfig().getSetting('home_update') == 'true'):
@@ -214,7 +214,6 @@ def showChannels():
         if cConfig().testUrl(url):
             oGui.addTV(SITE_IDENTIFIER, 'playChannel', i['channel_title'], '', icon, '', oOutputParameterHandler)
             endOfDir = True
-    cFtpManager().sendDb()
     cConfig().finishDialog(dialog)
     if endOfDir:
         oGui.setEndOfDirectory(50)
@@ -507,15 +506,28 @@ def showMoviesLinks(params = {}):
     sQual = ''
     if (aResult[0]):
         sQual = aResult[1][0]
-
         sTitle = sMovieTitle + ' [COLOR skyblue]' + sQual + '[/COLOR]'
 
+        params = {}
+        params['sItemUrl'] = sItemUrl
+        params['sMainUrl'] = sMainUrl
+        params['sMovieTitle'] = sMovieTitle
+        params['sThumbnail'] = sThumbnail
+
+        params = showHosters(params)
+
         oOutputParameterHandler = cOutputParameterHandler()
-        oOutputParameterHandler.addParameter('sItemUrl', sItemUrl)
-        oOutputParameterHandler.addParameter('sMainUrl', sMainUrl)
-        oOutputParameterHandler.addParameter('sMovieTitle', str(sMovieTitle))
-        oOutputParameterHandler.addParameter('sThumbnail', str(sThumbnail))
-        oGui.addMovie(SITE_IDENTIFIER, 'showHosters', sTitle, '', sThumbnail, '', oOutputParameterHandler, meta=True, isFolder=True, year=year)
+        oOutputParameterHandler.addParameter('sItemUrl', params['sItemUrl'])
+        oOutputParameterHandler.addParameter('sMainUrl', params['sMainUrl'])
+        oOutputParameterHandler.addParameter('sMovieTitle', params['sMovieTitle'])
+        oOutputParameterHandler.addParameter('sThumbnail', params['sThumbnail'])
+        oOutputParameterHandler.addParameter('sType', params['sType'])
+        oOutputParameterHandler.addParameter('sQual', params['sQual'])
+        oOutputParameterHandler.addParameter('refresh', params['refresh'])
+        oOutputParameterHandler.addParameter('status', 'NotStarted')
+
+        oGui.addMovie(SITE_IDENTIFIER, 'Display_protected_link', sTitle, '', sThumbnail, '', oOutputParameterHandler, \
+                      meta=True, isFolder=True, year=year, download=True)
 
     #on regarde si dispo dans d'autres qualités
     sPattern = '<a href="([^"]+)"><span class="otherquality"><span style="color:#.{6}"><b>([^<]+)<\/b><\/span><span style="color:#.{6}"><b>([^<]+)<\/b><\/span>'
@@ -538,7 +550,10 @@ def showMoviesLinks(params = {}):
             oOutputParameterHandler.addParameter('sMainUrl', sMainUrl)
             oOutputParameterHandler.addParameter('sMovieTitle', str(sMovieTitle))
             oOutputParameterHandler.addParameter('sThumbnail', str(sThumbnail))
-            oGui.addMovie(SITE_IDENTIFIER, 'showHosters', sTitle, '', sThumbnail, '', oOutputParameterHandler, meta=True, isFolder=True, year=year)
+            oOutputParameterHandler.addParameter('status', 'NotStarted')
+
+            oGui.addMovie(SITE_IDENTIFIER, 'showHosters', sTitle, '', sThumbnail, '', oOutputParameterHandler, \
+                          meta=True, isFolder=True, year=year, download=True)
 
         cConfig().finishDialog(dialog)
 
@@ -696,17 +711,20 @@ def showSeriesLinks(params = {}):
 
     oGui.setEndOfDirectory(50)
 
-def showHosters():# recherche et affiche les hotes
+def showHosters(params = {}):# recherche et affiche les hotes
     VSlog('showHosters')
 
-    params = {}
-
-    oGui = cGui()
     oInputParameterHandler = cInputParameterHandler()
     sMovieTitle = oInputParameterHandler.getValue('sMovieTitle')
     sUrl = oInputParameterHandler.getValue('sItemUrl')
     sMainUrl = oInputParameterHandler.getValue('sMainUrl')
     sThumbnail = oInputParameterHandler.getValue('sThumbnail')
+
+    if params != {}:
+        sMovieTitle = params['sMovieTitle']
+        sUrl = params['sItemUrl']
+        sMainUrl = params['sMainUrl']
+        sThumbnail = params['sThumbnail']
 
     sUrl = fixUrl(sUrl)
     oRequestHandler = cRequestHandler(sUrl)
@@ -716,7 +734,7 @@ def showHosters():# recherche et affiche les hotes
     sHtmlContent = oRequestHandler.request()
 
     #Si ca ressemble aux lien premiums on vire les liens non premium
-
+    params = {}
     params['sItemUrl'] = ExtractUptoboxLinksForMovies(sHtmlContent)
     params['sMainUrl'] = sMainUrl
     params['sMovieTitle'] = sMovieTitle
@@ -725,7 +743,7 @@ def showHosters():# recherche et affiche les hotes
     params['sQual'] = 'osef'
     params['refresh'] = "False"
 
-    Display_protected_link(params)
+    return params
 
 def showSeriesHosters():# recherche et affiche les hotes
     VSlog('showSeriesHosters')
@@ -816,7 +834,10 @@ def showSeriesHosters():# recherche et affiche les hotes
             oOutputParameterHandler.addParameter('sType', episode['sType'])
             oOutputParameterHandler.addParameter('sQual', episode['sQual'])
             oOutputParameterHandler.addParameter('refresh', episode['refresh'])
-            oGui.addTV(SITE_IDENTIFIER, 'Display_protected_link', episode['sDisplayTitle'], '', episode['sThumbnail'], '', oOutputParameterHandler, meta=True, isFolder=True)
+            oOutputParameterHandler.addParameter('status', 'NotStarted')
+
+            oGui.addTV(SITE_IDENTIFIER, 'Display_protected_link', episode['sDisplayTitle'], '', episode['sThumbnail'], '', \
+                      oOutputParameterHandler, meta=True, isFolder=True, download=True)
             if not stop:
                 oGui.addText(SITE_IDENTIFIER,'[COLOR khaki]' + VSlang(30448) + '[/COLOR]')
                 stop = True
@@ -1111,6 +1132,11 @@ def continueToWatch():
         sType = aEntry[6]
         sQual = aEntry[7]
 
+        status = 'NotStarted'
+        aEntryDl = oDb.get_downloadFromTitle(sTitle)
+        if aEntryDl != []:
+            status = aEntryDl[4]
+
         # VSlog(aEntry)
 
         correctedURL = correctUrl(sMainUrl)
@@ -1132,6 +1158,7 @@ def continueToWatch():
         oOutputParameterHandler.addParameter('sRawtitle', sRawtitle)
         oOutputParameterHandler.addParameter('sQual', sQual)
         oOutputParameterHandler.addParameter('refresh', "True")
+        oOutputParameterHandler.addParameter('status', status)
 
         sDisplayTitle = sTitle
 
@@ -1146,6 +1173,70 @@ def continueToWatch():
         oGui.setEndOfDirectory(50)
     else:
         oGui.setEndOfDirectory(500)
+
+def getDownload():
+    VSlog("getDownload")
+    oGui = cGui()
+    oDb = cDb()
+    oConfig = cConfig()
+    dialog = oConfig.createDialog(SITE_NAME)
+    matchedrow = oDb.get_download()
+    matchedrow.reverse()
+    for aEntry in matchedrow:
+        oConfig.updateDialog(dialog, len(matchedrow))
+        if dialog.iscanceled():
+            break
+
+        sTitle = aEntry[1]
+        sTitle = oDb.str_deconv(sTitle)
+        sPath = aEntry[2]
+        sPath = oDb.str_deconv(sPath)
+        sThumbnail = aEntry[3]
+        status = aEntry[4]
+        sMainUrl = aEntry[5]
+
+        sFullTitle = sTitle
+
+        oOutputParameterHandler = cOutputParameterHandler()
+        oOutputParameterHandler.addParameter('sMainUrl', sMainUrl)
+        oOutputParameterHandler.addParameter('sMovieTitle', sTitle)
+        oOutputParameterHandler.addParameter('sFullTitle', sFullTitle)
+        oOutputParameterHandler.addParameter('sThumbnail', sThumbnail)
+        oOutputParameterHandler.addParameter('sPath', sPath)
+        oOutputParameterHandler.addParameter('status', status)
+
+        sDisplayTitle = sTitle
+
+        oGui.addMovie(SITE_IDENTIFIER, 'playDownload', sDisplayTitle, '', sThumbnail, '', oOutputParameterHandler, downloadFolder = True, isFolder=True)
+
+    oConfig.finishDialog(dialog)
+    if len(matchedrow) == 0:
+        oGui.addText(SITE_IDENTIFIER,'[COLOR khaki]' + VSlang(30504) + '[/COLOR]')
+        oGui.setEndOfDirectory(50)
+    else:
+        oGui.setEndOfDirectory(500)
+
+def playDownload():
+    oInputParameterHandler = cInputParameterHandler()
+    sMainUrl = oInputParameterHandler.getValue('sMainUrl')
+    sMovieTitle = oInputParameterHandler.getValue('sMovieTitle')
+    sThumbnail = oInputParameterHandler.getValue('sThumbnail')
+    sFullTitle = oInputParameterHandler.getValue('sFullTitle')
+    sPath = oInputParameterHandler.getValue('sPath')
+    status = oInputParameterHandler.getValue('status')
+
+    try:
+        xlistitem = xbmcgui.ListItem( sMovieTitle, iconImage=sThumbnail, path=sPath)
+    except:
+        xlistitem = xbmcgui.ListItem( sMovieTitle, iconImage=sThumbnail, )
+    xlistitem.setInfo( "video", { "Title": sMovieTitle } )
+
+    playlist = xbmc.PlayList( xbmc.PLAYLIST_VIDEO )
+    playlist.clear()
+    playlist.add( sPath, xlistitem )
+
+    xbmcPlayer = xbmc.Player(  )
+    xbmcPlayer.play(playlist)
 
 def playContinueToWatch(sFullTitle):
     oDb = cDb()
@@ -1231,7 +1322,8 @@ def ExtractUptoboxLinksForTvShows(sHtmlContent):
     while 'uptobox' in sHtmlContent.lower():
         a = sHtmlContent.lower().find('uptobox')
         sHtmlContent = sHtmlContent[a:]
-        LinksGroup.append(ExtractUptoboxLinks(sHtmlContent))
+        if '</div>' in sHtmlContent[:len('uptobox')+10]:
+            LinksGroup.append(ExtractUptoboxLinks(sHtmlContent))
         sHtmlContent = sHtmlContent[7:]
 
     max = 0

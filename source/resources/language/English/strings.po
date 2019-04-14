@@ -361,7 +361,7 @@ msgid "Remove from list"
 msgstr ""
 
 msgctxt "#30217"
-msgid "[COLOR red]Delete definitely[/COLOR]"
+msgid "Delete item"
 msgstr ""
 
 msgctxt "#30218"
@@ -369,7 +369,7 @@ msgid "Stop download"
 msgstr ""
 
 msgctxt "#30219"
-msgid "Read"
+msgid "[COLOR green]Read downloaded item[/COLOR]"
 msgstr ""
 
 msgctxt "#30220"
@@ -910,4 +910,40 @@ msgstr ""
 
 msgctxt "#30503"
 msgid "[COLOR red]Delete: Favorites[/COLOR]"
+msgstr ""
+
+msgctxt "#30504"
+msgid "You will find here the downloaded Movies and TVShows !"
+msgstr ""
+
+msgctxt "#30505"
+msgid "Download started"
+msgstr ""
+
+msgctxt "#30506"
+msgid "Download stopped"
+msgstr ""
+
+msgctxt "#30507"
+msgid "Download done"
+msgstr ""
+
+msgctxt "#30508"
+msgid "Download failed. Please retry !"
+msgstr ""
+
+msgctxt "#30509"
+msgid "A download is in progress"
+msgstr ""
+
+msgctxt "#30510"
+msgid "File not found"
+msgstr ""
+
+msgctxt "#30511"
+msgid "Item successfully deleted"
+msgstr ""
+
+msgctxt "#30512"
+msgid "Please confirm file deletion"
 msgstr ""

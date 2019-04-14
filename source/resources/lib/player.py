@@ -3,7 +3,6 @@
 #
 from resources.lib.handler.inputParameterHandler import cInputParameterHandler
 from resources.lib.handler.pluginHandler import cPluginHandler
-from resources.lib.ftpmanager import cFtpManager
 from resources.lib.config import cConfig
 from resources.lib.gui.gui import cGui
 from resources.lib.db import cDb
@@ -278,8 +277,6 @@ class cPlayer(xbmc.Player):
                     self.db.del_resume(self.sTitle)
                     if self.sType != 'tvshow':
                         self.db.del_history(self.sTitle)
-                # Send Database by FTP
-                cFtpManager().sendDb()
 
     def onPlayBackStarted(self):
         VSlog("player started")

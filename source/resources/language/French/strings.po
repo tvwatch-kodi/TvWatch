@@ -361,16 +361,16 @@ msgid "Remove from list"
 msgstr "Supprimer de la liste"
 
 msgctxt "#30217"
-msgid "[COLOR red]Delete definitely[/COLOR]"
-msgstr "[COLOR red]Supprimer definitivement[/COLOR]"
+msgid "Delete item"
+msgstr "Supprimer le fichier"
 
 msgctxt "#30218"
 msgid "Stop download"
-msgstr "Arreter le telechargement"
+msgstr "Arrêter le téléchargement"
 
 msgctxt "#30219"
-msgid "Read"
-msgstr "Lire"
+msgid "[COLOR green]Read downloaded item[/COLOR]"
+msgstr "[COLOR green]Lire le fichier téléchargé[/COLOR]"
 
 msgctxt "#30220"
 msgid "Reset"
@@ -459,7 +459,7 @@ msgstr "A surveiller (episodes)"
 
 msgctxt "#30320"
 msgid "You have successfully logged out"
-msgstr "Vous avez été déconnecté avec succés"
+msgstr "Vous avez été déconnecté avec succès"
 
 msgctxt "#30321"
 msgid "Add collection"
@@ -912,3 +912,39 @@ msgstr "[COLOR red]Supprimer: Regardé[/COLOR]"
 msgctxt "#30503"
 msgid "[COLOR red]Delete: Favorites[/COLOR]"
 msgstr "[COLOR red]Supprimer: Favoris[/COLOR]"
+
+msgctxt "#30504"
+msgid "You will find here the downloaded Movies and TVShows !"
+msgstr "Vous trouverez ici les Films et Séries que vous avez téléchargés !"
+
+msgctxt "#30505"
+msgid "Download started"
+msgstr "Téléchargement démarré"
+
+msgctxt "#30506"
+msgid "Download stopped"
+msgstr "Téléchargement arrêté"
+
+msgctxt "#30507"
+msgid "Download done"
+msgstr "Téléchargement terminé"
+
+msgctxt "#30508"
+msgid "Download failed. Please retry !"
+msgstr "Le téléchargement à échouer. Réessayer SVP !"
+
+msgctxt "#30509"
+msgid "A download is in progress"
+msgstr "Un téléchargement est en cours"
+
+msgctxt "#30510"
+msgid "File not found"
+msgstr "Fichier introuvable"
+
+msgctxt "#30511"
+msgid "Item successfully deleted"
+msgstr "Fichier supprimé avec succès"
+
+msgctxt "#30512"
+msgid "Please confirm item deletion"
+msgstr "Confirmez la suppresion du fichier SVP"

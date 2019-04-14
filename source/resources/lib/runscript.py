@@ -133,7 +133,9 @@ class cClear:
         elif (env == 'sendLogsByFTP'):
             from resources.lib.ftpmanager import cFtpManager
             util.VS_show_busy_dialog()
-            cFtpManager().sendLogs()
+            ftp = cFtpManager()
+            ftp.sendLogs()
+            ftp.quit()
             util.VS_hide_busy_dialog()
             util.VScreateDialogOK(util.VSlang(30464))
 
@@ -145,7 +147,9 @@ class cClear:
                 util.VS_show_busy_dialog()
                 # Delete tvwatch.db
                 cDb().dropTables()
-                cFtpManager().sendDb()
+                ftp = cFtpManager()
+                ftp.sendDb()
+                ftp.quit()
                 # Delete metada.db
                 self.ClearDir2(util.VStranslatePath(cConfig().getFileCache()),True)
                 util.VS_hide_busy_dialog()

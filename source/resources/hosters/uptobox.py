@@ -7,7 +7,7 @@ from resources.lib.parser import cParser
 from resources.lib.gui.gui import cGui
 from resources.hosters.hoster import iHoster
 from resources.lib.config import cConfig
-from resources.lib.util import VSlog
+from resources.lib.util import VSlog, VSlang
 
 import urllib2,urllib,xbmcgui,re,xbmc
 
@@ -158,7 +158,7 @@ class cHoster(iHoster):
             else:
                 return True, api_call
 
-        cGui().showInfo(self.__sDisplayName, 'Fichier introuvable' , 5)
+        cGui().showInfo(self.__sDisplayName, VSlang(30510) , 5)
         return False, False
 
 
@@ -185,7 +185,7 @@ class cHoster(iHoster):
             else:
                 return True, api_call
 
-        cGui().showInfo(self.__sDisplayName, 'Fichier introuvable' , 5)
+        cGui().showInfo(self.__sDisplayName, VSlang(30510) , 5)
         return False, False
 
     def GetMedialinkDL(self,sHtmlContent):
@@ -267,7 +267,7 @@ class cHoster(iHoster):
 
             return stream_url
         else:
-            cGui().showInfo(self.__sDisplayName, 'Fichier introuvable' , 5)
+            cGui().showInfo(self.__sDisplayName, VSlang(30510) , 5)
             return False
 
         return False

@@ -2,7 +2,6 @@
 #Primatech.
 from resources.lib.gui.contextElement import cContextElement
 from resources.lib.gui.guiElement import cGuiElement
-from resources.lib.ftpmanager import cFtpManager
 from resources.lib.config import cConfig
 from resources.lib.db import cDb
 from resources.lib.handler.outputParameterHandler import cOutputParameterHandler
@@ -56,7 +55,8 @@ class cGui():
         CONTENT = 'addons'
 
 
-    def addMovie(self, sId, sFunction, sLabel, sIcon, sThumbnail, sDesc, oOutputParameterHandler = '', meta = False, continueToWatchFolder = False, isFolder=True, year=""):
+    def addMovie(self, sId, sFunction, sLabel, sIcon, sThumbnail, sDesc, oOutputParameterHandler = '', \
+                 meta = False, continueToWatchFolder = False, downloadFolder = False, isFolder=True, year="", download = False):
         cGui.CONTENT = "movies"
         oGuiElement = cGuiElement()
         oGuiElement.setSiteName(sId)
@@ -81,9 +81,10 @@ class cGui():
             sTitle = oOutputParameterHandler.getValue('sMovieTitle')
             oGuiElement.setFileName(sTitle)
 
-        self.addFolder(oGuiElement, oOutputParameterHandler, continueToWatchFolder = continueToWatchFolder, _isFolder=isFolder)
+        self.addFolder(oGuiElement, oOutputParameterHandler, continueToWatchFolder = continueToWatchFolder, \
+                        downloadFolder = downloadFolder, _isFolder=isFolder, download=download)
 
-    def addTV(self, sId, sFunction, sLabel, sIcon, sThumbnail, sDesc, oOutputParameterHandler = '', meta = False, continueToWatchFolder = False, isFolder=True, year=""):
+    def addTV(self, sId, sFunction, sLabel, sIcon, sThumbnail, sDesc, oOutputParameterHandler = '', meta = False, continueToWatchFolder = False, isFolder=True, year="", download=False):
         cGui.CONTENT = "tvshows"
         oGuiElement = cGuiElement()
         oGuiElement.setSiteName(sId)
@@ -116,7 +117,7 @@ class cGui():
             sTitle = oOutputParameterHandler.getValue('sMovieTitle')
             oGuiElement.setFileName(sTitle)
 
-        self.addFolder(oGuiElement, oOutputParameterHandler, continueToWatchFolder = continueToWatchFolder, _isFolder=isFolder)
+        self.addFolder(oGuiElement, oOutputParameterHandler, continueToWatchFolder = continueToWatchFolder, _isFolder=isFolder, download=download)
 
     def addMisc(self, sId, sFunction, sLabel, sIcon, sThumbnail, sDesc, oOutputParameterHandler = ''):
 
@@ -253,7 +254,7 @@ class cGui():
         self.addFolder(oGuiElement, oOutputParameterHandler)
 
     #afficher les liens non playable
-    def addFolder(self, oGuiElement, oOutputParameterHandler='',_isFolder=True, continueToWatchFolder=False):
+    def addFolder(self, oGuiElement, oOutputParameterHandler='',_isFolder=True, continueToWatchFolder=False, downloadFolder=False, download=False):
         #recherche append les reponses
         if  xbmcgui.Window(10101).getProperty('search') == 'true':
             import copy
@@ -298,6 +299,11 @@ class cGui():
                 # self.createContexMenuWatch(oGuiElement, oOutputParameterHandler)
                 if continueToWatchFolder:
                     self.createContexMenuPlay(oGuiElement, oOutputParameterHandler)
+                    self.createContexMenuDownload(oGuiElement, oOutputParameterHandler)
+                if download and not continueToWatchFolder:
+                    self.createContexMenuDownload(oGuiElement, oOutputParameterHandler)
+                if downloadFolder:
+                    self.createContexMenuDownload(oGuiElement, oOutputParameterHandler)
                 self.createContexMenuba(oGuiElement, oOutputParameterHandler)
                 self.createContexMenuinfo(oGuiElement, oOutputParameterHandler)
                 # self.createContexMenuFav(oGuiElement, oOutputParameterHandler)
@@ -409,21 +415,26 @@ class cGui():
         oOutputParameterHandler.addParameter('sType', sType)
         self.CreateSimpleMenu(oGuiElement,oOutputParameterHandler,'cTrakt','cTrakt','getAction', util.VSlang(30214))
 
-    def createContexMenuDownload(self, oGuiElement, oOutputParameterHandler= '', status = '0'):
+    def createContexMenuDownload(self, oGuiElement, oOutputParameterHandler= ''):
+        status = 'NotStarted'
+        if oOutputParameterHandler:
+            status = oOutputParameterHandler.getValue('status')
+            if status != 'NotStarted' and status != 'InProgress' and status != 'Downloaded':
+                status = 'NotStarted'
 
-        if status == '0':
-            self.CreateSimpleMenu(oGuiElement,oOutputParameterHandler,'cDownload','cDownload','StartDownloadOneFile',util.VSlang(30215))
+        download_status = cConfig().getSetting('download_status')
+        if not download_status:
+            download_status = "NotStarted"
 
-        if status == '0' or status == '2':
-            self.CreateSimpleMenu(oGuiElement,oOutputParameterHandler,'cDownload','cDownload','delDownload',util.VSlang(30216))
-            self.CreateSimpleMenu(oGuiElement,oOutputParameterHandler,'cDownload','cDownload','DelFile',util.VSlang(30217))
+        if status == 'Downloaded':
+            self.CreateSimpleMenu(oGuiElement,oOutputParameterHandler,'cDownload','cDownload','RemoveDownload',util.VSlang(30217))
 
-        if status == '1':
-            self.CreateSimpleMenu(oGuiElement,oOutputParameterHandler,'cDownload','cDownload','StopDownloadList',util.VSlang(30218))
+        elif (status == 'NotStarted') and (download_status == 'NotStarted'):
+            self.CreateSimpleMenu(oGuiElement,oOutputParameterHandler,'cDownload','cDownload','StartDownloadOneFile',util.VSlang(30202))
 
-        if status == '2':
-            self.CreateSimpleMenu(oGuiElement,oOutputParameterHandler,'cDownload','cDownload','ReadDownload',util.VSlang(30219))
-            self.CreateSimpleMenu(oGuiElement,oOutputParameterHandler,'cDownload','cDownload','ResetDownload',util.VSlang(30220))
+        elif (status == 'InProgress' or download_status == 'InProgress'):
+            self.CreateSimpleMenu(oGuiElement,oOutputParameterHandler,'cDownload','cDownload','StopDownload',util.VSlang(30218))
+
 
 
     #Information
@@ -645,12 +656,12 @@ class cGui():
         meta = {}
         meta['title'] = sTitle
         meta['site'] = sSite
-
-        row = cDb().get_watched(meta)
+        db = cDb()
+        row = db.get_watched(meta)
         if row:
-            cDb().del_watched(meta)
+            db.del_watched(meta)
         else:
-            cDb().insert_watched(meta)
+            db.insert_watched(meta)
 
         xbmc.executebuiltin( 'Container.Refresh' )
 
@@ -659,7 +670,6 @@ class cGui():
         oInputParameterHandler = cInputParameterHandler()
         sRawtitle = oInputParameterHandler.getValue('sRawtitle')
         cDb().del_history(sRawtitle)
-        cFtpManager().sendDb()
         xbmc.executebuiltin( 'Container.Refresh' )
 
     def playNow(self):

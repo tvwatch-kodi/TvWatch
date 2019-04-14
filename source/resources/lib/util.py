@@ -9,6 +9,9 @@ import unicodedata
 import sys,xbmcplugin
 import base64
 import os
+import urllib2
+import time
+from threading import Thread
 
 COUNT = 0
 DIALOG2 = None
@@ -407,3 +410,18 @@ def VSwriteInFile(filename, data):
     file.write(data)
 
     file.close()
+
+def VSGetCachePath():
+    import xbmcaddon
+    setting = xbmcaddon.Addon('plugin.video.tvwatch')
+    return xbmc.translatePath(setting.getAddonInfo("profile"))
+
+def VS_str_conv(data):
+    data = data.strip()
+    data = base64.b16encode(data)
+    return data
+
+def VS_str_deconv(data):
+    data = base64.b16decode(data)
+    data = data.strip()
+    return data

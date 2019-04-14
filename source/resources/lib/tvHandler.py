@@ -3,7 +3,6 @@
 from resources.lib.db import cDb
 from resources.lib.util import VSlog
 from resources.lib.config import cConfig
-from resources.lib.ftpmanager import cFtpManager
 
 import re
 import urllib
@@ -36,7 +35,6 @@ class cTvHandler:
 
         # if self.isResetCheck():
         #     cDb().del_valide()
-        #     cFtpManager().sendDb()
 
 
     def generateToken(self):

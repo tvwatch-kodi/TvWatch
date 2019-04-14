@@ -292,8 +292,9 @@ class CloudflareBypass(object):
                 rep = self.GetResponse(htmlcontent)
 
                 #Temporisation
-                #showInfo("Information", 'Decodage protection CloudFlare' , 5)
-                xbmc.sleep(6000)
+                # showInfo("Information", 'Please wait...' , 5)
+                # xbmc.sleep(6000)
+                xbmc.sleep(3000)
 
                 url = self.hostComplet + '/cdn-cgi/l/chk_jschl?s=' + urllib.quote_plus(s) + '&jschl_vc='+ urllib.quote_plus(hash) +'&pass=' + urllib.quote_plus(passe) + '&jschl_answer=' + rep
 

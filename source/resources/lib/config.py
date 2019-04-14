@@ -322,7 +322,6 @@ class cConfig():
             sound = False
 
         xbmcgui.Dialog().notification(str(sTitle), str(sDescription),self.__sIcon,iSeconds,sound)
-        #xbmc.executebuiltin("Notification(%s,%s,%s,%s)" % (str(sTitle), (str(sDescription)), iSeconds, self.__sIcon))
 
     def testUrl(self, url):
         code = 0
