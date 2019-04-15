@@ -8,7 +8,7 @@ from resources.lib.gui.gui import cGui
 from resources.lib.db import cDb
 from resources.lib.mySqlDB import cMySqlDB
 from resources.lib.cast import cCast
-from resources.lib.util import VSlog,isKrypton,VSerror,VSlang,uc,VS_show_busy_dialog, VS_hide_busy_dialog
+from resources.lib.util import VSlog,isKrypton,VSerror,VSlang,uc,VS_show_busy_dialog, VS_hide_busy_dialog, WriteSingleDatabase
 
 import xbmc, xbmcgui, xbmcplugin
 
@@ -206,7 +206,7 @@ class cPlayer(xbmc.Player):
                         seek = False
                     if (self.currentTime > 3) and _:
                         exec uc("c2VsZi5teVNxbERCLnVwZGF0ZUlQKHN0cihpbnQoc2VsZi5jdXJyZW50VGltZSkpLCBzZWxmLmNsaWVudElEKQ==")
-                        self.oConfig.setSetting(uc('bXlTZWxmUGxheQ=='), 'True')
+                        WriteSingleDatabase(uc('bXlTZWxmUGxheQ=='), 'True')
                         self.__setResume(update = True)
                     if self.sType != 'livetv':
                         if ((self.totalTime - self.currentTime < 60) or \
@@ -265,8 +265,8 @@ class cPlayer(xbmc.Player):
         if not self.playBackStoppedEventReceived:
             self.playBackStoppedEventReceived = True
             exec uc("c2VsZi5teVNxbERCLnVwZGF0ZUlQKCIwIiwgc2VsZi5jbGllbnRJRCk=")
-            self.oConfig.setSetting(uc('aXNQbGF5aW5n'), "0")
-            self.oConfig.setSetting(uc('bXlTZWxmUGxheQ=='), 'False')
+            WriteSingleDatabase(uc('aXNQbGF5aW5n'), "0")
+            WriteSingleDatabase(uc('bXlTZWxmUGxheQ=='), 'False')
             if self.sType != 'livetv':
                 try:
                     self.db.del_history(self.sTitle)

@@ -31,7 +31,7 @@ class cHome:
         oGui = cGui()
         oConfig = cConfig()
 
-        if (oConfig.getSetting('home_update') == 'true'):
+        if (util.ReadSingleDatabase('home_update') == 'true'):
             oOutputParameterHandler = cOutputParameterHandler()
             oOutputParameterHandler.addParameter('siteUrl', 'http://primatech')
             oGui.addDir(SITE_IDENTIFIER, 'showUpdate', util.VSlang(30418), 'update.png', oOutputParameterHandler)

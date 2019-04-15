@@ -933,7 +933,7 @@ msgid "Download failed. Please retry !"
 msgstr ""
 
 msgctxt "#30509"
-msgid "A download is in progress"
+msgid "A previous download is in progress"
 msgstr ""
 
 msgctxt "#30510"
@@ -950,4 +950,8 @@ msgstr ""
 
 msgctxt "#30513"
 msgid "An error occured. Please retry !"
+msgstr ""
+
+msgctxt "#30514"
+msgid "Please wait..."
 msgstr ""

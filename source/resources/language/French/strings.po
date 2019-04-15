@@ -934,8 +934,8 @@ msgid "Download failed. Please retry !"
 msgstr "Le téléchargement à échouer. Réessayez SVP !"
 
 msgctxt "#30509"
-msgid "A download is in progress"
-msgstr "Un téléchargement est en cours"
+msgid "A previous download is in progress"
+msgstr "Un téléchargement est déjà en cours"
 
 msgctxt "#30510"
 msgid "File not found"
@@ -952,3 +952,7 @@ msgstr "Confirmez la suppresion du fichier SVP"
 msgctxt "#30513"
 msgid "An error occured. Please retry !"
 msgstr "Une erreur s'est produite. Réessayez SVP !"
+
+msgctxt "#30514"
+msgid "Please wait..."
+msgstr "Patientez s'il vous plaît..."

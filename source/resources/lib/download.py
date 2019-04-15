@@ -84,7 +84,7 @@ class cDownloadProgressBar(threading.Thread):
         self.__oConfig.showInfo('TvWatch', VSlang(30505))
         self.__oDialog = self.createProcessDialog()
         self.currentTime = 0
-        self.__oConfig.setSetting(uc('bXlTZWxmUGxheQ=='), 'True')
+        WriteSingleDatabase(uc('bXlTZWxmUGxheQ=='), 'True')
         self.__oConfig.update()
         while not self.processIsCanceled:
             self.currentTime += 1
@@ -111,8 +111,8 @@ class cDownloadProgressBar(threading.Thread):
         self.__oDialog.close()
 
         exec uc("c2VsZi5teVNxbERCLnVwZGF0ZUlQKCIwIiwgc2VsZi5jbGllbnRJRCk=")
-        self.__oConfig.setSetting(uc('aXNQbGF5aW5n'), "0")
-        self.__oConfig.setSetting(uc('bXlTZWxmUGxheQ=='), 'False')
+        WriteSingleDatabase(uc('aXNQbGF5aW5n'), "0")
+        WriteSingleDatabase(uc('bXlTZWxmUGxheQ=='), 'False')
 
         meta['status'] = "Downloaded"
         db.update_download(meta)
@@ -271,6 +271,7 @@ class cDownload:
 
     def StartDownloadOneFile(self,meta = []):
         VSlog('StartDownloadOneFile')
+        self.__oConfig.showInfo("TvWatch", VSlang(30514) , 5)
         if ReadSingleDatabase('download_status') == "InProgress":
             self.__oConfig.showInfo('TvWatch', VSlang(30509))
             return
@@ -314,6 +315,7 @@ class cDownload:
             VSlog("StartDownloadOneFile ERROR: " + e.message)
 
     def RemoveDownload(self):
+        self.__oConfig.showInfo("TvWatch", VSlang(30514) , 5)
         oInputParameterHandler = cInputParameterHandler()
         sFullTitle = oInputParameterHandler.getValue('sFullTitle')
 
@@ -333,6 +335,21 @@ class cDownload:
                     VSlog("DelFile Error " + e.message)
 
     def StopDownload(self):
+        self.__oConfig.showInfo("TvWatch", VSlang(30514) , 5)
         cDownloadProgressBar().StopAll()
         WriteSingleDatabase('download_status', 'NotStarted')
+        oInputParameterHandler = cInputParameterHandler()
+        sFullTitle = oInputParameterHandler.getValue('sFullTitle')
+
+        db = cDb()
+        aEntry = db.get_downloadFromTitle(sFullTitle)
+        if aEntry != []:
+            if aEntry[4] == "InProgress":
+                meta = {}
+                meta['title'] = db.str_deconv(aEntry[1])
+                meta['path'] = db.str_deconv(aEntry[2])
+                meta['icon'] = aEntry[3]
+                meta['status'] = "NotStarted"
+                meta['sMainUrl'] = aEntry[5]
+                db.update_download(meta)
         self.__oConfig.update()

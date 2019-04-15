@@ -11,7 +11,7 @@ from resources.lib.handler.inputParameterHandler import cInputParameterHandler
 from resources.lib.handler.outputParameterHandler import cOutputParameterHandler
 from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.parser import cParser
-from resources.lib.util import cUtil, VSlog, VSlang, VScreateDialogOK, VS_show_busy_dialog, VSwriteInFile
+from resources.lib.util import cUtil, VSlog, VSlang, VScreateDialogOK, VS_show_busy_dialog, VSwriteInFile, VSupdate, ReadSingleDatabase
 from resources.lib.db import cDb
 from resources.lib.tvHandler import cTvHandler
 from resources.lib.player import cPlayer
@@ -127,7 +127,7 @@ def load():
     oGui.addDir(SITE_IDENTIFIER, 'getDownload', VSlang(30145), 'mark.png', oOutputParameterHandler) # Fichiers téléchargé
 
     oOutputParameterHandler = cOutputParameterHandler()
-    if (cConfig().getSetting('home_update') == 'true'):
+    if (ReadSingleDatabase('home_update') == 'true'):
         oGui.addDir(SITE_IDENTIFIER, 'showUpdate', "[COLOR skyblue]"+VSlang(30418)+"[/COLOR]", 'update.png', oOutputParameterHandler)
     else:
         oGui.addDir(SITE_IDENTIFIER, 'checkUpdate', VSlang(30473), 'update.png', oOutputParameterHandler)
@@ -969,7 +969,7 @@ def Display_protected_link(params = {}, playNow = True):
                 if playNow:
                     oHosterGui.play(playParams)
                     if refresh == "True":
-                        cGui().updateDirectory()
+                        VSupdate()
                 else:
                     return playParams
     # cConfig().showInfo('TvWatch', VSlang(30513))

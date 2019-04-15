@@ -6,6 +6,7 @@ from resources.lib.handler.outputParameterHandler import cOutputParameterHandler
 from resources.lib.ftpmanager import cFtpManager
 from resources.lib.util import VSlog, ReadSingleDatabase, WriteSingleDatabase
 
+import StorageServer
 import os, sys
 import urllib
 import xbmc
@@ -72,7 +73,7 @@ class cDb:
             sql_create = "CREATE TABLE IF NOT EXISTS favorite ("" addon_id integer PRIMARY KEY AUTOINCREMENT, ""title TEXT, ""siteurl TEXT, ""site TEXT, ""fav TEXT, ""cat TEXT, ""icon TEXT, ""fanart TEXT, ""UNIQUE(title, site)"");"
             self.dbcur.execute(sql_create)
 
-            sql_create = "CREATE TABLE IF NOT EXISTS downloaded ("" addon_id integer PRIMARY KEY AUTOINCREMENT, ""title TEXT, ""path TEXT, ""icon TEXT, ""status TEXT, ""mainUrl TEXT, ""UNIQUE(title, path)"");"
+            sql_create = "CREATE TABLE IF NOT EXISTS download2 ("" addon_id integer PRIMARY KEY AUTOINCREMENT, ""title TEXT, ""path TEXT, ""icon TEXT, ""status TEXT, ""mainUrl TEXT, ""UNIQUE(title)"");"
             self.dbcur.execute(sql_create)
 
             sql_create = "CREATE TABLE IF NOT EXISTS valide ("" addon_id integer PRIMARY KEY AUTOINCREMENT, ""url TEXT, ""ok TEXT, ""UNIQUE(url)"");"
@@ -283,7 +284,6 @@ class cDb:
             self.dbcur.execute(sql_delete)
             self.db.commit()
             self.oConfig.showInfo('TvWatch', 'Favoris supprimé')
-            self.oConfig.update()
             self.unlockDB()
             return False, False
         except Exception, e:

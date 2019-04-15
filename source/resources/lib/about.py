@@ -12,7 +12,7 @@ sLibrary = xbmc.translatePath(cConfig().getAddonPath()).decode("utf-8")
 sys.path.append(sLibrary)
 
 from resources.lib.handler.requestHandler import cRequestHandler
-from resources.lib.util import VSlog, VSlang
+from resources.lib.util import VSlog, VSlang, VSupdate, WriteSingleDatabase
 
 SITE_IDENTIFIER = 'about'
 SITE_NAME = 'About'
@@ -146,16 +146,15 @@ class cAbout:
                     currentVersion = int(version.replace(".",""))
                     VSlog("checkupdate New Version: " + str(newVersion))
                     VSlog("checkupdate Current Version: " + str(currentVersion))
+                    self.oConfig.setSetting('service_time', str(datetime.datetime.now()))
                     if newVersion > currentVersion:
-                        self.oConfig.setSetting('home_update', str('true'))
-                        self.oConfig.setSetting('service_time', str(datetime.datetime.now()))
+                        WriteSingleDatabase('home_update', "true")
                         dialog = self.oConfig.showInfo("TvWatch", VSlang(30418))
-                        cGui().updateDirectory()
+                        VSupdate()
                         return True
                     else:
                         #self.oConfig.showInfo('TvWatch', 'Fichier a jour')
-                        self.oConfig.setSetting('service_time', str(datetime.datetime.now()))
-                        self.oConfig.setSetting('home_update', str('false'))
+                        WriteSingleDatabase('home_update', "false")
         except Exception, e:
             self.oConfig.error(self.oConfig.getlanguage(30205))
             VSlog("checkupdate ERROR: " + e.message)
@@ -203,7 +202,7 @@ class cAbout:
                 sContent += lines[i]
 
             self.oConfig.setSetting('service_time', str(datetime.datetime.now()))
-            self.oConfig.setSetting('home_update', str('false'))
+            WriteSingleDatabase('home_update', "false")
 
             fin = self.oConfig.createDialogOK(sContent)
             self.oConfig.update()

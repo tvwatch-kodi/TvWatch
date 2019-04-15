@@ -9,7 +9,7 @@ from resources.lib.handler.inputParameterHandler import cInputParameterHandler
 from resources.lib.handler.pluginHandler import cPluginHandler
 from resources.lib.parser import cParser
 from resources.lib import util
-from resources.lib.util import VSlog, ReadSingleDatabase, WriteSingleDatabase
+from resources.lib.util import VSlog
 
 import xbmc,sys
 import xbmcgui
@@ -418,21 +418,14 @@ class cGui():
             if status != 'NotStarted' and status != 'InProgress' and status != 'Downloaded':
                 status = 'NotStarted'
 
-        download_status = ReadSingleDatabase("download_status")
-        if not download_status:
-            download_status = "NotStarted"
-
         if (status == 'Downloaded'):
             self.CreateSimpleMenu(oGuiElement,oOutputParameterHandler,'cDownload','cDownload','RemoveDownload',util.VSlang(30217))
 
-        elif (status == 'NotStarted') and (download_status == 'NotStarted'):
+        elif (status == 'NotStarted'):
             self.CreateSimpleMenu(oGuiElement,oOutputParameterHandler,'cDownload','cDownload','StartDownloadOneFile',util.VSlang(30202))
 
-        elif (status == 'InProgress') or (download_status == 'InProgress'):
+        elif (status == 'InProgress'):
             self.CreateSimpleMenu(oGuiElement,oOutputParameterHandler,'cDownload','cDownload','StopDownload',util.VSlang(30218))
-
-        # if (status == 'InProgress') or (status == 'Downloaded'):
-        #     self.CreateSimpleMenu(oGuiElement,oOutputParameterHandler,'cDownload','cDownload','RemoveDownload',util.VSlang(30217))
 
     #Information
     def createContexMenuinfo(self, oGuiElement, oOutputParameterHandler= ''):

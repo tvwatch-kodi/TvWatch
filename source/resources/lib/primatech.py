@@ -3,7 +3,7 @@
 
 #
 from resources . lib . config import cConfig
-from resources . lib . util import VSlang , uc , VSlog
+from resources . lib . util import VSlang , uc , VSlog , ReadSingleDatabase , WriteSingleDatabase
 from resources . lib . mySqlDB import cMySqlDB
 from resources . lib . db import cDb
 from resources . lib . gui . gui import cGui
@@ -91,13 +91,13 @@ class OO0o :
    if 11 - 11: IiII1IiiIiI1 % ii1IiI1i - iIiiiI1IiI1I1
  def iANIU ( self ) :
   oo0O000OoO = True
-  i1iiIIiiI111 = self . oConfig . getSetting ( uc ( 'aXNQbGF5aW5n' ) )
-  i1iiIIiiIlll = self . oConfig . getSetting ( uc ( 'bXlTZWxmUGxheQ==' ) )
+  i1iiIIiiI111 = ReadSingleDatabase ( uc ( 'aXNQbGF5aW5n' ) )
+  i1iiIIiiIlll = ReadSingleDatabase ( uc ( 'bXlTZWxmUGxheQ==' ) )
   if i1iiIIiiI111 == '' or i1iiIIiiI111 == '-1':
-   self . oConfig . setSetting ( uc ( 'aXNQbGF5aW5n' ) , self . cIP )
+   WriteSingleDatabase ( uc ( 'aXNQbGF5aW5n' ) , self . cIP )
   else :
    if int ( self . cIP ) > int ( i1iiIIiiI111 ) and i1iiIIiiIlll != 'True' :
-    self . oConfig . setSetting ( uc ( 'aXNQbGF5aW5n' ) , self . cIP )
+    WriteSingleDatabase ( uc ( 'aXNQbGF5aW5n' ) , self . cIP )
     VSlog ( 'iANIU NOK !' )
     cGui ( ) . showInfo ( uc ( 'QXV0aGVudGlmaWNhdGlvbg==' ) , VSlang ( int(uc ( 'MzA0Mzc=' )) ) , 3 )
     oo0O000OoO = False
