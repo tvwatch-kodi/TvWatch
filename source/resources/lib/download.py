@@ -9,7 +9,7 @@ from resources.lib.player import cPlayer
 from resources.lib.gui.gui import cGui
 from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.db import cDb
-from resources.lib.util import cUtil, VSlog, VSGetCachePath, uc, VS_str_conv, VSlang
+from resources.lib.util import cUtil, VSlog, VSGetCachePath, uc, VS_str_conv, VSlang, ReadSingleDatabase, WriteSingleDatabase
 
 import urllib2,urllib
 import xbmcplugin, xbmc
@@ -58,7 +58,7 @@ class cDownloadProgressBar(threading.Thread):
         return diag
 
     def _StartDownload(self):
-        xbmcgui.Window(10101).setProperty('arret', '0')
+        WriteSingleDatabase("download_stop", "False")
         headers = self.oUrlHandler.info()
 
         db = cDb()
@@ -78,7 +78,7 @@ class cDownloadProgressBar(threading.Thread):
         meta['status'] = "InProgress"
 
         db.insert_download(meta)
-        self.__oConfig.setSetting("download_status", "InProgress")
+        WriteSingleDatabase('download_status', 'InProgress')
 
         #mise a jour pour info taille
         self.__oConfig.showInfo('TvWatch', VSlang(30505))
@@ -99,7 +99,7 @@ class cDownloadProgressBar(threading.Thread):
             TotDown = TotDown + data.__len__()
 
             self.__stateCallBackFunction(TotDown, iTotalSize)
-            if xbmcgui.Window(10101).getProperty('arret') == '1':
+            if ReadSingleDatabase("download_stop") == "True":
                 self.processIsCanceled = True
 
             #petite pause, ca ralentit le download mais evite de bouffer 100/100 ressources
@@ -116,7 +116,7 @@ class cDownloadProgressBar(threading.Thread):
 
         meta['status'] = "Downloaded"
         db.update_download(meta)
-        self.__oConfig.setSetting("download_status", "NotStarted")
+        WriteSingleDatabase("download_status", "NotStarted")
 
         #fait une pause pour fermer le Dialog
         xbmc.sleep(500)
@@ -173,9 +173,9 @@ class cDownloadProgressBar(threading.Thread):
             self.__oConfig.showInfo('TvWatch', VSlang(30508))
             return
 
-        if xbmc.getCondVisibility("Window.IsVisible(10151)"):
-            self.__oConfig.showInfo('TvWatch', VSlang(30509))
-            return
+        # if xbmc.getCondVisibility("Window.IsVisible(10151)"):
+        #     self.__oConfig.showInfo('TvWatch', VSlang(30509))
+        #     return
 
         self._StartDownload()
 
@@ -188,9 +188,7 @@ class cDownloadProgressBar(threading.Thread):
 
     def StopAll(self):
         self.processIsCanceled = True
-        xbmcgui.Window(10101).setProperty('SimpleDownloaderQueue', '0')
-
-        xbmcgui.Window(10101).setProperty('arret', '1')
+        WriteSingleDatabase("download_stop", "True")
         try:
             self.__oDialog.close()
         except Exception, e:
@@ -232,9 +230,9 @@ class cDownload:
 
     def download(self, sDBUrl, sTitle, sDownloadPath, sThumbnail, sMainUrl, FastMode = True):
         VSlog("Telechargement " + str(sDBUrl))
-        if self.isDownloading():
-            self.__oConfig.showInfo('TvWatch', VSlang(30509))
-            return False
+        # if self.isDownloading():
+        #     self.__oConfig.showInfo('TvWatch', VSlang(30509))
+        #     return False
 
         #resolve url
         oHoster = cHosterGui().checkHoster(sDBUrl)
@@ -273,6 +271,9 @@ class cDownload:
 
     def StartDownloadOneFile(self,meta = []):
         VSlog('StartDownloadOneFile')
+        if ReadSingleDatabase('download_status') == "InProgress":
+            self.__oConfig.showInfo('TvWatch', VSlang(30509))
+            return
         oInputParameterHandler = cInputParameterHandler()
 
         meta = {}
@@ -307,8 +308,6 @@ class cDownload:
 
             path = os.path.join(VSGetCachePath(), VS_str_conv(sFileName)).decode("utf-8")
 
-            xbmcgui.Window(10101).setProperty('SimpleDownloaderQueue', '0')
-
             self.download(sUrl, sFileName, path, sThumbnail, sMainUrl)
         except Exception, e:
             self.__oConfig.showInfo('TvWatch', VSlang(30508))
@@ -335,5 +334,5 @@ class cDownload:
 
     def StopDownload(self):
         cDownloadProgressBar().StopAll()
-        self.__oConfig.setSetting("download_status", "NotStarted")
+        WriteSingleDatabase('download_status', 'NotStarted')
         self.__oConfig.update()

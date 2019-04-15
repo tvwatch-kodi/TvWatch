@@ -839,23 +839,24 @@ def showSeriesHosters():# recherche et affiche les hotes
 
         cConfig().finishDialog(dialog)
 
-    params = {}
+    oGui.setEndOfDirectory(50)
 
-    if len(episodes) == 1:
-        params['sItemUrl'] = episodes[0]['sItemUrl']
-        params['sMainUrl'] = sMainUrl
-        params['sMovieTitle'] = episodes[0]['sMovieTitle']
-        params['sThumbnail'] = episodes[0]['sThumbnail']
-        params['sType'] = episodes[0]['sType']
-        params['sQual'] = episodes[0]['sQual']
-        params['refresh'] = episodes[0]['refresh']
-
-        try:
-            Display_protected_link(params)
-        except Exception, e:
-            VSlog("showSeriesHosters ERROR: " + e.message)
-    else:
-        oGui.setEndOfDirectory(50)
+    # if len(episodes) == 1:
+    #     params = {}
+    #     params['sItemUrl'] = episodes[0]['sItemUrl']
+    #     params['sMainUrl'] = sMainUrl
+    #     params['sMovieTitle'] = episodes[0]['sMovieTitle']
+    #     params['sThumbnail'] = episodes[0]['sThumbnail']
+    #     params['sType'] = episodes[0]['sType']
+    #     params['sQual'] = episodes[0]['sQual']
+    #     params['refresh'] = episodes[0]['refresh']
+    #
+    #     try:
+    #         Display_protected_link(params)
+    #     except Exception, e:
+    #         VSlog("showSeriesHosters ERROR: " + e.message)
+    # else:
+    #     oGui.setEndOfDirectory(50)
 
 def showStreamingHosters():# recherche et affiche les hotes
     oGui = cGui()

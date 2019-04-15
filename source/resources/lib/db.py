@@ -4,7 +4,7 @@ from resources.lib.config import cConfig
 from resources.lib.handler.inputParameterHandler import cInputParameterHandler
 from resources.lib.handler.outputParameterHandler import cOutputParameterHandler
 from resources.lib.ftpmanager import cFtpManager
-from resources.lib.util import VSlog
+from resources.lib.util import VSlog, ReadSingleDatabase, WriteSingleDatabase
 
 import os, sys
 import urllib
@@ -22,7 +22,6 @@ except:
     VSlog('SQLITE 2 as DB engine')
 
 class cDb:
-
     def __init__(self, ftp = True):
         self.oConfig = cConfig()
         self.enableFtp = ftp
@@ -37,8 +36,6 @@ class cDb:
         except Exception, e:
             VSlog('cDb ERROR in Constructor: ' + str(e.message))
 
-
-
     def __del__(self):
         ''' Cleanup db when object destroyed '''
         try:
@@ -51,10 +48,17 @@ class cDb:
         except Exception, e:
             VSlog('cDb ERROR in Destructor: ' + str(e.message))
 
+    def lockDB(self):
+        if ReadSingleDatabase("dbLock") == "Locked":
+            raise Exception('DB is already locked')
+
+    def unlockDB(self):
+        WriteSingleDatabase("dbLock", "Unlocked")
+
     def createTables(self):
         # self.dropTables()
         try:
-
+            self.lockDB()
             ''' Create table '''
             sql_create = "CREATE TABLE IF NOT EXISTS history ("" addon_id integer PRIMARY KEY AUTOINCREMENT, ""sItemUrl TEXT, ""mainUrl TEST, ""rawtitle TEXT, ""title TEXT, ""icon TEXT, ""type TEXT, ""quality TEXT, ""UNIQUE(rawtitle)"");"
             self.dbcur.execute(sql_create)
@@ -76,11 +80,14 @@ class cDb:
 
             VSlog('Table initialized')
 
+            self.unlockDB()
+
         except Exception, e:
             VSlog('cDb ERROR in createTables: ' + str(e.message))
 
     def dropTables(self):
         try:
+            self.lockDB()
             self.dbcur.execute("DROP TABLE IF EXISTS %s" %('history'))
             self.dbcur.execute("DROP TABLE IF EXISTS %s" %('resume'))
             self.dbcur.execute("DROP TABLE IF EXISTS %s" %('watched'))
@@ -88,6 +95,7 @@ class cDb:
             self.dbcur.execute("DROP TABLE IF EXISTS %s" %('downloaded'))
             self.dbcur.execute("DROP TABLE IF EXISTS %s" %('valide'))
             VSlog('Tables dropped successfully')
+            self.unlockDB()
         except:
             VSlog("deleteTable FAIL")
 
@@ -119,10 +127,12 @@ class cDb:
         title = self.str_conv(meta['title'])
         timepoint = meta['timepoint']
         try:
+            self.lockDB()
             ex = "INSERT INTO resume (title, timepoint) VALUES (?, ?)"
             self.dbcur.execute(ex, (title, timepoint))
             self.db.commit()
             VSlog('SQL INSERT resume Successfully')
+            self.unlockDB()
         except Exception, e:
             VSlog('SQL ERROR INSERT resume: ' + str(e.message))
             if 'UNIQUE constraint failed' in str(e.message):
@@ -132,10 +142,12 @@ class cDb:
         title = self.str_conv(meta['title'])
         timepoint = meta['timepoint']
         try:
+            self.lockDB()
             ex = "UPDATE resume SET timepoint = '%s' WHERE title = '%s'" % (timepoint, title)
             self.dbcur.execute(ex)
             self.db.commit()
             VSlog('SQL UPDATE resume Successfully')
+            self.unlockDB()
         except Exception, e:
             VSlog('SQL ERROR UPDATE resume: ' + str(e.message))
 
@@ -143,8 +155,10 @@ class cDb:
         title = self.str_conv(meta['title'])
         sql_select = "SELECT * FROM resume WHERE title = '%s'" % (title)
         try:
+            self.lockDB()
             self.dbcur.execute(sql_select)
             matchedrow = self.dbcur.fetchall()
+            self.unlockDB()
             if not matchedrow:
                 matchedrow = []
             return matchedrow
@@ -156,9 +170,11 @@ class cDb:
         title = self.str_conv(title)
         sql_delete = "DELETE FROM resume WHERE title = '%s'" % (title)
         try:
+            self.lockDB()
             self.dbcur.execute(sql_delete)
             self.db.commit()
             VSlog('SQL DELETE resume Successfully')
+            self.unlockDB()
         except Exception, e:
             VSlog('SQL ERROR DELETE resume: ' + str(e.message))
 
@@ -171,9 +187,11 @@ class cDb:
         site = urllib.quote_plus(meta['site'])
         ex = "INSERT INTO watched (title, site) VALUES (?, ?)"
         try:
+            self.lockDB()
             self.dbcur.execute(ex, (title,site))
             self.db.commit()
             VSlog('SQL INSERT watched Successfully')
+            self.unlockDB()
         except Exception, e:
             VSlog('SQL ERROR INSERT watched: ' + str(e.message))
 
@@ -182,8 +200,10 @@ class cDb:
         site = urllib.quote_plus(meta['site'])
         sql_select = "SELECT * FROM watched WHERE site = '%s'" % (site)
         try:
+            self.lockDB()
             self.dbcur.execute(sql_select)
             matchedrow = self.dbcur.fetchall()
+            self.unlockDB()
             if matchedrow:
                 count = 1
             return count
@@ -195,8 +215,10 @@ class cDb:
         site = urllib.quote_plus(meta['site'])
         sql_select = "DELETE FROM watched WHERE site = '%s'" % (site)
         try:
+            self.lockDB()
             self.dbcur.execute(sql_select)
             self.db.commit()
+            self.unlockDB()
             return False, False
         except Exception, e:
             VSlog('SQL ERROR DELETE watched: ' + str(e.message))
@@ -212,11 +234,13 @@ class cDb:
         siteurl = urllib.quote_plus(meta['siteurl'])
         sIcon = meta['icon']
         try:
+            self.lockDB()
             ex = "INSERT INTO favorite (title, siteurl, site, fav, cat, icon, fanart) VALUES (?, ?, ?, ?, ?, ?, ?)"
             self.dbcur.execute(ex, (title,siteurl, meta['site'],meta['fav'],meta['cat'],sIcon,meta['fanart']))
             self.db.commit()
             VSlog('SQL INSERT favorite Successfully')
             self.oConfig.showInfo(meta['title'], 'Enregistré avec succés')
+            self.unlockDB()
         except Exception, e:
             if 'UNIQUE constraint failed' in str(e.message):
                 self.oConfig.showInfo(meta['title'], 'Item déjà présent dans votre Liste')
@@ -227,8 +251,10 @@ class cDb:
         sql_select = "SELECT * FROM favorite"
         matchedrow = []
         try:
+            self.lockDB()
             self.dbcur.execute(sql_select)
             matchedrow = self.dbcur.fetchall()
+            self.unlockDB()
             if not matchedrow:
                 matchedrow = []
         except Exception, e:
@@ -253,10 +279,12 @@ class cDb:
             sql_delete = "DELETE FROM favorite;"
 
         try:
+            self.lockDB()
             self.dbcur.execute(sql_delete)
             self.db.commit()
             self.oConfig.showInfo('TvWatch', 'Favoris supprimé')
             self.oConfig.update()
+            self.unlockDB()
             return False, False
         except Exception, e:
             VSlog('SQL ERROR EXECUTE favorite: ' + str(e.message))
@@ -317,10 +345,12 @@ class cDb:
             sRawtitle = sRawtitle[:sRawtitle.find('Saison')]
         sRawtitle = self.str_conv(sRawtitle)
         try:
+            self.lockDB()
             ex = "INSERT INTO history (title, sItemUrl, mainUrl, icon, type, rawtitle, quality) VALUES (?, ?, ?, ?, ?, ?, ?)"
             self.dbcur.execute(ex, (title, sItemUrl, sMainUrl, sIcon, sType, sRawtitle, sQuality))
             self.db.commit()
             VSlog('SQL INSERT history Successfully')
+            self.unlockDB()
         except Exception, e:
             VSlog('SQL ERROR INSERT history: ' + str(e.message))
             if 'UNIQUE constraint failed' in str(e.message):
@@ -339,10 +369,13 @@ class cDb:
             sRawtitle = sRawtitle[:sRawtitle.find('Saison')]
         sRawtitle = self.str_conv(sRawtitle)
         try:
-            ex = "UPDATE history SET title='%s', sItemUrl='%s', mainUrl='%s', type='%s', icon='%s', quality='%s' WHERE rawtitle='%s'" % (title, sItemUrl, sMainUrl, sType, sIcon, sQuality, sRawtitle)
+            self.lockDB()
+            ex = "UPDATE history SET title='%s', sItemUrl='%s', mainUrl='%s', type='%s', icon='%s', quality='%s' WHERE rawtitle='%s'" \
+            % (title, sItemUrl, sMainUrl, sType, sIcon, sQuality, sRawtitle)
             self.dbcur.execute(ex)
             self.db.commit()
             VSlog('SQL UPDATE history Successfully')
+            self.unlockDB()
         except Exception, e:
             VSlog('SQL UPDATE history: ' + str(e.message))
 
@@ -350,8 +383,10 @@ class cDb:
     def get_history(self):
         sql_select = "SELECT * FROM history"
         try:
+            self.lockDB()
             self.dbcur.execute(sql_select)
             matchedrow = self.dbcur.fetchall()
+            self.unlockDB()
             if not matchedrow:
                 matchedrow = []
             return matchedrow
@@ -366,8 +401,10 @@ class cDb:
         sRawtitle = self.str_conv(sRawtitle)
         sql_select = "SELECT * FROM history WHERE rawtitle = '%s'" % (sRawtitle)
         try:
+            self.lockDB()
             self.dbcur.execute(sql_select)
             matchedrow = self.dbcur.fetchone()
+            self.unlockDB()
             if not matchedrow:
                 matchedrow = []
             return matchedrow
@@ -382,9 +419,11 @@ class cDb:
         sRawtitle = self.str_conv(sRawtitle)
         sql_delete = "DELETE FROM history WHERE rawtitle = '%s'" % (sRawtitle)
         try:
+            self.lockDB()
             self.dbcur.execute(sql_delete)
             self.db.commit()
             VSlog('SQL DELETE history Successfully')
+            self.unlockDB()
         except Exception, e:
             VSlog('SQL ERROR DELETE history: ' + str(e.message))
 
@@ -397,9 +436,11 @@ class cDb:
             url = url[:url.find('?wmsAuthSign')]
         # url = urllib.quote_plus(url)
         try:
+            self.lockDB()
             ex = "INSERT INTO valide (url, ok) VALUES (?, ?)"
             self.dbcur.execute(ex, (url,ok))
             self.db.commit()
+            self.unlockDB()
         except Exception, e:
             VSlog('SQL ERROR INSERT valide: ' + str(e.message))
 
@@ -409,8 +450,10 @@ class cDb:
         # url = urllib.quote_plus(url)
         sql_select = "SELECT * FROM valide WHERE url = '%s'" % (url)
         try:
+            self.lockDB()
             self.dbcur.execute(sql_select)
             matchedrow = self.dbcur.fetchone()
+            self.unlockDB()
             return matchedrow
         except Exception, e:
             VSlog('SQL ERROR GET valide: ' + str(e.message))
@@ -419,8 +462,10 @@ class cDb:
     def get_valide(self):
         sql_select = "SELECT * FROM valide"
         try:
+            self.lockDB()
             self.dbcur.execute(sql_select)
             matchedrow = self.dbcur.fetchall()
+            self.unlockDB()
             return matchedrow
         except Exception, e:
             VSlog('SQL ERROR GET valide: ' + str(e.message))
@@ -429,9 +474,11 @@ class cDb:
     def del_valide(self):
         sql_delete = "DELETE FROM valide"
         try:
+            self.lockDB()
             self.dbcur.execute(sql_delete)
             self.db.commit()
             VSlog('SQL DELETE valide Successfully')
+            self.unlockDB()
         except Exception, e:
             VSlog('SQL ERROR valide history: ' + str(e.message))
 
@@ -452,10 +499,12 @@ class cDb:
         #     sRawtitle = sRawtitle[:sRawtitle.find('Saison')]
         # sRawtitle = self.str_conv(sRawtitle)
         try:
+            self.lockDB()
             ex = "INSERT INTO downloaded (title, path, icon, status, mainUrl) VALUES (?, ?, ?, ?, ?)"
             self.dbcur.execute(ex, (title, path, sIcon, status, mainUrl))
             self.db.commit()
             VSlog('SQL INSERT downloaded Successfully')
+            self.unlockDB()
         except Exception, e:
             VSlog('SQL ERROR INSERT downloaded: ' + str(e.message))
             if 'UNIQUE constraint failed' in str(e.message):
@@ -474,10 +523,12 @@ class cDb:
         #     sRawtitle = sRawtitle[:sRawtitle.find('Saison')]
         # sRawtitle = self.str_conv(sRawtitle)
         try:
+            self.lockDB()
             ex = "UPDATE downloaded SET icon='%s', status='%s', mainUrl='%s' WHERE title='%s' AND path='%s'" % (sIcon, status, mainUrl, title, path)
             self.dbcur.execute(ex)
             self.db.commit()
             VSlog('SQL UPDATE downloaded Successfully')
+            self.unlockDB()
         except Exception, e:
             VSlog('SQL UPDATE downloaded: ' + str(e.message))
 
@@ -485,8 +536,10 @@ class cDb:
     def get_download(self):
         sql_select = "SELECT * FROM downloaded"
         try:
+            self.lockDB()
             self.dbcur.execute(sql_select)
             matchedrow = self.dbcur.fetchall()
+            self.unlockDB()
             if not matchedrow:
                 matchedrow = []
             return matchedrow
@@ -501,8 +554,10 @@ class cDb:
         title = self.str_conv(title)
         sql_select = "SELECT * FROM downloaded WHERE title = '%s'" % (title)
         try:
+            self.lockDB()
             self.dbcur.execute(sql_select)
             matchedrow = self.dbcur.fetchone()
+            self.unlockDB()
             if not matchedrow:
                 matchedrow = []
             return matchedrow
@@ -513,8 +568,10 @@ class cDb:
     def get_downloadFromStatus(self, status):
         sql_select = "SELECT * FROM downloaded WHERE status = '%s'" % (status)
         try:
+            self.lockDB()
             self.dbcur.execute(sql_select)
             matchedrow = self.dbcur.fetchone()
+            self.unlockDB()
             if not matchedrow:
                 matchedrow = []
             return matchedrow
@@ -525,9 +582,11 @@ class cDb:
     def del_downloadByStatus(self, status):
         sql_delete = "DELETE FROM downloaded WHERE status = '%s'" % (status)
         try:
+            self.lockDB()
             self.dbcur.execute(sql_delete)
             self.db.commit()
             VSlog('SQL DELETE downloaded Successfully')
+            self.unlockDB()
         except Exception, e:
             VSlog('SQL ERROR DELETE downloaded: ' + str(e.message))
 
@@ -538,8 +597,10 @@ class cDb:
         title = self.str_conv(title)
         sql_delete = "DELETE FROM downloaded WHERE title = '%s'" % (title)
         try:
+            self.lockDB()
             self.dbcur.execute(sql_delete)
             self.db.commit()
             VSlog('SQL DELETE downloaded Successfully')
+            self.unlockDB()
         except Exception, e:
             VSlog('SQL ERROR DELETE downloaded: ' + str(e.message))

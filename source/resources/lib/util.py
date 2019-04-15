@@ -422,3 +422,9 @@ def VS_str_deconv(data):
     data = base64.b16decode(data)
     data = data.strip()
     return data
+
+def WriteSingleDatabase(address, data):
+    xbmcgui.Window(10101).setProperty(address, data)
+
+def ReadSingleDatabase(address):
+    return xbmcgui.Window(10101).getProperty(address)
