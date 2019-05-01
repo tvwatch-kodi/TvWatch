@@ -104,8 +104,8 @@ class cPremiumHandler:
         else:
             return False
 
-        #print url
-        #print post_data
+        # print url
+        # print post_data
         if (self.__ssl):
             try:
                 import ssl
@@ -149,8 +149,8 @@ class cPremiumHandler:
                 #login denied
                     cGui().showInfo(self.__sDisplayName, 'Authentification rate' , 5)
                 else:
-                    VSlog("debug" + str(getattr(e, "code", None)))
-                    VSlog("debug" + str(getattr(e, "reason", None)))
+                    VSlog("debug Authentificate " + str(getattr(e, "code", None)))
+                    VSlog("debug Authentificate " + str(getattr(e, "reason", None)))
 
                 self.isLogin = False
                 return False
@@ -260,7 +260,8 @@ class cPremiumHandler:
         return
 
     def ConnectWithXFSS(self, xfss):
-        url = 'https://uptobox.com/?op=login&referer=homepage/'
+        # url = 'https://uptobox.com/?op=login&referer=homepage/'
+        url = 'https://uptobox.com'
         req = urllib2.Request(url, None, headers)
         cookie = "xfss=%s;" % (xfss)
         req.add_header('cookie', cookie)
@@ -270,8 +271,9 @@ class cPremiumHandler:
         try:
             response = urllib2.urlopen(req)
         except urllib2.URLError, e:
-            VSlog("debug" + str(getattr(e, "code", None)))
-            VSlog("debug" + str(getattr(e, "reason", None)))
+            VSlog("debug ConnectWithXFSS " + str(getattr(e, "code", None)))
+            VSlog("debug ConnectWithXFSS " + str(getattr(e, "reason", None)))
+            return False
 
         sHtmlContent = response.read()
         head = response.headers
