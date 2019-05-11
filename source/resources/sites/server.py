@@ -878,7 +878,6 @@ def showStreamingHosters():# recherche et affiche les hotes
     if (aResult[0] == True):
         for aEntry in aResult[1]:
             sHosterUrl = aEntry
-            #print sHosterUrl
 
             sDisplayTitle = sMovieTitle
 

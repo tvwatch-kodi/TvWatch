@@ -4,7 +4,7 @@
 =============================================================================
 - Auteurs : Primatech
 =============================================================================
-- Current Version 2.3.05 - 1.5.2019
+- Current Version 2.3.06 - 11.5.2019
 =============================================================================
 - Version 1.0.0
 21-02-2018 -- @tvwatch-kodi -- First stable version
@@ -151,3 +151,5 @@
 16-04-2019 -- @tvwatch-kodi -- Enhance Download feature
 - Version 2.3.05
 01-05-2019 -- @tvwatch-kodi -- Fix Uptobox URL
+- Version 2.3.06
+11-05-2019 -- @tvwatch-kodi -- New way to get dl link

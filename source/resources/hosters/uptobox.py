@@ -9,6 +9,7 @@ from resources.hosters.hoster import iHoster
 from resources.lib.config import cConfig
 from resources.lib.util import VSlog, VSlang
 
+import requests
 import urllib2,urllib,xbmcgui,re,xbmc
 
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:44.0) Gecko/20100101 Firefox/44.0'}
@@ -114,11 +115,26 @@ class cHoster(iHoster):
     def getUrl(self):
         return self.__sUrl
 
-    def getMediaLink(self):
+    def getMediaLinkByUserToken(self):
+        VSlog("getMediaLinkByUserToken")
+        FILE_CODE = self.__sUrl.replace('http://uptobox.com/','')
+        USR_TOKEN = "e84e2bdf19d127b4e624eed2c83bfd871tgrq"
+        URL = "https://uptobox.com/api/link"
 
+        PARAMS = {'token':USR_TOKEN, 'file_code':FILE_CODE}
+
+        try:
+            r = requests.get(url = URL, params = PARAMS)
+            data = r.json()
+            result = True, data['data']['dlLink']
+        except:
+            result = False, False
+        return result
+
+    def getMediaLink(self):
+        return self.getMediaLinkByUserToken()
         #dialog3 = xbmcgui.Dialog()
         #ret = dialog3.select('Choissisez votre mode de fonctionnement',['Passer en Streaming (via Uptostream)','Rester en direct (via Uptobox)'])
-
         sPlayerMode = self.oConfig.getSetting('playerMode')
         #mode DL
         if sPlayerMode == '0':

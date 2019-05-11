@@ -38,7 +38,7 @@ class cHosterGui:
         return self.play(params)
 
     def checkHoster(self, sHosterUrl):
-        cConfig().log('checkHoster')
+        VSlog('checkHoster')
         #securitee
         if (not sHosterUrl):
             return False
@@ -108,9 +108,6 @@ class cHosterGui:
 
         if not sTitle:
             sTitle = sFileName
-
-        if (False):
-            sMediaUrl = self.__getRedirectUrl(sMediaUrl)
 
         VSlog("Hoster - play " + sMediaUrl)
 
