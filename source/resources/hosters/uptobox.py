@@ -6,7 +6,7 @@ from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.parser import cParser
 from resources.lib.gui.gui import cGui
 from resources.hosters.hoster import iHoster
-from resources.lib.config import cConfig
+# from resources.lib.config import cConfig
 from resources.lib.util import VSlog, VSlang
 
 import requests
@@ -21,7 +21,7 @@ class cHoster(iHoster):
         self.__sFileName = ''
         self.oPremiumHandler = None
         self.stream = True
-        self.oConfig = cConfig()
+        # self.oConfig = cConfig()
 
     def getDisplayName(self):
         return  self.__sDisplayName
@@ -115,8 +115,9 @@ class cHoster(iHoster):
     def getUrl(self):
         return self.__sUrl
 
-    def getMediaLinkByUserToken(self):
+    def getMediaLinkByUserToken(self, url):
         VSlog("getMediaLinkByUserToken")
+        self.__sUrl = url
         FILE_CODE = self.__sUrl.replace('http://uptobox.com/','')
         USR_TOKEN = "e84e2bdf19d127b4e624eed2c83bfd871tgrq"
         URL = "https://uptobox.com/api/link"
@@ -132,10 +133,10 @@ class cHoster(iHoster):
         return result
 
     def getMediaLink(self):
-        return self.getMediaLinkByUserToken()
+        return self.getMediaLinkByUserToken(self.__sUrl)
         #dialog3 = xbmcgui.Dialog()
         #ret = dialog3.select('Choissisez votre mode de fonctionnement',['Passer en Streaming (via Uptostream)','Rester en direct (via Uptobox)'])
-        sPlayerMode = self.oConfig.getSetting('playerMode')
+        # sPlayerMode = self.oConfig.getSetting('playerMode')
         #mode DL
         if sPlayerMode == '0':
             self.stream = False

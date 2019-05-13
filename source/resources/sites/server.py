@@ -17,6 +17,7 @@ from resources.lib.tvHandler import cTvHandler
 from resources.lib.player import cPlayer
 from resources.lib.config import GestionCookie
 from resources.lib.mySqlDB import cMySqlDB
+from resources.hosters.uptobox import cHoster
 
 import urllib,re,urllib2
 import xbmc, xbmcgui, xbmcplugin
@@ -947,10 +948,7 @@ def Display_protected_link(params = {}, playNow = True):
             b = sHtmlContent[a:].find('"')
             sUrl = sHtmlContent[a:a+b]
 
-            oRequestHandler = cRequestHandler(sUrl)
-            sHtmlContent2 = oRequestHandler.request()
-
-            if "Fichier introuvable" in sHtmlContent2:
+            if not cHoster().getMediaLinkByUserToken(sUrl)[0]:
                 if '<div class="lienet2">' in sHtmlContent:
                     sHtmlContent = sHtmlContent[sHtmlContent.find('<div class="lienet2">'):]
                     a = sHtmlContent.find('<a href="') + len('<a href="')
