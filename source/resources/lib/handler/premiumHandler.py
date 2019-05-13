@@ -4,7 +4,6 @@ from resources.lib.config import cConfig
 from resources.lib.gui.gui import cGui
 from resources.lib.parser import cParser
 from resources.lib.config import GestionCookie
-from resources.lib.mySqlDB import cMySqlDB
 from resources.lib.util import VSlog,VSlang,uc
 
 from random import randint
@@ -300,7 +299,7 @@ class cPremiumHandler:
                         continue
                     cookies = cookies + cook[0] + '=' + cook[1]+ ';'
                     if cook[0] == 'xfss':
-                        cMySqlDB().updateXFSS(cook[1], self.xfss)
+                        # cMySqlDB().updateXFSS(cook[1], self.xfss)
                         self.xfss = cook[1]
 
         if xfss:

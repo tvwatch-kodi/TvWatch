@@ -71,3 +71,14 @@ class cMySqlDB:
         except Exception, e:
             VSlog('SQL ERROR GET table: ' + e.message)
         return res
+
+    def getInfoByName(self, name):
+        sql_select = "SELECT * FROM infoTable WHERE name = '%s'" % (name)
+        res = ""
+        try:
+            self.dbcur.execute(sql_select)
+            res = self.dbcur.fetchone()
+            res = res[2]
+        except Exception, e:
+            VSlog('SQL ERROR GET table: ' + e.message)
+        return res

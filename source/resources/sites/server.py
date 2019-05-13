@@ -16,6 +16,7 @@ from resources.lib.db import cDb
 from resources.lib.tvHandler import cTvHandler
 from resources.lib.player import cPlayer
 from resources.lib.config import GestionCookie
+from resources.lib.mySqlDB import cMySqlDB
 
 import urllib,re,urllib2
 import xbmc, xbmcgui, xbmcplugin
@@ -29,12 +30,14 @@ SITE_IDENTIFIER = 'server'
 SITE_NAME = '[COLOR violet]TvWatch[/COLOR]'
 SITE_DESC = 'Fichier en DDL, HD'
 
+# URL_HOST = 'https://www.annuairetelechargement.com/'
 URL_HOST = 'https://www.annuaire-telechargement.com/'
 
 def GetURL_MAIN():
-    oRequestHandler = cRequestHandler(URL_HOST)
-    oRequestHandler.request()
-    URL = oRequestHandler.getRealUrl()
+    # oRequestHandler = cRequestHandler(URL_HOST)
+    # oRequestHandler.request()
+    # URL = oRequestHandler.getRealUrl()
+    URL = cMySqlDB().getInfoByName("SERVER_URL")
     if not URL:
         URL = URL_HOST
     return URL
@@ -622,7 +625,9 @@ def showSeriesLinks(params = {}):
         for aEntry in aResult1[1]:
             sQual = aEntry[1] + " |" + aEntry[2].replace("(","").replace(")","")
             sDisplayTitle = sMovieTitle + ' [COLOR skyblue]' + sQual + '[/COLOR]'
-            sItemUrl = URL_MAIN + 'telecharger-series' + aEntry[0]
+            sItemUrl = aEntry[0]
+            if URL_MAIN not in sItemUrl:
+                sItemUrl = URL_MAIN + 'telecharger-series' + sItemUrl
 
             meta = {}
             meta['sItemUrl'] = sItemUrl
@@ -658,7 +663,10 @@ def showSeriesLinks(params = {}):
                 sMovieTitle = sMovieTitle[:sMovieTitle.find('Saison')]
                 sMovieTitle += 'Saison '
                 sMovieTitle += aEntry[2]
-            sItemUrl = URL_MAIN + 'telecharger-series' + aEntry[0]
+
+            sItemUrl = aEntry[0]
+            if URL_MAIN not in sItemUrl:
+                sItemUrl = URL_MAIN + 'telecharger-series' + sItemUrl
 
             meta = {}
             meta['sItemUrl'] = sItemUrl
@@ -891,8 +899,8 @@ def showStreamingHosters():# recherche et affiche les hotes
 
 def Display_protected_link(params = {}, playNow = True):
     VSlog('Display_protected_link')
-    if playNow:
-        VS_show_busy_dialog()
+    # if playNow:
+    #     VS_show_busy_dialog()
     oInputParameterHandler = cInputParameterHandler()
     sUrl = oInputParameterHandler.getValue('sItemUrl')
     sMainUrl = oInputParameterHandler.getValue('sMainUrl')
@@ -929,6 +937,34 @@ def Display_protected_link(params = {}, playNow = True):
             oDialog = VScreateDialogOK(VSlang(30458))
             aResult_dlprotecte = (False, False)
 
+    elif 'protect-stream' in sUrl:
+        oRequestHandler = cRequestHandler(sUrl)
+        sHtmlContent = oRequestHandler.request()
+        if '<div class="lienet">' in sHtmlContent:
+            sHtmlContent = sHtmlContent[sHtmlContent.find('<div class="lienet">'):]
+            a = sHtmlContent.find('<a href="') + len('<a href="')
+            b = sHtmlContent[a:].find('"')
+            sUrl = sHtmlContent[a:a+b]
+
+            oRequestHandler = cRequestHandler(sUrl)
+            sHtmlContent2 = oRequestHandler.request()
+
+            if "Fichier introuvable" in sHtmlContent2:
+                if '<div class="lienet2">' in sHtmlContent:
+                    sHtmlContent = sHtmlContent[sHtmlContent.find('<div class="lienet2">'):]
+                    a = sHtmlContent.find('<a href="') + len('<a href="')
+                    b = sHtmlContent[a:].find('"')
+                    sUrl = sHtmlContent[a:a+b]
+                    params['sItemUrl'] = sUrl
+                    params['sMainUrl'] = sMainUrl
+                    params['sMovieTitle'] = sMovieTitle
+                    params['sThumbnail'] = sThumbnail
+                    params['sType'] = sType
+                    params['sQual'] = sQual
+                    params['refresh'] = refresh
+                    return Display_protected_link(params, playNow)
+            else:
+                aResult_dlprotecte = (True, [sUrl])
     #Si lien normal
     else:
         if not sUrl.startswith('http'):
