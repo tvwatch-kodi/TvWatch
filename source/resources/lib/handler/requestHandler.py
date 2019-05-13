@@ -13,6 +13,7 @@ class cRequestHandler:
     REQUEST_TYPE_POST = 1
 
     def __init__(self, sUrl):
+        VSlog("Request handler URL: " + str(sUrl))
         self.__sUrl = sUrl
         self.__sRealUrl = ''
         self.__cType = self.REQUEST_TYPE_GET
