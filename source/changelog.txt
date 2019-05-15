@@ -4,7 +4,7 @@
 =============================================================================
 - Auteurs : Primatech
 =============================================================================
-- Current Version 2.3.09 - 13.5.2019
+- Current Version 2.3.10 - 15.5.2019
 =============================================================================
 - Version 1.0.0
 21-02-2018 -- @tvwatch-kodi -- First stable version
@@ -160,3 +160,5 @@
 13-05-2019 -- @tvwatch-kodi -- Check next page change
 - Version 2.3.09
 13-05-2019 -- @tvwatch-kodi -- Add method to check uptobox link
+- Version 2.3.10
+15-05-2019 -- @tvwatch-kodi -- Minor issue in uptobox check link method

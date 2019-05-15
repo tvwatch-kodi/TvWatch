@@ -949,6 +949,7 @@ def Display_protected_link(params = {}, playNow = True):
             sUrl = sHtmlContent[a:a+b]
 
             if not cHoster().getMediaLinkByUserToken(sUrl)[0]:
+                VSlog("File not found with protect-stream for URL: " + sUrl)
                 if '<div class="lienet2">' in sHtmlContent:
                     sHtmlContent = sHtmlContent[sHtmlContent.find('<div class="lienet2">'):]
                     a = sHtmlContent.find('<a href="') + len('<a href="')

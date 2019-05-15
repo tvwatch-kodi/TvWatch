@@ -117,7 +117,7 @@ class cHoster(iHoster):
 
     def getMediaLinkByUserToken(self, url):
         VSlog("getMediaLinkByUserToken")
-        self.__sUrl = url
+        self.setUrl(url)
         FILE_CODE = self.__sUrl.replace('http://uptobox.com/','')
         USR_TOKEN = "e84e2bdf19d127b4e624eed2c83bfd871tgrq"
         URL = "https://uptobox.com/api/link"
@@ -128,7 +128,7 @@ class cHoster(iHoster):
             r = requests.get(url = URL, params = PARAMS)
             data = r.json()
             result = True, data['data']['dlLink']
-        except:
+        except Exception, e:
             result = False, False
         return result
 
