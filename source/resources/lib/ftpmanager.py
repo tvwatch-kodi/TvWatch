@@ -16,9 +16,6 @@ class cFtpManager:
         except Exception, e:
             VSlog("FtpManager __init__ ERROR: " + e.message)
 
-    def quit(self):
-            self.ftp.quit()
-
     def getmTimeLocalDB(self, fileDb):
         t = time.localtime(os.path.getmtime(fileDb))
         year = t[0]
@@ -44,8 +41,6 @@ class cFtpManager:
             if ((os.path.exists(fileDb)) and (fileDbServer in self.ftp.nlst())):
                 timestamp_s = self.ftp.voidcmd('MDTM /htdocs/db/'+fileDbServer)[4:].strip()
                 timestamp_l = self.getmTimeLocalDB(fileDb)
-                # if (os.path.getsize(fileDb) != self.ftp.size(fileDbServer)):
-                #     do = True
                 if int(timestamp_l) > int(timestamp_s):
                     do = True
             else:
@@ -56,9 +51,10 @@ class cFtpManager:
                 self.ftp.cwd('/htdocs/db/')
                 self.ftp.storbinary(command, f)
                 f.close()
-                # self.ftp.quit()
+                self.ftp.quit()
         except Exception, e:
             VSlog("FtpManager sendDb ERROR: " + e.message)
+            self.ftp.quit()
 
     def getDb(self):
         fileDb = self.oConfig.getFileDB()
@@ -69,8 +65,6 @@ class cFtpManager:
             if ((os.path.exists(fileDb)) and (fileDbServer in self.ftp.nlst())):
                 timestamp_s = self.ftp.voidcmd('MDTM /htdocs/db/'+fileDbServer)[4:].strip()
                 timestamp_l = self.getmTimeLocalDB(fileDb)
-                # if (os.path.getsize(fileDb) != self.ftp.size(fileDbServer)):
-                #     do = True
                 if int(timestamp_l) < int(timestamp_s):
                     do = True
             else:
@@ -81,9 +75,10 @@ class cFtpManager:
                 self.ftp.cwd('/htdocs/db/')
                 self.ftp.retrbinary(command, f.write)
                 f.close()
-                # self.ftp.quit()
+                self.ftp.quit()
         except Exception, e:
             VSlog("FtpManager getDb ERROR: " + e.message)
+            self.ftp.quit()
 
     def sendLogs(self):
         fileLog = self.oConfig.getLogFile()
@@ -93,6 +88,7 @@ class cFtpManager:
             self.ftp.cwd('/htdocs/logs/')
             self.ftp.storbinary(command, f)
             f.close()
-            # self.ftp.quit()
+            self.ftp.quit()
         except Exception, e:
             VSlog("FtpManager sendLogs ERROR: " + e.message)
+            self.ftp.quit()

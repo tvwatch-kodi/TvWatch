@@ -28,9 +28,10 @@ class cDb:
         self.enableFtp = ftp
         try:
             if self.enableFtp:
-                self.ftp = cFtpManager()
+                self.lockDB()
                 VSlog("Retrieve DB from server")
-                self.ftp.getDb()
+                cFtpManager().getDb()
+                self.unlockDB()
             DB = self.oConfig.getFileDB()
             self.db = sqlite.connect(DB)
             self.dbcur = self.db.cursor()
@@ -43,9 +44,10 @@ class cDb:
             self.dbcur.close()
             self.db.close()
             if self.enableFtp:
+                self.lockDB()
                 VSlog("sendDb to server")
-                self.ftp.sendDb()
-                self.ftp.quit()
+                cFtpManager().sendDb()
+                self.unlockDB()
         except Exception, e:
             VSlog('cDb ERROR in Destructor: ' + str(e.message))
 
@@ -138,6 +140,8 @@ class cDb:
             VSlog('SQL ERROR INSERT resume: ' + str(e.message))
             if 'UNIQUE constraint failed' in str(e.message):
                 self.update_resume(meta)
+            elif 'malformed' in str(e.message).lower():
+                self.dropTables()
 
     def update_resume(self, meta):
         title = self.str_conv(meta['title'])
@@ -151,6 +155,8 @@ class cDb:
             self.unlockDB()
         except Exception, e:
             VSlog('SQL ERROR UPDATE resume: ' + str(e.message))
+            if 'malformed' in str(e.message).lower():
+                self.dropTables()
 
     def get_resume(self, meta):
         title = self.str_conv(meta['title'])
@@ -165,6 +171,8 @@ class cDb:
             return matchedrow
         except Exception, e:
             VSlog('SQL ERROR EXECUTE resume: ' + str(e.message))
+            if 'malformed' in str(e.message).lower():
+                self.dropTables()
             return []
 
     def del_resume(self, title):
@@ -178,6 +186,8 @@ class cDb:
             self.unlockDB()
         except Exception, e:
             VSlog('SQL ERROR DELETE resume: ' + str(e.message))
+            if 'malformed' in str(e.message).lower():
+                self.dropTables()
 
     #***********************************
     #   Watched fonctions
@@ -195,6 +205,8 @@ class cDb:
             self.unlockDB()
         except Exception, e:
             VSlog('SQL ERROR INSERT watched: ' + str(e.message))
+            if 'malformed' in str(e.message).lower():
+                self.dropTables()
 
     def get_watched(self, meta):
         count = 0
@@ -210,6 +222,8 @@ class cDb:
             return count
         except Exception, e:
             VSlog('SQL ERROR EXECUTE watched: ' + str(e.message))
+            if 'malformed' in str(e.message).lower():
+                self.dropTables()
             return None
 
     def del_watched(self, meta):
@@ -223,6 +237,8 @@ class cDb:
             return False, False
         except Exception, e:
             VSlog('SQL ERROR DELETE watched: ' + str(e.message))
+            if 'malformed' in str(e.message).lower():
+                self.dropTables()
             return False, False
 
     #***********************************
@@ -243,10 +259,11 @@ class cDb:
             self.oConfig.showInfo(meta['title'], 'Enregistré avec succés')
             self.unlockDB()
         except Exception, e:
+            VSlog('SQL ERROR INSERT favorite: ' + str(e.message))
             if 'UNIQUE constraint failed' in str(e.message):
                 self.oConfig.showInfo(meta['title'], 'Item déjà présent dans votre Liste')
-            VSlog('SQL ERROR INSERT favorite: ' + str(e.message))
-            pass
+            elif 'malformed' in str(e.message).lower():
+                self.dropTables()
 
     def get_favorite(self):
         sql_select = "SELECT * FROM favorite"
@@ -260,6 +277,8 @@ class cDb:
                 matchedrow = []
         except Exception, e:
             VSlog('SQL ERROR EXECUTE favorite: ' + str(e.message))
+            if 'malformed' in str(e.message).lower():
+                self.dropTables()
         return matchedrow
 
 
@@ -288,6 +307,8 @@ class cDb:
             return False, False
         except Exception, e:
             VSlog('SQL ERROR EXECUTE favorite: ' + str(e.message))
+            if 'malformed' in str(e.message).lower():
+                self.dropTables()
             return False, False
 
     def writeFavourites(self):
@@ -355,6 +376,8 @@ class cDb:
             VSlog('SQL ERROR INSERT history: ' + str(e.message))
             if 'UNIQUE constraint failed' in str(e.message):
                 self.update_history(meta)
+            elif 'malformed' in str(e.message).lower():
+                self.dropTables()
 
     def update_history(self, meta):
         title = meta['title']
@@ -378,6 +401,8 @@ class cDb:
             self.unlockDB()
         except Exception, e:
             VSlog('SQL UPDATE history: ' + str(e.message))
+            if 'malformed' in str(e.message).lower():
+                self.dropTables()
 
 
     def get_history(self):
@@ -392,6 +417,8 @@ class cDb:
             return matchedrow
         except Exception, e:
             VSlog('SQL ERROR GET history: ' + str(e.message))
+            if 'malformed' in str(e.message).lower():
+                self.dropTables()
             return []
 
     def get_historyFromTitle(self, title):
@@ -410,6 +437,8 @@ class cDb:
             return matchedrow
         except Exception, e:
             VSlog('SQL ERROR GET history: ' + str(e.message))
+            if 'malformed' in str(e.message).lower():
+                self.dropTables()
             return []
 
     def del_history(self, title):
@@ -426,6 +455,8 @@ class cDb:
             self.unlockDB()
         except Exception, e:
             VSlog('SQL ERROR DELETE history: ' + str(e.message))
+            if 'malformed' in str(e.message).lower():
+                self.dropTables()
 
     #***********************************
     #   valide fonctions
@@ -443,6 +474,8 @@ class cDb:
             self.unlockDB()
         except Exception, e:
             VSlog('SQL ERROR INSERT valide: ' + str(e.message))
+            if 'malformed' in str(e.message).lower():
+                self.dropTables()
 
     def get_valideFromUrl(self, url):
         if '?wmsAuthSign' in url:
@@ -457,6 +490,8 @@ class cDb:
             return matchedrow
         except Exception, e:
             VSlog('SQL ERROR GET valide: ' + str(e.message))
+            if 'malformed' in str(e.message).lower():
+                self.dropTables()
             return None
 
     def get_valide(self):
@@ -469,6 +504,8 @@ class cDb:
             return matchedrow
         except Exception, e:
             VSlog('SQL ERROR GET valide: ' + str(e.message))
+            if 'malformed' in str(e.message).lower():
+                self.dropTables()
             return None
 
     def del_valide(self):
@@ -481,6 +518,8 @@ class cDb:
             self.unlockDB()
         except Exception, e:
             VSlog('SQL ERROR valide history: ' + str(e.message))
+            if 'malformed' in str(e.message).lower():
+                self.dropTables()
 
     #***********************************
     #   downloaded fonctions
@@ -509,6 +548,8 @@ class cDb:
             VSlog('SQL ERROR INSERT downloaded: ' + str(e.message))
             if 'UNIQUE constraint failed' in str(e.message):
                 self.update_download(meta)
+            elif 'malformed' in str(e.message).lower():
+                self.dropTables()
 
     def update_download(self, meta):
         mainUrl = meta['sMainUrl']
@@ -531,6 +572,8 @@ class cDb:
             self.unlockDB()
         except Exception, e:
             VSlog('SQL UPDATE downloaded: ' + str(e.message))
+            if 'malformed' in str(e.message).lower():
+                self.dropTables()
 
 
     def get_download(self):
@@ -545,6 +588,8 @@ class cDb:
             return matchedrow
         except Exception, e:
             VSlog('SQL ERROR GET downloaded: ' + str(e.message))
+            if 'malformed' in str(e.message).lower():
+                self.dropTables()
             return []
 
     def get_downloadFromTitle(self, title):
@@ -563,6 +608,8 @@ class cDb:
             return matchedrow
         except Exception, e:
             VSlog('SQL ERROR GET downloaded: ' + str(e.message))
+            if 'malformed' in str(e.message).lower():
+                self.dropTables()
             return []
 
     def get_downloadFromStatus(self, status):
@@ -577,6 +624,8 @@ class cDb:
             return matchedrow
         except Exception, e:
             VSlog('SQL ERROR GET downloaded: ' + str(e.message))
+            if 'malformed' in str(e.message).lower():
+                self.dropTables()
             return []
 
     def del_downloadByStatus(self, status):
@@ -589,6 +638,8 @@ class cDb:
             self.unlockDB()
         except Exception, e:
             VSlog('SQL ERROR DELETE downloaded: ' + str(e.message))
+            if 'malformed' in str(e.message).lower():
+                self.dropTables()
 
     def del_download(self, title):
         # sRawtitle = title
@@ -604,3 +655,5 @@ class cDb:
             self.unlockDB()
         except Exception, e:
             VSlog('SQL ERROR DELETE downloaded: ' + str(e.message))
+            if 'malformed' in str(e.message).lower():
+                self.dropTables()

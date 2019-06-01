@@ -133,28 +133,23 @@ class cClear:
         elif (env == 'sendLogsByFTP'):
             from resources.lib.ftpmanager import cFtpManager
             util.VS_show_busy_dialog()
-            ftp = cFtpManager()
-            ftp.sendLogs()
-            ftp.quit()
+            cFtpManager().sendLogs()
             util.VS_hide_busy_dialog()
             util.VScreateDialogOK(util.VSlang(30464))
 
         elif (env == 'deleteCache'):
-            from resources.lib.ftpmanager import cFtpManager
             from resources.lib.db import cDb
 
             if util.VScreateDialogYesNo(util.VSlang(30466)):
+                util.VSlog("Delete Cache from RunScript")
                 util.VS_show_busy_dialog()
                 # Delete tvwatch.db
                 cDb().dropTables()
-                ftp = cFtpManager()
-                ftp.sendDb()
-                ftp.quit()
                 # Delete metada.db
                 self.ClearDir2(util.VStranslatePath(cConfig().getFileCache()),True)
                 util.VS_hide_busy_dialog()
                 util.VScreateDialogOK(util.VSlang(30467))
-                xbmc.executebuiltin( 'Container.Refresh' )
+                xbmc.executebuiltin('Container.Refresh')
 
         elif (env == 'search'):
             from resources.lib.handler.pluginHandler import cPluginHandler
