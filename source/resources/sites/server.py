@@ -47,6 +47,7 @@ URL_MAIN = GetURL_MAIN()
 URL_DECRYPT =  'www.dl-protect1.com'
 
 URL_IMAGE = 'http://www.zone-image.com/'
+# URL_IMAGE = URL_MAIN
 
 URL_SEARCH = (URL_MAIN + 'index.php?', 'showMovies')
 URL_SEARCH_MOVIES = (URL_MAIN + 'index.php?', 'showMovies')
@@ -427,7 +428,10 @@ def showMovies(sSearch = ''):
             if 'http' in aEntry[1]:
                 sThumbnail = aEntry[1]
             else:
-                sThumbnail = URL_IMAGE+aEntry[1]
+                sThumbnail = URL_IMAGE+"/"+aEntry[1]
+            while "//" in sThumbnail:
+                sThumbnail = sThumbnail.replace("//","/")
+            sThumbnail = sThumbnail.replace(":/","://")
 
             sIcon = ''
             if sSearch:
