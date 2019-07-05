@@ -969,6 +969,19 @@ def Display_protected_link(params = {}, playNow = True):
                     return Display_protected_link(params, playNow)
             else:
                 aResult_dlprotecte = (True, [sUrl])
+    elif "torrent/" in sUrl:
+
+        sUrl = URL_MAIN+"/"+sUrl
+        while "//" in sUrl:
+            sUrl = sUrl.replace("//","/")
+        sUrl = sUrl.replace(":/","://")
+        VSlog(sUrl)
+
+        sHtmlContent = DecryptTorrent(sUrl)
+
+        # VSlog(sHtmlContent)
+        if 'uptobox' in sHtmlContent:
+            VSlog("uptobox link found")
     #Si lien normal
     else:
         if not sUrl.startswith('http'):
@@ -1440,6 +1453,51 @@ def DecryptDlProtecte(url):
 
     return sHtmlContent
 
+def DecryptTorrent(url):
+    VSlog('DecryptTorrent : ' + url)
+
+    url = url.replace('https', 'http')
+
+    if not (url):
+        return ''
+
+    # 1ere Requete pour recuperer le cookie
+    oRequestHandler = cRequestHandler(url)
+    oRequestHandler.addHeaderEntry('User-Agent', UA)
+    sHtmlContent = oRequestHandler.request()
+
+    # cookies = GestionCookie().Readcookie('www_torrent_com')
+    cookies = oRequestHandler.GetCookies()
+    VSlog( 'cookie'  + str(cookies))
+
+    #Tout ca a virer et utiliser oRequestHandler.addMultipartFiled('sess_id':sId,'upload_type':'url','srv_tmp_url':sTmp) quand ca marchera
+    multipart_form_data = {'submit':'Afficher les liens','submit':'Afficher les liens'}
+    data, headersMulti = encode_multipart2(multipart_form_data, {})
+
+    #2 eme requete pour avoir le lien
+    oRequestHandler = cRequestHandler(url)
+    oRequestHandler.setRequestType(oRequestHandler.REQUEST_TYPE_POST)
+    # oRequestHandler.addHeaderEntry('Host', URL_MAIN)
+    oRequestHandler.addHeaderEntry('origin', "https://www1.annuaire-telechargement.cc")
+    oRequestHandler.addHeaderEntry('Referer', url)
+    oRequestHandler.addHeaderEntry('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3')
+    oRequestHandler.addHeaderEntry('User-Agent', UA)
+    oRequestHandler.addHeaderEntry('Accept-Language', 'fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7')
+    oRequestHandler.addHeaderEntry('Content-Length', headersMulti['Content-Length'])
+    oRequestHandler.addHeaderEntry('Content-Type', headersMulti['Content-Type'])
+    oRequestHandler.addHeaderEntry('Cookie', cookies)
+    # oRequestHandler.addHeaderEntry('Cookie', "__cfduid=d93d7a4587a982e430e93540b7161d4b51557755346; HstCfa4191558=1561496185387; HstCmu4191558=1561496185387; HstCnv4191558=1; __atuvc=3%7C26; __atuvs=5d129b189a0307fe000; HstCns4191558=4; HstCla4191558=1561500658404; HstPn4191558=21; HstPt4191558=21")
+    oRequestHandler.addHeaderEntry('Accept-Encoding', 'gzip, deflate')
+    # oRequestHandler.addHeaderEntry('upgrade-insecure-requests', '1')
+    # oRequestHandler.addHeaderEntry('dnt', '1')
+    # oRequestHandler.addHeaderEntry('cache-control', 'max-age=0')
+
+    oRequestHandler.addParametersLine(data)
+
+    sHtmlContent = oRequestHandler.request()
+
+    return sHtmlContent
+
 #******************************************************************************
 #from http://code.activestate.com/recipes/578668-encode-multipart-form-data-for-uploading-files-via/
 
@@ -1518,6 +1576,86 @@ def encode_multipart(fields, files, boundary = None):
     }
 
     return (body, headers)
+
+#******************************************************************************
+#from http://code.activestate.com/recipes/578668-encode-multipart-form-data-for-uploading-files-via/
+
+"""Encode multipart form data to upload files via POST."""
+
+def encode_multipart2(fields, files, boundary = None):
+    r"""Encode dict of form fields and dict of files as multipart/form-data.
+    Return tuple of (body_string, headers_dict). Each value in files is a dict
+    with required keys 'filename' and 'content', and optional 'mimetype' (if
+    not specified, tries to guess mime type or uses 'application/octet-stream').
+
+    >>> body, headers = encode_multipart({'FIELD': 'VALUE'},
+    ...                                  {'FILE': {'filename': 'F.TXT', 'content': 'CONTENT'}},
+    ...                                  boundary='BOUNDARY')
+    >>> print('\n'.join(repr(l) for l in body.split('\r\n')))
+    '--BOUNDARY'
+    'Content-Disposition: form-data; name="FIELD"'
+    ''
+    'VALUE'
+    '--BOUNDARY'
+    'Content-Disposition: form-data; name="FILE"; filename="F.TXT"'
+    'Content-Type: text/plain'
+    ''
+    'CONTENT'
+    '--BOUNDARY--'
+    ''
+    >>> print(sorted(headers.items()))
+    [('Content-Length', '193'), ('Content-Type', 'multipart/form-data; boundary=BOUNDARY')]
+    >>> len(body)
+    193
+    """
+
+    import mimetypes
+    import random
+    import string
+
+    _BOUNDARY_CHARS = string.digits + string.ascii_letters
+
+    def escape_quote(s):
+        return s.replace('"', '\\"')
+
+    if boundary is None:
+        boundary = ''.join(random.choice(_BOUNDARY_CHARS) for i in range(16))
+    lines = []
+
+    for name, value in fields.items():
+        lines.extend((
+            '------WebKitFormBoundary{0}'.format(boundary),
+            'Content-Disposition: form-data; name="{0}"'.format(escape_quote(name)),
+            '',
+            str(value),
+            '------WebKitFormBoundary{0}--'.format(boundary),
+            '',
+        ))
+
+    for name, value in files.items():
+        filename = value['filename']
+        if 'mimetype' in value:
+            mimetype = value['mimetype']
+        else:
+            mimetype = mimetypes.guess_type(filename)[0] or 'application/octet-stream'
+        lines.extend((
+            '--{0}'.format(boundary),
+            'Content-Disposition: form-data; name="{0}"'.format(
+                    escape_quote(name), escape_quote(filename)),
+            'Content-Type: {0}'.format(mimetype),
+            '',
+            value['content'],
+        ))
+
+    body = '\r\n'.join(lines)
+
+    headers = {
+        'Content-Type': 'multipart/form-data; boundary=----WebKitFormBoundary{0}'.format(boundary),
+        'Content-Length': str(len(body)),
+    }
+
+    return (body, headers)
+
 
 def showUpdate():
     try:

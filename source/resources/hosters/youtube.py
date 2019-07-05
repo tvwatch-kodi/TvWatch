@@ -68,11 +68,13 @@ class cHoster(iHoster):
         return
 
     def getMediaLink(self):
-        first_test = self.__getMediaLinkForGuest2()
-        if first_test != False:
-            return first_test
-        else:
-            return self.__getMediaLinkForGuest()
+        video_id = self.__sUrl[self.__sUrl.rfind("=")+1:]
+        return True, "plugin://plugin.video.youtube/play/?video_id=" + video_id
+        # first_test = self.__getMediaLinkForGuest2()
+        # if first_test != False:
+        #     return first_test
+        # else:
+        #     return self.__getMediaLinkForGuest()
 
     def __getMediaLinkForGuest2(self):
 
