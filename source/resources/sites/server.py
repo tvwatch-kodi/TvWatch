@@ -32,7 +32,8 @@ SITE_NAME = '[COLOR violet]TvWatch[/COLOR]'
 SITE_DESC = 'Fichier en DDL, HD'
 
 # URL_HOST = 'https://www.annuairetelechargement.com/'
-URL_HOST = 'https://www.annuaire-telechargement.com/'
+# URL_HOST = 'https://www.annuaire-telechargement.com/'
+URL_HOST = 'https://www.zone-telechargement.net/'
 
 def GetURL_MAIN():
     # oRequestHandler = cRequestHandler(URL_HOST)
@@ -737,9 +738,12 @@ def showHosters(params = {}, playNow = True):# recherche et affiche les hotes
     oRequestHandler.addHeaderEntry('Accept-Language','fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3')
     sHtmlContent = oRequestHandler.request()
 
-    #Si ca ressemble aux lien premiums on vire les liens non premium
+    datas = ExtractUptoboxLinksForMovies(sHtmlContent)
     meta = {}
-    meta['sItemUrl'] = ExtractUptoboxLinksForMovies(sHtmlContent)
+    meta['sBaseUrl'] = sUrl
+    meta['sItemUrl'] = datas[0]
+    meta['sEncodeUrl'] = datas[1]
+    meta['sNextUrl'] = datas[2]
     meta['sMainUrl'] = sMainUrl
     meta['sMovieTitle'] = sMovieTitle
     meta['sThumbnail'] = sThumbnail
@@ -918,18 +922,23 @@ def Display_protected_link(params = {}, playNow = True):
 
     if params != {}:
         sUrl = params['sItemUrl']
+        sEncodeUrl = params['sEncodeUrl']
+        sNextUrl = params['sNextUrl']
         sMainUrl = params['sMainUrl']
         sMovieTitle = params['sMovieTitle']
         sThumbnail = params['sThumbnail']
         sType = params['sType']
         sQual = params['sQual']
         refresh = params['refresh']
+        sBaseUrl = params['sBaseUrl']
 
     oParser = cParser()
 
     #Est ce un lien dl-protect ?
     if URL_DECRYPT in sUrl:
-        sHtmlContent = DecryptDlProtecte(sUrl)
+        f = { 'url' : sEncodeUrl, 'nextURL' : sNextUrl}
+        data = urllib.urlencode(f)
+        sHtmlContent = DecryptDlProtecte(sUrl, data, sBaseUrl)
 
         if sHtmlContent:
             #Si redirection
@@ -1350,8 +1359,14 @@ def CutPremiumlinks(sHtmlContent):
         sHtmlContent = sHtmlContent[a:]
     return sHtmlContent
 
-def ExtractUptoboxLinks(sHtmlContent):
+def ExtractUptoboxLinksOLD(sHtmlContent):
     #Recupere les liens Uptobox uniquement
+
+    trig1 = 'href="'
+    trig2 = 'font-weight:bold'
+    trig3 = '">'
+    trig4 = '</a>'
+
     Links = []
     if 'uptobox' in sHtmlContent.lower():
         a = sHtmlContent.lower().find('uptobox')
@@ -1359,19 +1374,60 @@ def ExtractUptoboxLinks(sHtmlContent):
         sHtmlContent = sHtmlContent[a:]
         stop = False
         while not stop:
-            if 'href="' in sHtmlContent:
-                a = sHtmlContent.find('href="') + 6
-            if 'font-weight:bold' in sHtmlContent:
-                aa = sHtmlContent.find('font-weight:bold') + 16
+            if trig1 in sHtmlContent:
+                a = sHtmlContent.find(trig1) + len(trig1)
+            if trig2 in sHtmlContent:
+                aa = sHtmlContent.find(trig2) + len(trig2)
             if a < aa:
-                b = sHtmlContent[a:].find('">')
-                c = sHtmlContent[a+b:].find('</a>')
+                b = sHtmlContent[a:].find(trig3)
+                c = sHtmlContent[a+b:].find(trig4)
                 link = sHtmlContent[a:a+b]
                 name = sHtmlContent[a+b+2:a+b+c]
                 Links.append([link, name])
                 sHtmlContent = sHtmlContent[a+b+c+2:]
             else:
                 stop = True
+    return Links
+
+def ExtractUptoboxLinks(sHtmlContent):
+    #Recupere les liens Uptobox uniquement
+
+    trig1 = '<form action="'
+    trig2 = 'name="url"'
+    trig3 = 'name="nextURL"'
+
+    Links = []
+    if 'uptobox' in sHtmlContent.lower():
+        a = sHtmlContent.lower().find('uptobox')
+        aa = a
+        sHtmlContent = sHtmlContent[a:]
+        stop = False
+        while not stop:
+            if trig1 in sHtmlContent:
+                a = sHtmlContent.find(trig1) + len(trig1)
+                if '"' in sHtmlContent[a:]:
+                    aa = sHtmlContent.find('"') + len('"') + a
+                    link = sHtmlContent[a:aa]
+                    VSlog(link)
+                    sHtmlContent = sHtmlContent[aa:]
+            if trig2 in sHtmlContent:
+                a = sHtmlContent.find(trig2) + len(trig2)
+                if 'value="' in sHtmlContent[a:]:
+                    aa = sHtmlContent[a:].find('value="') + len('value="') + a
+                    aaa = sHtmlContent[aa:].find('"') + aa
+                    data = sHtmlContent[aa:aaa]
+                    VSlog(data)
+                    sHtmlContent = sHtmlContent[aaa:]
+            if trig3 in sHtmlContent:
+                a = sHtmlContent.find(trig3) + len(trig3)
+                if 'value="' in sHtmlContent[a:]:
+                    aa = sHtmlContent[a:].find('value="') + len('value="') + a
+                    aaa = sHtmlContent[aa:].find('"') + aa
+                    nextURL = sHtmlContent[aa:aaa]
+                    VSlog(nextURL)
+                    sHtmlContent = sHtmlContent[aaa:]
+            Links.append([link, data, nextURL])
+            stop = True
     return Links
 
 def ExtractUptoboxLinksForTvShows(sHtmlContent):
@@ -1410,11 +1466,10 @@ def ExtractUptoboxLinksForMovies(sHtmlContent):
 
     link = ''
     if len(Links) > 0:
-        link = Links[0][0]
-
+        link = Links[0]
     return link
 
-def DecryptDlProtecte(url):
+def DecryptDlProtecte(url, data, baseUrl):
     VSlog('DecryptDlProtecte : ' + url)
 
     url = url.replace('https', 'http')
@@ -1424,19 +1479,58 @@ def DecryptDlProtecte(url):
 
     # 1ere Requete pour recuperer le cookie
     oRequestHandler = cRequestHandler(url)
+    oRequestHandler.setRequestType(1)
+    oRequestHandler.addHeaderEntry('Host', 'www.dl-protect1.com')
+    oRequestHandler.addHeaderEntry('Referer', baseUrl)
+    oRequestHandler.addHeaderEntry('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8')
     oRequestHandler.addHeaderEntry('User-Agent', UA)
+    oRequestHandler.addHeaderEntry('Accept-Language', 'fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3')
+    oRequestHandler.addHeaderEntry('Content-Length', len(str(data)))
+    oRequestHandler.addHeaderEntry('Content-Type',  "application/x-www-form-urlencoded")
+    oRequestHandler.addHeaderEntry('Accept-Encoding', 'gzip, deflate')
+    oRequestHandler.addParametersLine(data)
     sHtmlContent = oRequestHandler.request()
 
     cookies = GestionCookie().Readcookie('www_dl-protect1_com')
     #VSlog( 'cookie'  + str(cookies))
 
-    #Tout ca a virer et utiliser oRequestHandler.addMultipartFiled('sess_id':sId,'upload_type':'url','srv_tmp_url':sTmp) quand ca marchera
-    multipart_form_data = {'submit':'continuer','submit':'Continuer'}
-    data, headersMulti = encode_multipart(multipart_form_data, {})
+    aResult = re.search('<form action="([^"]+)" method="post".+?\s*.+?name="([^"]+)" value="([^"]+)"',str(sHtmlContent))
+    url = 'https://' + str(url.split('/')[2]) + str(aResult.group(1))
 
-    #2 eme requete pour avoir le lien
+    #Tout ca a virer et utiliser oRequestHandler.addMultipartFiled('sess_id':sId,'upload_type':'url','srv_tmp_url':sTmp) quand ca marchera
+    import string
+    _BOUNDARY_CHARS = string.digits
+    boundary = ''.join(random.choice(_BOUNDARY_CHARS) for i in range(27))
+    multipart_form_data = {'submit':'continuer','submit':'Continuer'}
+    data, headersMulti = encode_multipart(multipart_form_data, {}, aResult.group(2),aResult.group(3),boundary)
+
     oRequestHandler = cRequestHandler(url)
-    oRequestHandler.setRequestType(oRequestHandler.REQUEST_TYPE_POST)
+    oRequestHandler.setRequestType(1)
+    oRequestHandler.addHeaderEntry('Host', 'www.dl-protect1.com')
+    oRequestHandler.addHeaderEntry('Referer', url)
+    oRequestHandler.addHeaderEntry('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8')
+    oRequestHandler.addHeaderEntry('User-Agent', UA)
+    oRequestHandler.addHeaderEntry('Accept-Language', 'fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3')
+    oRequestHandler.addHeaderEntry('Content-Length', headersMulti['Content-Length'])
+    oRequestHandler.addHeaderEntry('Content-Type', headersMulti['Content-Type'])
+    oRequestHandler.addHeaderEntry('Cookie', cookies)
+    oRequestHandler.addHeaderEntry('Accept-Encoding', 'gzip, deflate')
+
+    oRequestHandler.addParametersLine(data)
+
+    sHtmlContent = oRequestHandler.request()
+
+    aResult = re.search('name="([^"]+)" value="([^"]+)"',str(sHtmlContent))
+
+    #Tout ca a virer et utiliser oRequestHandler.addMultipartFiled('sess_id':sId,'upload_type':'url','srv_tmp_url':sTmp) quand ca marchera
+    import string
+    _BOUNDARY_CHARS = string.digits
+    boundary = ''.join(random.choice(_BOUNDARY_CHARS) for i in range(27))
+    multipart_form_data = {'submit':'continuer','submit':'Continuer'}
+    data, headersMulti = encode_multipart(multipart_form_data, {}, aResult.group(1), aResult.group(2),boundary)
+
+    oRequestHandler = cRequestHandler(url)
+    oRequestHandler.setRequestType(1)
     oRequestHandler.addHeaderEntry('Host', 'www.dl-protect1.com')
     oRequestHandler.addHeaderEntry('Referer', url)
     oRequestHandler.addHeaderEntry('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8')
@@ -1503,7 +1597,7 @@ def DecryptTorrent(url):
 
 """Encode multipart form data to upload files via POST."""
 
-def encode_multipart(fields, files, boundary = None):
+def encode_multipart(fields, files, typeUrl, param, boundary = None):
     r"""Encode dict of form fields and dict of files as multipart/form-data.
     Return tuple of (body_string, headers_dict). Each value in files is a dict
     with required keys 'filename' and 'content', and optional 'mimetype' (if
@@ -1540,11 +1634,15 @@ def encode_multipart(fields, files, boundary = None):
         return s.replace('"', '\\"')
 
     if boundary is None:
-        boundary = ''.join(random.choice(_BOUNDARY_CHARS) for i in range(15))
+        boundary = ''.join(random.choice(_BOUNDARY_CHARS) for i in range(27))
     lines = []
 
     for name, value in fields.items():
         lines.extend((
+            '-----------------------------{0}'.format(boundary),
+            'Content-Disposition: form-data; name="{0}"'.format(escape_quote(typeUrl)),
+            '',
+            '{0}'.format(param),
             '-----------------------------{0}'.format(boundary),
             'Content-Disposition: form-data; name="{0}"'.format(escape_quote(name)),
             '',
