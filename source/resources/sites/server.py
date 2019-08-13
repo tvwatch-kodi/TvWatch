@@ -764,15 +764,15 @@ def showSeriesHosters():# recherche et affiche les hotes
     oGui = cGui()
     oInputParameterHandler = cInputParameterHandler() #apelle l'entree de paramettre
     sMovieTitle = oInputParameterHandler.getValue('sMovieTitle')
-    sItemUrl = oInputParameterHandler.getValue('sItemUrl')
+    sBaseUrl = oInputParameterHandler.getValue('sItemUrl')
     sMainUrl = oInputParameterHandler.getValue('sMainUrl')
     sThumbnail = oInputParameterHandler.getValue('sThumbnail')
     sQual = oInputParameterHandler.getValue('sQual')
     currentEpisode = oInputParameterHandler.getValue('currentEpisode')
     currentSeason = oInputParameterHandler.getValue('currentSeason')
 
-    sItemUrl = fixUrl(sItemUrl)
-    oRequestHandler = cRequestHandler(sItemUrl)
+    sBaseUrl = fixUrl(sBaseUrl)
+    oRequestHandler = cRequestHandler(sBaseUrl)
     sHtmlContent = oRequestHandler.request()
 
     Links = ExtractUptoboxLinksForTvShows(sHtmlContent)
@@ -787,10 +787,12 @@ def showSeriesHosters():# recherche et affiche les hotes
             if dialog.iscanceled():
                 break
 
-            sName = aEntry[1]
+            sName = aEntry[3]
             sName = sName.replace('Télécharger','')
             sName = sName.replace('pisodes','pisode')
             sItemUrl = aEntry[0]
+            sEncodeUrl = aEntry[1]
+            sNextUrl = aEntry[2]
 
             # if sName != '' and sName.find('pisode') != -1:
             sTitle = sMovieTitle + ' ' + sName
@@ -807,6 +809,10 @@ def showSeriesHosters():# recherche et affiche les hotes
             meta['sQual'] = sQual
             meta['refresh'] = "False"
             meta['episode'] = '0'
+            meta['sEncodeUrl'] = sEncodeUrl
+            meta['sNextUrl'] = sNextUrl
+            meta['sBaseUrl'] = sBaseUrl
+
             if "Episode" in sTitle:
                 episode = sTitle[sTitle.find("Episode")+7:].split(" ")
                 meta['episode'] = episode[1]
@@ -847,6 +853,9 @@ def showSeriesHosters():# recherche et affiche les hotes
             oOutputParameterHandler.addParameter('sType', episode['sType'])
             oOutputParameterHandler.addParameter('sQual', episode['sQual'])
             oOutputParameterHandler.addParameter('refresh', episode['refresh'])
+            oOutputParameterHandler.addParameter('sEncodeUrl', episode['sEncodeUrl'])
+            oOutputParameterHandler.addParameter('sNextUrl', episode['sNextUrl'])
+            oOutputParameterHandler.addParameter('sBaseUrl', episode['sBaseUrl'])
             oOutputParameterHandler.addParameter('status', 'NotStarted')
 
             oGui.addTV(SITE_IDENTIFIER, 'Display_protected_link', episode['sDisplayTitle'], '', episode['sThumbnail'], '', \
@@ -919,6 +928,9 @@ def Display_protected_link(params = {}, playNow = True):
     sType = oInputParameterHandler.getValue('sType')
     sQual = oInputParameterHandler.getValue('sQual')
     refresh = oInputParameterHandler.getValue('refresh')
+    sEncodeUrl = oInputParameterHandler.getValue('sEncodeUrl')
+    sNextUrl = oInputParameterHandler.getValue('sNextUrl')
+    sBaseUrl = oInputParameterHandler.getValue('sBaseUrl')
 
     if params != {}:
         sUrl = params['sItemUrl']
@@ -961,23 +973,23 @@ def Display_protected_link(params = {}, playNow = True):
             b = sHtmlContent[a:].find('"')
             sUrl = sHtmlContent[a:a+b]
 
-            if not cHoster().getMediaLinkByUserToken(sUrl)[0]:
-                VSlog("File not found with protect-stream for URL: " + sUrl)
-                if '<div class="lienet2">' in sHtmlContent:
-                    sHtmlContent = sHtmlContent[sHtmlContent.find('<div class="lienet2">'):]
-                    a = sHtmlContent.find('<a href="') + len('<a href="')
-                    b = sHtmlContent[a:].find('"')
-                    sUrl = sHtmlContent[a:a+b]
-                    params['sItemUrl'] = sUrl
-                    params['sMainUrl'] = sMainUrl
-                    params['sMovieTitle'] = sMovieTitle
-                    params['sThumbnail'] = sThumbnail
-                    params['sType'] = sType
-                    params['sQual'] = sQual
-                    params['refresh'] = refresh
-                    return Display_protected_link(params, playNow)
-            else:
-                aResult_dlprotecte = (True, [sUrl])
+            # if not cHoster().getMediaLinkByUserToken(sUrl)[0]:
+            #     VSlog("File not found with protect-stream for URL: " + sUrl)
+            #     if '<div class="lienet2">' in sHtmlContent:
+            #         sHtmlContent = sHtmlContent[sHtmlContent.find('<div class="lienet2">'):]
+            #         a = sHtmlContent.find('<a href="') + len('<a href="')
+            #         b = sHtmlContent[a:].find('"')
+            #         sUrl = sHtmlContent[a:a+b]
+            #         params['sItemUrl'] = sUrl
+            #         params['sMainUrl'] = sMainUrl
+            #         params['sMovieTitle'] = sMovieTitle
+            #         params['sThumbnail'] = sThumbnail
+            #         params['sType'] = sType
+            #         params['sQual'] = sQual
+            #         params['refresh'] = refresh
+            #         return Display_protected_link(params, playNow)
+            # else:
+            #     aResult_dlprotecte = (True, [sUrl])
     elif "torrent/" in sUrl:
 
         sUrl = URL_MAIN+"/"+sUrl
@@ -1118,10 +1130,13 @@ def getNextEpisode(title, sQual, nextSeason = False):
                         for aEntry in Links:
                             foundUrl = None
                             foundTitle = None
-                            sName = aEntry[1]
+                            sName = aEntry[3]
                             sName = sName.replace('Télécharger','')
                             sName = sName.replace('pisodes','pisode')
                             sUrl2 = aEntry[0]
+                            sEncodeUrl = aEntry[1]
+                            sNextUrl = aEntry[2]
+                            sBaseUrl = sUrl
 
                             if sName != '' and sName.find('pisode') != -1:
                                 sTitle = sMovieTitle + ' ' + sName
@@ -1139,6 +1154,9 @@ def getNextEpisode(title, sQual, nextSeason = False):
                                 params['sType'] = "tvshow"
                                 params['sQual'] = sQual
                                 params['refresh'] = "True"
+                                params['sBaseUrl'] = sBaseUrl
+                                params['sEncodeUrl'] = sEncodeUrl
+                                params['sNextUrl'] = sNextUrl
                                 break
 
                             if sEpisode in foundTitle:
@@ -1150,6 +1168,9 @@ def getNextEpisode(title, sQual, nextSeason = False):
                                     params['sType'] = "tvshow"
                                     params['sQual'] = sQual
                                     params['refresh'] = "True"
+                                    params['sBaseUrl'] = sBaseUrl
+                                    params['sEncodeUrl'] = sEncodeUrl
+                                    params['sNextUrl'] = sNextUrl
                                     break
                                 else:
                                     getNextOne = True
@@ -1325,6 +1346,9 @@ def playContinueToWatch(sFullTitle):
         params['sType'] = sType
         params['sQual'] = sQual
         params['refresh'] = "True"
+        params['sEncodeUrl'] = "osef"
+        params['sNextUrl'] = "osef"
+        params['sBaseUrl'] = "osef"
 
         try:
             Display_protected_link(params)
@@ -1395,20 +1419,20 @@ def ExtractUptoboxLinks(sHtmlContent):
     trig1 = '<form action="'
     trig2 = 'name="url"'
     trig3 = 'name="nextURL"'
+    trig4 = '</button>'
 
     Links = []
     if 'uptobox' in sHtmlContent.lower():
         a = sHtmlContent.lower().find('uptobox')
         aa = a
-        sHtmlContent = sHtmlContent[a:]
+        sHtmlContent = sHtmlContent[a+len("Uptobox</div>"):]
         stop = False
         while not stop:
             if trig1 in sHtmlContent:
                 a = sHtmlContent.find(trig1) + len(trig1)
                 if '"' in sHtmlContent[a:]:
-                    aa = sHtmlContent.find('"') + len('"') + a
+                    aa = sHtmlContent[a:].find('"') + a
                     link = sHtmlContent[a:aa]
-                    VSlog(link)
                     sHtmlContent = sHtmlContent[aa:]
             if trig2 in sHtmlContent:
                 a = sHtmlContent.find(trig2) + len(trig2)
@@ -1416,7 +1440,6 @@ def ExtractUptoboxLinks(sHtmlContent):
                     aa = sHtmlContent[a:].find('value="') + len('value="') + a
                     aaa = sHtmlContent[aa:].find('"') + aa
                     data = sHtmlContent[aa:aaa]
-                    VSlog(data)
                     sHtmlContent = sHtmlContent[aaa:]
             if trig3 in sHtmlContent:
                 a = sHtmlContent.find(trig3) + len(trig3)
@@ -1424,10 +1447,23 @@ def ExtractUptoboxLinks(sHtmlContent):
                     aa = sHtmlContent[a:].find('value="') + len('value="') + a
                     aaa = sHtmlContent[aa:].find('"') + aa
                     nextURL = sHtmlContent[aa:aaa]
-                    VSlog(nextURL)
                     sHtmlContent = sHtmlContent[aaa:]
-            Links.append([link, data, nextURL])
-            stop = True
+            if trig4 in sHtmlContent:
+                a = sHtmlContent.find(trig4)
+                if '>' in sHtmlContent[:a]:
+                    aa = sHtmlContent[:a].rfind('>') + len('>')
+                    name = sHtmlContent[aa:a]
+
+            Links.append([link, data, nextURL, name])
+
+            if trig1 in sHtmlContent:
+                a = sHtmlContent.find(trig1)
+                b = sHtmlContent.find("</div>")
+                if b < a:
+                    stop = True
+            else:
+                stop = True
+
     return Links
 
 def ExtractUptoboxLinksForTvShows(sHtmlContent):

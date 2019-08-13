@@ -146,7 +146,8 @@ class cHosterGui:
                 playParams['guiElement'] = oGuiElement
                 playParams['title'] = sFileName
                 playParams['sUrlToPlay'] = aLink[1]
-                playParams['sItemUrl'] = protectedLink
+                # playParams['sItemUrl'] = protectedLink #dl protect
+                playParams['sItemUrl'] = sMediaUrl #uptobox
                 playParams['sMainUrl'] = sMainUrl
                 playParams['sQual'] = sQual
                 playParams['sThumbnail'] = sThumbnail
