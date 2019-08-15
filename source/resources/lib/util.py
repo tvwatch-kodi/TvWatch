@@ -268,7 +268,7 @@ def QuoteSafe(sUrl):
 def VSlog(e):
     xbmc.log('\t[PLUGIN] TvWatch: '+str(e), xbmc.LOGNOTICE)
 
-def VSupdate(self):
+def VSupdate():
     xbmc.executebuiltin("Container.Refresh")
 
 def VS_show_busy_dialog():

@@ -32,8 +32,8 @@ class cDb:
                 VSlog("Retrieve DB from server")
                 cFtpManager().getDb()
                 self.unlockDB()
-            DB = self.oConfig.getFileDB()
-            self.db = sqlite.connect(DB)
+            self.DB = self.oConfig.getFileDB()
+            self.db = sqlite.connect(self.DB)
             self.dbcur = self.db.cursor()
         except Exception, e:
             VSlog('cDb ERROR in Constructor: ' + str(e.message))
@@ -87,6 +87,12 @@ class cDb:
 
         except Exception, e:
             VSlog('cDb ERROR in createTables: ' + str(e.message))
+            if "database disk image is malformed" in str(e.message):
+                os.remove(self.DB)
+                self.db = sqlite.connect(self.DB)
+                self.dbcur = self.db.cursor()
+                self.createTables()
+                cFtpManager().sendDb()
 
     def dropTables(self):
         try:
