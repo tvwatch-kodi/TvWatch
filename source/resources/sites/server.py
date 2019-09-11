@@ -45,10 +45,10 @@ def GetURL_MAIN():
     return URL
 
 URL_MAIN = GetURL_MAIN()
-URL_DECRYPT =  'www.dl-protect1.com'
 
 URL_IMAGE = 'http://www.zone-image.com/'
-# URL_IMAGE = URL_MAIN
+
+URL_DECRYPT =  ''
 
 URL_SEARCH = (URL_MAIN + 'index.php?', 'showMovies')
 URL_SEARCH_MOVIES = (URL_MAIN + 'index.php?', 'showMovies')
@@ -64,11 +64,19 @@ MOVIE_HD = (URL_MAIN + 'films-bluray-hd/', 'showMovies') # films en HD
 MOVIE_HDLIGHT = (URL_MAIN + 'x265-x264-hdlight/', 'showMovies') # films en x265 et x264
 MOVIE_VOSTFR = (URL_MAIN + 'filmsenvostfr/', 'showMovies') # films VOSTFR
 MOVIE_4K = (URL_MAIN + 'film-ultra-hd-4k/', 'showMovies') # films "4k"
-
+MOVIE_MKV = (URL_MAIN + 'films-mkv/', 'showMovies')
+MOVIE_VO = (URL_MAIN + 'films-vo/','showMovies')
+MOVIE_INTEGRAL = (URL_MAIN + 'collection-films-integrale/','showMovies')
 MOVIE_ANIME = (URL_MAIN + 'dessins-animes/', 'showMovies') # dessins animes
 
 SERIE_VFS = (URL_MAIN + 'series-vf/', 'showMovies') # serie VF
 SERIE_VOSTFRS = (URL_MAIN + 'series-vostfr/', 'showMovies') # serie VOSTFR
+SERIE_VF_720 = (URL_MAIN + 'series-vf-en-hd/','showMovies')
+SERIE_VF_1080 = (URL_MAIN + 'series-vf-1080p/','showMovies')
+SERIE_VOSTFRS_720 = (URL_MAIN + 'series-vostfr-hd/','showMovies')
+SERIE_VOSTFRS_1080 = (URL_MAIN + 'series-vostfr-1080p/','showMovies')
+SERIE_VO = (URL_MAIN + 'series-vo/', 'showMovies')
+ANCIENNE_SERIE = (URL_MAIN + 'telecharger-series/ancienne-serie/', 'showMovies')
 
 ANIM_VFS = (URL_MAIN + 'animes-vf/', 'showMovies') # Anime VF
 ANIM_VOSTFRS = (URL_MAIN + 'animes-vostfr/', 'showMovies') # Anime VOSTFR
@@ -739,6 +747,7 @@ def showHosters(params = {}, playNow = True):# recherche et affiche les hotes
     sHtmlContent = oRequestHandler.request()
 
     datas = ExtractUptoboxLinksForMovies(sHtmlContent)
+    VSlog(datas)
     meta = {}
     meta['sBaseUrl'] = sUrl
     meta['sItemUrl'] = datas[0]
@@ -957,7 +966,7 @@ def Display_protected_link(params = {}, playNow = True):
             if sHtmlContent.startswith('http'):
                 aResult_dlprotecte = (True, [sHtmlContent])
             else:
-                sPattern_dlprotecte = '<div class="lienet"><a href="(.+?)">'
+                sPattern_dlprotecte = '<div class="alert alert-primary".+?\s*<a href="(.+?)">'
                 aResult_dlprotecte = oParser.parse(sHtmlContent, sPattern_dlprotecte)
 
         else:
@@ -1009,6 +1018,7 @@ def Display_protected_link(params = {}, playNow = True):
             sUrl = 'http://' + sUrl
         aResult_dlprotecte = (True, [sUrl])
 
+    VSlog(aResult_dlprotecte)
     if aResult_dlprotecte[0]:
         episode = 1
         for aEntry in aResult_dlprotecte[1]:
@@ -1025,6 +1035,7 @@ def Display_protected_link(params = {}, playNow = True):
             oHoster = oHosterGui.checkHoster(sHosterUrl)
             if (oHoster != False):
                 oHoster.setDisplayName(sDisplayTitle)
+                oHoster.setFileName(sTitle)
                 oHoster.setFileName(sTitle)
 
                 playParams = {}
@@ -1508,7 +1519,7 @@ def ExtractUptoboxLinksForMovies(sHtmlContent):
 def DecryptDlProtecte(url, data, baseUrl):
     VSlog('DecryptDlProtecte : ' + url)
 
-    url = url.replace('https', 'http')
+    # url = url.replace('https', 'http')
 
     if not (url):
         return ''
@@ -1516,7 +1527,7 @@ def DecryptDlProtecte(url, data, baseUrl):
     # 1ere Requete pour recuperer le cookie
     oRequestHandler = cRequestHandler(url)
     oRequestHandler.setRequestType(1)
-    oRequestHandler.addHeaderEntry('Host', 'www.dl-protect1.com')
+    oRequestHandler.addHeaderEntry('Host', url.split('/')[2])
     oRequestHandler.addHeaderEntry('Referer', baseUrl)
     oRequestHandler.addHeaderEntry('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8')
     oRequestHandler.addHeaderEntry('User-Agent', UA)
@@ -1525,60 +1536,6 @@ def DecryptDlProtecte(url, data, baseUrl):
     oRequestHandler.addHeaderEntry('Content-Type',  "application/x-www-form-urlencoded")
     oRequestHandler.addHeaderEntry('Accept-Encoding', 'gzip, deflate')
     oRequestHandler.addParametersLine(data)
-    sHtmlContent = oRequestHandler.request()
-
-    cookies = GestionCookie().Readcookie('www_dl-protect1_com')
-    #VSlog( 'cookie'  + str(cookies))
-
-    aResult = re.search('<form action="([^"]+)" method="post".+?\s*.+?name="([^"]+)" value="([^"]+)"',str(sHtmlContent))
-    url = 'https://' + str(url.split('/')[2]) + str(aResult.group(1))
-
-    #Tout ca a virer et utiliser oRequestHandler.addMultipartFiled('sess_id':sId,'upload_type':'url','srv_tmp_url':sTmp) quand ca marchera
-    import string
-    _BOUNDARY_CHARS = string.digits
-    boundary = ''.join(random.choice(_BOUNDARY_CHARS) for i in range(27))
-    multipart_form_data = {'submit':'continuer','submit':'Continuer'}
-    data, headersMulti = encode_multipart(multipart_form_data, {}, aResult.group(2),aResult.group(3),boundary)
-
-    oRequestHandler = cRequestHandler(url)
-    oRequestHandler.setRequestType(1)
-    oRequestHandler.addHeaderEntry('Host', 'www.dl-protect1.com')
-    oRequestHandler.addHeaderEntry('Referer', url)
-    oRequestHandler.addHeaderEntry('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8')
-    oRequestHandler.addHeaderEntry('User-Agent', UA)
-    oRequestHandler.addHeaderEntry('Accept-Language', 'fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3')
-    oRequestHandler.addHeaderEntry('Content-Length', headersMulti['Content-Length'])
-    oRequestHandler.addHeaderEntry('Content-Type', headersMulti['Content-Type'])
-    oRequestHandler.addHeaderEntry('Cookie', cookies)
-    oRequestHandler.addHeaderEntry('Accept-Encoding', 'gzip, deflate')
-
-    oRequestHandler.addParametersLine(data)
-
-    sHtmlContent = oRequestHandler.request()
-
-    aResult = re.search('name="([^"]+)" value="([^"]+)"',str(sHtmlContent))
-
-    #Tout ca a virer et utiliser oRequestHandler.addMultipartFiled('sess_id':sId,'upload_type':'url','srv_tmp_url':sTmp) quand ca marchera
-    import string
-    _BOUNDARY_CHARS = string.digits
-    boundary = ''.join(random.choice(_BOUNDARY_CHARS) for i in range(27))
-    multipart_form_data = {'submit':'continuer','submit':'Continuer'}
-    data, headersMulti = encode_multipart(multipart_form_data, {}, aResult.group(1), aResult.group(2),boundary)
-
-    oRequestHandler = cRequestHandler(url)
-    oRequestHandler.setRequestType(1)
-    oRequestHandler.addHeaderEntry('Host', 'www.dl-protect1.com')
-    oRequestHandler.addHeaderEntry('Referer', url)
-    oRequestHandler.addHeaderEntry('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8')
-    oRequestHandler.addHeaderEntry('User-Agent', UA)
-    oRequestHandler.addHeaderEntry('Accept-Language', 'fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3')
-    oRequestHandler.addHeaderEntry('Content-Length', headersMulti['Content-Length'])
-    oRequestHandler.addHeaderEntry('Content-Type', headersMulti['Content-Type'])
-    oRequestHandler.addHeaderEntry('Cookie', cookies)
-    oRequestHandler.addHeaderEntry('Accept-Encoding', 'gzip, deflate')
-
-    oRequestHandler.addParametersLine(data)
-
     sHtmlContent = oRequestHandler.request()
 
     return sHtmlContent
