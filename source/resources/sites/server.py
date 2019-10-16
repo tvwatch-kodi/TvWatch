@@ -80,6 +80,12 @@ ANCIENNE_SERIE = (URL_MAIN + 'telecharger-series/ancienne-serie/', 'showMovies')
 
 ANIM_VFS = (URL_MAIN + 'animes-vf/', 'showMovies') # Anime VF
 ANIM_VOSTFRS = (URL_MAIN + 'animes-vostfr/', 'showMovies') # Anime VOSTFR
+ANIM_VF_720 = (URL_MAIN + 'animes-vf-720p/','showMovies')
+ANIM_VF_1080 = (URL_MAIN + 'animes-vf-1080p/','showMovies')
+ANIM_VOSTFRS_720 = (URL_MAIN + 'animes-vostfr-720p/','showMovies')
+ANIM_VOSTFRS_1080 = (URL_MAIN + 'animes-vostfr-1080p/','showMovies')
+ANIM_VOSTEN = (URL_MAIN + 'animes-vosten/', 'showMovies')
+FILM_ANIM = (URL_MAIN + 'films-mangas/','showMovies')
 
 DOC_NEWS = (URL_MAIN + 'documentaires-gratuit/', 'showMovies') # docs
 DOC_DOCS = ('http://', 'load')
@@ -741,6 +747,10 @@ def showHosters(params = {}, playNow = True):# recherche et affiche les hotes
 
     sUrl = fixUrl(sUrl)
     oRequestHandler = cRequestHandler(sUrl)
+    oRequestHandler.request()
+    sUrl = oRequestHandler.getRealUrl()
+
+    oRequestHandler = cRequestHandler(sUrl)
     oRequestHandler.addHeaderEntry('User-Agent','Mozilla/5.0 (Windows NT 6.1; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0')
     oRequestHandler.addHeaderEntry('Accept','text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8')
     oRequestHandler.addHeaderEntry('Accept-Language','fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3')
@@ -782,7 +792,12 @@ def showSeriesHosters():# recherche et affiche les hotes
 
     sBaseUrl = fixUrl(sBaseUrl)
     oRequestHandler = cRequestHandler(sBaseUrl)
+    oRequestHandler.request()
+    sBaseUrl = oRequestHandler.getRealUrl()
+
+    oRequestHandler = cRequestHandler(sBaseUrl)
     sHtmlContent = oRequestHandler.request()
+
 
     Links = ExtractUptoboxLinksForTvShows(sHtmlContent)
 
