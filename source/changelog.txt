@@ -4,7 +4,7 @@
 =============================================================================
 - Auteurs : Primatech
 =============================================================================
-- Current Version 2.3.19 - 29.11.2019
+- Current Version 2.3.20 - 29.11.2019
 =============================================================================
 - Version 1.0.0
 21-02-2018 -- @tvwatch-kodi -- First stable version
@@ -183,3 +183,5 @@
 29-11-2019 -- @tvwatch-kodi -- Fix cloudflare issue
 29-11-2019 -- @tvwatch-kodi -- Fix download feature
 29-11-2019 -- @tvwatch-kodi -- Add default download folder 
+- Version 2.3.20
+29-11-2019 -- @tvwatch-kodi -- Add jsunfuck file
