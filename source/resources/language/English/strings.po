@@ -955,3 +955,11 @@ msgstr ""
 msgctxt "#30514"
 msgid "Please wait..."
 msgstr ""
+
+msgctxt "#30515"
+msgid "Set default download folder"
+msgstr ""
+
+msgctxt "#30516"
+msgid "Download folder"
+msgstr ""

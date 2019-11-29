@@ -48,7 +48,8 @@ URL_MAIN = GetURL_MAIN()
 
 URL_IMAGE = 'http://www.zone-image.com/'
 
-URL_DECRYPT =  ''
+URL_DL_PROTECT =  'dl-protect'
+URL_ZT_PROTECT =  'zt-protect'
 
 URL_SEARCH = (URL_MAIN + 'index.php?', 'showMovies')
 URL_SEARCH_MOVIES = (URL_MAIN + 'index.php?', 'showMovies')
@@ -968,10 +969,21 @@ def Display_protected_link(params = {}, playNow = True):
         refresh = params['refresh']
         sBaseUrl = params['sBaseUrl']
 
+    # VSlog(sUrl)
+    # VSlog(sEncodeUrl)
+    # VSlog(sNextUrl)
+    # VSlog(sMainUrl)
+    # VSlog(sMovieTitle)
+    # VSlog(sThumbnail)
+    # VSlog(sType)
+    # VSlog(sQual)
+    # VSlog(refresh)
+    # VSlog(sBaseUrl)
+
     oParser = cParser()
 
     #Est ce un lien dl-protect ?
-    if URL_DECRYPT in sUrl:
+    if (URL_DL_PROTECT in sUrl) or (URL_ZT_PROTECT in sUrl):
         f = { 'url' : sEncodeUrl, 'nextURL' : sNextUrl}
         data = urllib.urlencode(f)
         sHtmlContent = DecryptDlProtecte(sUrl, data, sBaseUrl)

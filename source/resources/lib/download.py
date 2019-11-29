@@ -9,7 +9,7 @@ from resources.lib.player import cPlayer
 from resources.lib.gui.gui import cGui
 from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.db import cDb
-from resources.lib.util import cUtil, VSlog, VSGetCachePath, uc, VS_str_conv, VSlang, ReadSingleDatabase, WriteSingleDatabase
+from resources.lib.util import cUtil, VSlog, uc, VS_str_conv, VSlang, ReadSingleDatabase, WriteSingleDatabase
 
 import urllib2,urllib
 import xbmcplugin, xbmc
@@ -282,9 +282,12 @@ class cDownload:
         meta['sMainUrl'] = oInputParameterHandler.getValue('sMainUrl')
         meta['sItemUrl'] = oInputParameterHandler.getValue('sItemUrl')
         meta['sThumbnail'] = oInputParameterHandler.getValue('sThumbnail')
-        meta['sType'] = ''
-        meta['sQual'] = ''
-        meta['refresh'] = ''
+        meta['sNextUrl'] = oInputParameterHandler.getValue('sNextUrl')
+        meta['sType'] = oInputParameterHandler.getValue('sType')
+        meta['sQual'] = oInputParameterHandler.getValue('sQual')
+        meta['refresh'] = oInputParameterHandler.getValue('refresh')
+        meta['sEncodeUrl'] = oInputParameterHandler.getValue('sEncodeUrl')
+        meta['sBaseUrl'] = oInputParameterHandler.getValue('sBaseUrl')
 
         needShowHosters = oInputParameterHandler.getValue('needShowHosters')
 
@@ -307,7 +310,11 @@ class cDownload:
             sThumbnail = params['sThumbnail']
             sMainUrl = params['sMainUrl']
 
-            path = os.path.join(VSGetCachePath(), VS_str_conv(sFileName)).decode("utf-8")
+            dlFolder = self.__oConfig.getSetting('dlFolder')
+            if dlFolder == '':
+                dlFolder = xbmcgui.Dialog().browse(0, "TvWatch", "files")
+
+            path = os.path.join(dlFolder, sFileName).decode("utf-8")
 
             self.download(sUrl, sFileName, path, sThumbnail, sMainUrl)
         except Exception, e:

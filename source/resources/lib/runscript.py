@@ -2,7 +2,7 @@
 #Primatech.
 from config import cConfig
 
-import xbmc, xbmcgui, xbmcaddon
+import xbmc, xbmcgui, xbmcaddon, xbmcvfs
 import sys, os
 import urllib, urllib2
 import util
@@ -137,6 +137,10 @@ class cClear:
             util.VS_hide_busy_dialog()
             util.VScreateDialogOK(util.VSlang(30464))
 
+        elif (env == 'selectDlFolder'):
+            dlFolder = xbmcgui.Dialog().browse(0, "TvWatch", "files")
+            cConfig().setSetting('dlFolder', str(dlFolder))
+
         elif (env == 'deleteCache'):
             from resources.lib.db import cDb
 
@@ -144,9 +148,14 @@ class cClear:
                 util.VSlog("Delete Cache from RunScript")
                 util.VS_show_busy_dialog()
                 # Delete tvwatch.db
-                cDb().dropTables()
+                cDb(True).dropTables()
                 # Delete metada.db
-                self.ClearDir2(util.VStranslatePath(cConfig().getFileCache()),True)
+                path = util.VSGetCachePath()
+                dirs, files = xbmcvfs.listdir(path)
+                for f in files:
+                    if "settings.xml" not in f:
+                        f = os.path.join(path, f).decode("utf-8")
+                        xbmcvfs.delete(f)
                 util.VS_hide_busy_dialog()
                 util.VScreateDialogOK(util.VSlang(30467))
                 xbmc.executebuiltin('Container.Refresh')

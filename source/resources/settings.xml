@@ -21,6 +21,8 @@
         <!-- <setting id="history-view" type="bool" label="Activer l'historique de recherche" default="true"/> -->
         <setting label="30463" type="action"  action="XBMC.RunScript(special://home/addons/plugin.video.tvwatch/resources/lib/runscript.py, sendLogsByFTP)" />
         <setting label="30465" type="action"  action="XBMC.RunScript(special://home/addons/plugin.video.tvwatch/resources/lib/runscript.py, deleteCache)" />
+		<setting label="30515" type="action"  action="XBMC.RunScript(special://home/addons/plugin.video.tvwatch/resources/lib/runscript.py, selectDlFolder)" />
+		<setting id="dlFolder" type="text" label="30516" default="" enable="false"/>
 
         <!-- Unvisible section -->
         <setting visible="false" id="isPlaying" type="text" default="-1" />

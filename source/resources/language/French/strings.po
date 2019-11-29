@@ -956,3 +956,11 @@ msgstr "Une erreur s'est produite. Réessayez SVP !"
 msgctxt "#30514"
 msgid "Please wait..."
 msgstr "Patientez s'il vous plaît..."
+
+msgctxt "#30515"
+msgid "Set destination download folder"
+msgstr "Sélectionner le dossier destination de téléchargement"
+
+msgctxt "#30516"
+msgid "Download folder"
+msgstr "Dossier de téléchargement"
