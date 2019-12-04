@@ -418,6 +418,8 @@ def showMovies(sSearch = ''):
         #sPattern = '<div style="height:[0-9]{3}px;"> *<a href="([^"]+)"><img class="[^"]+?" data-newsid="[^"]+?" src="([^<"]+)".+?<div class="[^"]+?" style="[^"]+?"> *<a href="[^"]+?"> ([^<]+?)<'
         sPattern = '<div style="height:[0-9]{3}px;">\s*<a href="([^"]+)"><img class="[^"]+?" data-newsid="[^"]+?" src="([^<"]+)".+?<a href="[^"]+" *>([^<]+)<'
         oRequestHandler = cRequestHandler(sUrl)
+        if URL_HOST.split('.')[1] in sUrl:
+            oRequestHandler.enableDNS(True)
         sHtmlContent = oRequestHandler.request()
         aResult = oParser.parse(sHtmlContent, sPattern)
 
@@ -509,6 +511,8 @@ def showMoviesLinks(params = {}):
 
     sItemUrl = fixUrl(sItemUrl)
     oRequestHandler = cRequestHandler(sItemUrl)
+    if URL_HOST.split('.')[1] in sItemUrl:
+        oRequestHandler.enableDNS(True)
     sHtmlContent = oRequestHandler.request()
 
     year = ""
@@ -594,6 +598,8 @@ def showSeriesLinks(params = {}):
 
     sItemUrl = fixUrl(sItemUrl)
     oRequestHandler = cRequestHandler(sItemUrl)
+    if URL_HOST.split('.')[1] in sItemUrl:
+        oRequestHandler.enableDNS(True)
     sHtmlContent = oRequestHandler.request()
 
     year = ""
@@ -748,10 +754,14 @@ def showHosters(params = {}, playNow = True):# recherche et affiche les hotes
 
     sUrl = fixUrl(sUrl)
     oRequestHandler = cRequestHandler(sUrl)
+    if URL_HOST.split('.')[1] in sUrl:
+        oRequestHandler.enableDNS(True)
     oRequestHandler.request()
     sUrl = oRequestHandler.getRealUrl()
 
     oRequestHandler = cRequestHandler(sUrl)
+    if URL_HOST.split('.')[1] in sUrl:
+        oRequestHandler.enableDNS(True)
     oRequestHandler.addHeaderEntry('User-Agent','Mozilla/5.0 (Windows NT 6.1; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0')
     oRequestHandler.addHeaderEntry('Accept','text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8')
     oRequestHandler.addHeaderEntry('Accept-Language','fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3')
@@ -793,10 +803,14 @@ def showSeriesHosters():# recherche et affiche les hotes
 
     sBaseUrl = fixUrl(sBaseUrl)
     oRequestHandler = cRequestHandler(sBaseUrl)
+    if URL_HOST.split('.')[1] in sBaseUrl:
+        oRequestHandler.enableDNS(True)
     oRequestHandler.request()
     sBaseUrl = oRequestHandler.getRealUrl()
 
     oRequestHandler = cRequestHandler(sBaseUrl)
+    if URL_HOST.split('.')[1] in sBaseUrl:
+        oRequestHandler.enableDNS(True)
     sHtmlContent = oRequestHandler.request()
 
 
@@ -919,6 +933,8 @@ def showStreamingHosters():# recherche et affiche les hotes
 
     sUrl = fixUrl(sUrl)
     oRequestHandler = cRequestHandler(sUrl)
+    if URL_HOST.split('.')[1] in sUrl:
+        oRequestHandler.enableDNS(True)
     sHtmlContent = oRequestHandler.request()
     oParser = cParser()
 
@@ -987,6 +1003,8 @@ def Display_protected_link(params = {}, playNow = True):
         f = { 'url' : sEncodeUrl, 'nextURL' : sNextUrl}
         data = urllib.urlencode(f)
         sHtmlContent = DecryptDlProtecte(sUrl, data, sBaseUrl)
+
+        # VSwriteInFile("test.html",sHtmlContent)
 
         if sHtmlContent:
             #Si redirection
@@ -1158,6 +1176,8 @@ def getNextEpisode(title, sQual, nextSeason = False):
 
                     sUrl = fixUrl(sUrl)
                     oRequestHandler = cRequestHandler(sUrl)
+                    if URL_HOST.split('.')[1] in sUrl:
+                        oRequestHandler.enableDNS(True)
                     sHtmlContent = oRequestHandler.request()
 
                     Links = ExtractUptoboxLinksForTvShows(sHtmlContent)
@@ -1553,6 +1573,8 @@ def DecryptDlProtecte(url, data, baseUrl):
 
     # 1ere Requete pour recuperer le cookie
     oRequestHandler = cRequestHandler(url)
+    if URL_HOST.split('.')[1] in url:
+        oRequestHandler.enableDNS(True)
     oRequestHandler.setRequestType(1)
     oRequestHandler.addHeaderEntry('Host', url.split('/')[2])
     oRequestHandler.addHeaderEntry('Referer', baseUrl)
@@ -1577,6 +1599,8 @@ def DecryptTorrent(url):
 
     # 1ere Requete pour recuperer le cookie
     oRequestHandler = cRequestHandler(url)
+    if URL_HOST.split('.')[1] in url:
+        oRequestHandler.enableDNS(True)
     oRequestHandler.addHeaderEntry('User-Agent', UA)
     sHtmlContent = oRequestHandler.request()
 
@@ -1590,6 +1614,8 @@ def DecryptTorrent(url):
 
     #2 eme requete pour avoir le lien
     oRequestHandler = cRequestHandler(url)
+    if URL_HOST.split('.')[1] in url:
+        oRequestHandler.enableDNS(True)
     oRequestHandler.setRequestType(oRequestHandler.REQUEST_TYPE_POST)
     # oRequestHandler.addHeaderEntry('Host', URL_MAIN)
     oRequestHandler.addHeaderEntry('origin', "https://www1.annuaire-telechargement.cc")
@@ -1860,6 +1886,8 @@ def searchOnServer(sSearch, titleonly=False):
     sPattern = '<a href="([^"]+)" *><img class="mainimg.+?src="([^"]+)"(?:.|\s)+?<a href=".+?" *>([^"]+)</a>'
     data = urllib.urlencode(query_args)
     oRequestHandler = cRequestHandler(URL_SEARCH[0])
+    if URL_HOST.split('.')[1] in URL_SEARCH[0]:
+        oRequestHandler.enableDNS(True)
     oRequestHandler.setRequestType(cRequestHandler.REQUEST_TYPE_POST)
     oRequestHandler.addParametersLine(data)
     oRequestHandler.addParameters('User-Agent', UA)

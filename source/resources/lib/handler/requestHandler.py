@@ -3,10 +3,8 @@
 #
 import urllib
 import urllib2
-
+import socket
 from resources.lib.util import VSlang, VSlog
-
-from urllib2 import HTTPError, URLError
 
 class cRequestHandler:
     REQUEST_TYPE_GET = 0
@@ -28,6 +26,7 @@ class cRequestHandler:
         self.__bRemoveBreakLines = False
         self.__sResponseHeader = ''
         self.__enableSSL = False
+        self.__enableDNS = False
 
     def removeNewLines(self, bRemoveNewLines):
         self.__bRemoveNewLines = bRemoveNewLines
@@ -43,6 +42,9 @@ class cRequestHandler:
 
     def enableSSL(self, valeur):
         self.__enableSSL = valeur
+
+    def enableDNS(self, valeur):
+        self.__enableDNS = valeur
 
     def addHeaderEntry(self, sHeaderKey, sHeaderValue):
         for sublist in self.__aHeaderEntries:
@@ -105,6 +107,25 @@ class cRequestHandler:
         self.addHeaderEntry('Accept-Charset', 'ISO-8859-1,utf-8;q=0.7,*;q=0.7')
 
     def __callRequest(self):
+        if self.__enableDNS:
+            prv_getaddrinfo = socket.getaddrinfo
+            def new_getaddrinfo(*args):
+                dns_cache = {}
+                try:
+                    import dns.resolver
+                    host = args[0]
+                    port = args[1]
+                    VSlog((host, port))
+                    resolver = dns.resolver.Resolver(configure=False)
+                    resolver.nameservers = [ '80.67.169.12', '2001:910:800::12', '80.67.169.40', '2001:910:800::40' ]
+                    answer = resolver.query(host, 'a')
+                    host = str(answer[0])
+                    return [(2, 1, 0, '', (host, port)), (2, 1, 0, '', (host, port))]
+                except Exception, e:
+                    VSlog("new_getaddrinfo ERROR: " + e.message)
+                    return prv_getaddrinfo(*args)
+            socket.getaddrinfo = new_getaddrinfo
+
         if self.__aParamatersLine:
             sParameters = self.__aParamatersLine
         else:
@@ -189,6 +210,10 @@ class cRequestHandler:
 
         if (self.__bRemoveBreakLines == True):
             sContent = sContent.replace("&nbsp;","")
+
+        if self.__enableDNS:
+            socket.getaddrinfo = prv_getaddrinfo
+            self.__enableDNS = False
 
         return sContent
 
