@@ -21,15 +21,17 @@ class cHosterGui:
     def showHoster(self, oHoster, sMediaUrl, sThumbnail, protectedLink, sQual, bGetRedirectUrl = False):
         cConfig().log('showHoster')
 
-        params = ['','','','','','','']
+        params = {}
 
-        params[0] = oHoster.getPluginIdentifier()
-        params[1] = sMediaUrl
-        params[2] = protectedLink
-        params[3] = oHoster.getFileName()
-        params[4] = oHoster.getDisplayName()
-        params[5] = sThumbnail
-        params[6] = sQual
+        params['sHosterIdentifier'] = oHoster.getPluginIdentifier()
+        params['sMediaUrl'] = sMediaUrl
+        params['sMainUrl'] = protectedLink
+        params['sItemUrl'] = sMediaUrl
+        params['sFileName'] = oHoster.getFileName()
+        params['title'] = oHoster.getDisplayName()
+        params['sThumbnail'] = sThumbnail
+        params['sQual'] = sQual
+        params['sType'] = "tvshow"
 
         #existe dans le menu krypton 17
         # if not util.isKrypton():
@@ -65,7 +67,8 @@ class cHosterGui:
 
         #Gestion classique
         if ('uptostream' in sHostName):
-            return self.getHoster('uptostream')
+            # return self.getHoster('uptostream')
+            return self.getHoster('uptobox')
 
         #Lien telechargeable a convertir en stream
         if ('uptobox' in sHostName):
@@ -82,6 +85,7 @@ class cHosterGui:
         return cHoster()
 
     def play(self, params = {}):
+        VSlog("play hoster")
         # oGui = cGui()
 
         oInputParameterHandler = cInputParameterHandler()

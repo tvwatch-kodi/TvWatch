@@ -964,3 +964,7 @@ msgstr "Sélectionner le dossier destination de téléchargement"
 msgctxt "#30516"
 msgid "Download folder"
 msgstr "Dossier de téléchargement"
+
+msgctxt "#30517"
+msgid "Server"
+msgstr "Serveur"

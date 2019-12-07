@@ -56,8 +56,12 @@ class main:
             #plugins = __import__('resources.lib.home', fromlist=['home']).cHome()
             #function = getattr(plugins, 'showSources')
             VSlog('In default.py call load')
-            from resources.sites.server import load
-            load() #server
+            if self.oConfig.getSetting('serverType') == "0":
+                from resources.sites.server import load
+                load()
+            elif self.oConfig.getSetting('serverType') == "1":
+                from resources.sites.french_stream_com import load
+                load()
 
             return
 
@@ -118,6 +122,7 @@ class main:
 
             if sSiteName == 'globalParametre':
                 self.oConfig.showSettingsWindow()
+                self.oConfig.update()
                 cCast().updateCast()
                 return
 
@@ -201,8 +206,12 @@ def searchGlobal():
     sSearchText = oInputParameterHandler.getValue('searchtext')
     sCat = oInputParameterHandler.getValue('sCat')
 
-    from resources.sites.server import showMovies
-    showMovies(sSearchText) #server
+    if self.oConfig.getSetting('serverType') == "0":
+        from resources.sites.server import showMovies
+        showMovies(sSearchText)
+    elif self.oConfig.getSetting('serverType') == "1":
+        from resources.sites.french_stream_com import showMovies
+        showMovies(sSearchText)
 
 
 def _pluginSearch(plugin, sSearchText):

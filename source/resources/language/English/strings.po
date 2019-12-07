@@ -963,3 +963,7 @@ msgstr ""
 msgctxt "#30516"
 msgid "Download folder"
 msgstr ""
+
+msgctxt "#30517"
+msgid "Server"
+msgstr ""

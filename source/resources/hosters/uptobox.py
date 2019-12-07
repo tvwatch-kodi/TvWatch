@@ -80,10 +80,15 @@ class cHoster(iHoster):
 
     def setUrl(self, sUrl):
         self.__sUrl = str(sUrl)
-        self.__sUrl = self.__sUrl.replace('http://uptobox.com/', '')
-        self.__sUrl = self.__sUrl.replace('https://uptobox.com/', '')
-        self.__sUrl = self.__sUrl.replace('iframe/', '')
-        self.__sUrl = 'http://uptobox.com/' + str(self.__sUrl)
+        if "uptobox.com/" in self.__sUrl:
+            a = self.__sUrl.find("uptobox.com/") + len("uptobox.com/")
+            self.__sUrl = self.__sUrl[a:]
+        elif "uptostream.com/iframe/" in self.__sUrl:
+            a = self.__sUrl.find("uptostream.com/iframe/") + len("uptostream.com/iframe/")
+            self.__sUrl = self.__sUrl[a:]
+        elif "uptostream.com/" in self.__sUrl:
+            a = self.__sUrl.find("uptostream.com/") + len("uptostream.com/")
+            self.__sUrl = self.__sUrl[a:]
 
     def checkSubtitle(self,sHtmlContent):
         oParser = cParser()
@@ -118,7 +123,7 @@ class cHoster(iHoster):
     def getMediaLinkByUserToken(self, url):
         VSlog("getMediaLinkByUserToken")
         self.setUrl(url)
-        FILE_CODE = self.__sUrl.replace('http://uptobox.com/','')
+        FILE_CODE = self.__sUrl
         USR_TOKEN = "e84e2bdf19d127b4e624eed2c83bfd871tgrq"
         URL = "https://uptobox.com/api/link"
 

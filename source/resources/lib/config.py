@@ -190,30 +190,11 @@ class cConfig():
         location['region'] = ''
 
         try:
-            from urllib2 import urlopen
-            res = urlopen('http://iplocation.com/')
-            content = res.read()
-
-            if '<th>Country</th>' in content:
-                country = content[content.find('<th>Country</th>'):]
-                if ('"country_name">' in country) and ('</span>' in country):
-                    a = country.find('"country_name">') + 15
-                    b = country.find('</span>')
-                    location['country'] = country[a:b]
-
-            if '<th>Region</th>' in content:
-                region = content[content.find('<th>Region</th>'):]
-                if ('"region_name">' in region) and ('</span>' in region):
-                    a = region.find('"region_name">') + 14
-                    b = region.find('</span>')
-                    location['region'] = region[a:b]
-
-            if '<th>City</th>' in content:
-                city = content[content.find('<th>City</th>'):]
-                if ('"city">' in city) and ('</td>' in city):
-                    a = city.find('"city">') + 7
-                    b = city.find('</td>')
-                    location['city'] = city[a:b]
+            from requests import get
+            ip = get('https://api.ipify.org').text
+            location['country'] = get('https://ipapi.co/'+ip+'/country_name').text
+            location['city'] = get('https://ipapi.co/'+ip+'/city').text
+            location['region'] = get('https://ipapi.co/'+ip+'/region').text
         except:
             self.log('ERROR: getLocation ')
 

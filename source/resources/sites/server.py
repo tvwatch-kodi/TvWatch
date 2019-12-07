@@ -11,7 +11,7 @@ from resources.lib.handler.inputParameterHandler import cInputParameterHandler
 from resources.lib.handler.outputParameterHandler import cOutputParameterHandler
 from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.parser import cParser
-from resources.lib.util import cUtil, VSlog, VSlang, VScreateDialogOK, VS_show_busy_dialog, VSwriteInFile, VSupdate, ReadSingleDatabase
+from resources.lib.util import VSlog, VSlang, VScreateDialogOK, VS_show_busy_dialog, VSwriteInFile, VSupdate, ReadSingleDatabase
 from resources.lib.db import cDb
 from resources.lib.tvHandler import cTvHandler
 from resources.lib.player import cPlayer
