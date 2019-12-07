@@ -194,14 +194,18 @@ class cRequestHandler:
                     self.__sRealUrl,self.__sResponseHeader = CF.GetReponseInfo()
 
             if not sContent:
-                VSlog("%s (%d),%s" % (VSlang(30205), e.code , self.__sUrl))
+                VSlog("%s 1: (%d),%s" % (VSlang(30205), e.code , self.__sUrl))
                 return ''
 
         except urllib2.URLError, e:
+            VSlog("%s 2: (%s),%s" % (VSlang(30205), e.reason , self.__sUrl))
             if 'CERTIFICATE_VERIFY_FAILED' in str(e.reason) and self.__enableSSL == False:
                 self.__enableSSL = True
                 return self.__callRequest()
-            VSlog("%s (%s),%s" % (VSlang(30205), e.reason , self.__sUrl))
+            # elif 'getaddrinfo failed' in str(e.reason) and self.__enableDNS == False:
+            elif self.__enableDNS == False:
+                 self.__enableDNS = True
+                 return self.__callRequest()
             return ''
 
         if (self.__bRemoveNewLines == True):
