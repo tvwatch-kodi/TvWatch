@@ -4,7 +4,7 @@
 =============================================================================
 - Auteurs : Primatech
 =============================================================================
-- Current Version 2.3.22 - 7.12.2019
+- Current Version 2.3.23 - 7.12.2019
 =============================================================================
 - Version 1.0.0
 21-02-2018 -- @tvwatch-kodi -- First stable version
@@ -189,3 +189,5 @@
 05-12-2019 -- @tvwatch-kodi -- Enable DNS Resolver
 - Version 2.3.22
 07-12-2019 -- @tvwatch-kodi -- Fix connection to server
+- Version 2.3.23
+07-12-2019 -- @tvwatch-kodi -- Fix DNS Resolver

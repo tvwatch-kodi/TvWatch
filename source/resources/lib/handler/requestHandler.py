@@ -116,6 +116,15 @@ class cRequestHandler:
                     host = args[0]
                     port = args[1]
                     VSlog((host, port))
+                    a = 0
+                    if "//" in host:
+                        a = host.find("//")
+                    b = 0
+                    if "/" in host[a+2:]:
+                        b = host[a+2:].find("/") + a + 2
+                    if a != 0 or b != 0:
+                        host = host[a:b]
+                        VSlog((host, port))
                     resolver = dns.resolver.Resolver(configure=False)
                     resolver.nameservers = [ '80.67.169.12', '2001:910:800::12', '80.67.169.40', '2001:910:800::40' ]
                     answer = resolver.query(host, 'a')
