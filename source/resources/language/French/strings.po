@@ -968,3 +968,11 @@ msgstr "Dossier de téléchargement"
 msgctxt "#30517"
 msgid "Server"
 msgstr "Serveur"
+
+msgctxt "#30518"
+msgid "Change server"
+msgstr "Changer de serveur"
+
+msgctxt "#30519"
+msgid "Select a server"
+msgstr "Sélectionner un serveur"

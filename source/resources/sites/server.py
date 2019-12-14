@@ -11,7 +11,7 @@ from resources.lib.handler.inputParameterHandler import cInputParameterHandler
 from resources.lib.handler.outputParameterHandler import cOutputParameterHandler
 from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.parser import cParser
-from resources.lib.util import VSlog, VSlang, VScreateDialogOK, VS_show_busy_dialog, VSwriteInFile, VSupdate, ReadSingleDatabase
+from resources.lib.util import VSlog, VSlang, VScreateDialogOK, VS_show_busy_dialog, VSwriteInFile, VSupdate, ReadSingleDatabase, VScreateDialogSelect
 from resources.lib.db import cDb
 from resources.lib.tvHandler import cTvHandler
 from resources.lib.player import cPlayer
@@ -51,9 +51,9 @@ URL_IMAGE = 'http://www.zone-image.com/'
 URL_DL_PROTECT =  'dl-protect'
 URL_ZT_PROTECT =  'zt-protect'
 
-URL_SEARCH = (URL_MAIN + 'index.php?', 'showMovies')
-URL_SEARCH_MOVIES = (URL_MAIN + 'index.php?', 'showMovies')
-URL_SEARCH_SERIES = (URL_MAIN  + 'index.php?', 'showMovies')
+URL_SEARCH = (URL_MAIN + 'engine/ajax/controller.php?mod=filter&q=', 'showMovies')
+URL_SEARCH_MOVIES = (URL_MAIN + 'engine/ajax/controller.php?mod=filter&q=', 'showMovies')
+URL_SEARCH_SERIES = (URL_MAIN  + 'engine/ajax/controller.php?mod=filter&q=', 'showMovies')
 FUNCTION_SEARCH = 'showMovies'
 
 TV_EN_DIRECT = (URL_MAIN + 'tv/', 'showTvGroup')
@@ -153,6 +153,9 @@ def load():
     else:
         oGui.addDir(SITE_IDENTIFIER, 'checkUpdate', VSlang(30473), 'update.png', oOutputParameterHandler)
 
+    # oOutputParameterHandler = cOutputParameterHandler()
+    # oGui.addDir(SITE_IDENTIFIER, 'changeServer', VSlang(30518), 'update.png', oOutputParameterHandler) #Dessins Animés
+
     oGui.setEndOfDirectory(50)
 
 def showSearch():
@@ -160,7 +163,7 @@ def showSearch():
 
     sSearchText = oGui.showKeyBoard()
     if (sSearchText != False):
-        sUrl = sSearchText
+        sUrl = URL_SEARCH[0] + sSearchText + '&note=0&art=0&AiffchageMode=0&inputTirePar=0&cstart=1'
         showMovies(sUrl)
         oGui.setEndOfDirectory()
         return
@@ -307,10 +310,6 @@ def showFilms():
     oOutputParameterHandler.addParameter('movie', "True")
     oGui.addDir(SITE_IDENTIFIER, 'showMovies', VSlang(30427), 'sport.png', oOutputParameterHandler) #Populaires
 
-    #oOutputParameterHandler = cOutputParameterHandler()
-    #oOutputParameterHandler.addParameter('sItemUrl', MOVIE_GENRES[0])
-    #oGui.addDir(SITE_IDENTIFIER, MOVIE_GENRES[1], 'Films (Genres)', 'genres.png', oOutputParameterHandler)
-
     oOutputParameterHandler = cOutputParameterHandler()
     oOutputParameterHandler.addParameter('sItemUrl', MOVIE_HD[0])
     oGui.addDir(SITE_IDENTIFIER, 'showMovies', VSlang(30428), 'hd.png', oOutputParameterHandler) #Blu-rays
@@ -331,7 +330,24 @@ def showFilms():
     oOutputParameterHandler.addParameter('sItemUrl', MOVIE_ANIME[0])
     oGui.addDir(SITE_IDENTIFIER, 'showMovies', VSlang(30432), 'animes.png', oOutputParameterHandler) #Dessins Animés
 
+    #oOutputParameterHandler = cOutputParameterHandler()
+    #oOutputParameterHandler.addParameter('sItemUrl', MOVIE_GENRES[0])
+    #oGui.addDir(SITE_IDENTIFIER, MOVIE_GENRES[1], 'Films (Genres)', 'genres.png', oOutputParameterHandler)
+
     oGui.setEndOfDirectory(50)
+
+def changeServer():
+    oConfig = cConfig()
+    list = ["ZoneTelechargement", "FrenchStream"]
+    ret = VScreateDialogSelect(list, VSlang(30519))
+    if oConfig.getSetting('serverType') != str(ret):
+        oConfig.setSetting('serverType',str(ret))
+        if str(ret) == "0":  #zt
+            load()
+        elif str(ret) == "1": #french_stream_com
+            from resources.sites.french_stream_com import load
+            load()
+        VSupdate()
 
 def showSeries():
     oGui = cGui()
@@ -392,6 +408,7 @@ def showGenre(basePath):
     oGui.setEndOfDirectory(500)
 
 def showMovies(sSearch = ''):
+    ancienAffichage = False
     oGui = cGui()
     bGlobal_Search = False
     view = 500
@@ -399,29 +416,60 @@ def showMovies(sSearch = ''):
     oParser = cParser()
     aResult = None
 
+    oInputParameterHandler = cInputParameterHandler()
+    sUrl = oInputParameterHandler.getValue('sItemUrl')
+    try:
+        movie = oInputParameterHandler.getValue('movie')
+    except:
+        pass
+    sUrl = fixUrl(sUrl)
+
     if sSearch:
-        if URL_SEARCH[0] in sSearch:
-            bGlobal_Search = True
-            sSearch=sSearch.replace(URL_SEARCH[0],'')
+        sUrl = sSearch
 
-        sHtmlContent, aResult = searchOnServer(sSearch)
+    oRequestHandler = cRequestHandler(sUrl)
+    if URL_HOST.split('.')[1] in sUrl:
+        oRequestHandler.enableDNS(True)
+    oRequestHandler.addHeaderEntry('User-Agent', UA)
+    oRequestHandler.addHeaderEntry('Accept-Encoding','gzip, deflate')
+    sHtmlContent = oRequestHandler.request()
 
+    #sPattern = '<div style="height:[0-9]{3}px;"> *<a href="([^"]+)"><img class="[^"]+?" data-newsid="[^"]+?" src="([^<"]+)".+?<div class="[^"]+?" style="[^"]+?"> *<a href="[^"]+?"> ([^<]+?)<'
+    if 'genres' in sUrl or 'controller.php' in sUrl:
+        sPattern = '<a href="([^"]+)" *><img class="mainimg.+?src="([^"]+)"(?:.|\s)+?<a href=".+?" *>([^"]+)</a>'
     else:
-        oInputParameterHandler = cInputParameterHandler()
-        sUrl = oInputParameterHandler.getValue('sItemUrl')
-        try:
-            movie = oInputParameterHandler.getValue('movie')
-        except:
-            pass
-        sUrl = fixUrl(sUrl)
-        #request = urllib2.Request(sUrl, None, headers)
-        #sPattern = '<div style="height:[0-9]{3}px;"> *<a href="([^"]+)"><img class="[^"]+?" data-newsid="[^"]+?" src="([^<"]+)".+?<div class="[^"]+?" style="[^"]+?"> *<a href="[^"]+?"> ([^<]+?)<'
-        sPattern = '<div style="height:[0-9]{3}px;">\s*<a href="([^"]+)"><img class="[^"]+?" data-newsid="[^"]+?" src="([^<"]+)".+?<a href="[^"]+" *>([^<]+)<'
-        oRequestHandler = cRequestHandler(sUrl)
-        if URL_HOST.split('.')[1] in sUrl:
-            oRequestHandler.enableDNS(True)
-        sHtmlContent = oRequestHandler.request()
+        sPattern = '<a title="([^"]+)" href="([^"]+)"><img class="mainimg".+?src="([^"]+)".+?</a>'
+
+    aResult = oParser.parse(sHtmlContent, sPattern)
+
+    # if sSearch:
+    #     if URL_SEARCH[0] in sSearch:
+    #         bGlobal_Search = True
+    #         sSearch=sSearch.replace(URL_SEARCH[0],'')
+    #
+    #     sHtmlContent, aResult = searchOnServer(sSearch)
+    #
+    # else:
+    #     oInputParameterHandler = cInputParameterHandler()
+    #     sUrl = oInputParameterHandler.getValue('sItemUrl')
+    #     try:
+    #         movie = oInputParameterHandler.getValue('movie')
+    #     except:
+    #         pass
+    #     sUrl = fixUrl(sUrl)
+    #     #request = urllib2.Request(sUrl, None, headers)
+    #     #sPattern = '<div style="height:[0-9]{3}px;"> *<a href="([^"]+)"><img class="[^"]+?" data-newsid="[^"]+?" src="([^<"]+)".+?<div class="[^"]+?" style="[^"]+?"> *<a href="[^"]+?"> ([^<]+?)<'
+    #     sPattern = '<div style="height:[0-9]{3}px;">\s*<a href="([^"]+)"><img class="[^"]+?" data-newsid="[^"]+?" src="([^<"]+)".+?<a href="[^"]+" *>([^<]+)<'
+    #     oRequestHandler = cRequestHandler(sUrl)
+    #     if URL_HOST.split('.')[1] in sUrl:
+    #         oRequestHandler.enableDNS(True)
+    #     sHtmlContent = oRequestHandler.request()
+    #     aResult = oParser.parse(sHtmlContent, sPattern)
+
+    if (aResult[0] == False):
+        sPattern = '<a href="([^"]+)" *><img class="mainimg.+?src="([^"]+)"(?:.|\s)+?<a href=".+?" *>([^"]+)</a>'
         aResult = oParser.parse(sHtmlContent, sPattern)
+        ancienAffichage = True #Si le site utile l'ancienne affichage
 
     #VSlog(aResult)
     if (aResult[0] == False):
@@ -434,8 +482,15 @@ def showMovies(sSearch = ''):
             cConfig().updateDialog(dialog, total)
             if dialog.iscanceled():
                 break
-            sTitle = str(aEntry[2])
-            sUrl2 = aEntry[0]
+
+            if 'controller.php' in sUrl or 'genres' in sUrl or ancienAffichage == True:
+                sTitle = aEntry[2]
+                sUrl2 = aEntry[0]
+                sThumbnail = aEntry[1]
+            else:
+                sTitle = aEntry[0]
+                sUrl2 = aEntry[1]
+                sThumbnail = aEntry[2]
 
             #Si recherche et trop de resultat, on nettoye
             #31/12/17 Ne fonctionne plus ?

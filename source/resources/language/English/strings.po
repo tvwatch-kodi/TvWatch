@@ -967,3 +967,11 @@ msgstr ""
 msgctxt "#30517"
 msgid "Server"
 msgstr ""
+
+msgctxt "#30518"
+msgid "Change server"
+msgstr ""
+
+msgctxt "#30519"
+msgid "Select a server"
+msgstr ""
