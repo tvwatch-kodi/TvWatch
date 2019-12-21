@@ -348,7 +348,7 @@ def primatech( boo = False ):
         exec uc("cXVpdCgp")
 
 def VSerror(e):
-    xbmcgui.Dialog().notification('TvWatch','Erreur: '+str(e),xbmcgui.NOTIFICATION_ERROR,2000)
+    xbmcgui.Dialog().notification('TvWatch',str(e),xbmcgui.NOTIFICATION_ERROR,2000)
     VSlog('Erreur: ' + str(e))
 
 def VSshowInfo(sTitle, sDescription, iSeconds=0,sound = True):
@@ -428,3 +428,48 @@ def WriteSingleDatabase(address, data):
 
 def ReadSingleDatabase(address):
     return xbmcgui.Window(10101).getProperty(address)
+
+
+class dialog(xbmcgui.Dialog):
+
+    #def __init__(self):
+    #    xbmcgui.__init__('')
+    #    pass
+
+    def VSok(self, desc, title='vStream'):
+        dialog = self.ok(title, desc)
+        return dialog
+
+    def VSyesno(self, desc, title='vStream'):
+        dialog = self.yesno(title, desc)
+        return dialog
+
+    def VSselect(self, desc, title='vStream'):
+        ret = self.select(title, desc)
+        return ret
+
+    def VSselectqual(self, list_qual, list_url):
+
+        if len(list_url) == 0:
+            return ''
+        if len(list_url) == 1:
+            return list_url[0]
+
+        ret = self.select(addon().VSlang(30448), list_qual)
+        if ret > -1:
+            return list_url[ret]
+        return ''
+
+    def VSinfo(self, desc, title='vStream', iseconds=0, sound = False):
+        if (iseconds == 0):
+            iseconds = 1000
+        else:
+            iseconds = iseconds * 1000
+
+        if (addon().getSetting('Block_Noti_sound') == 'true'):
+            sound = True
+
+        return self.notification(str(title), str(desc),xbmcgui.NOTIFICATION_INFO,iseconds,sound)
+
+    def VSerror(self, e):
+        return self.notification('Vstream','Erreur: '+str(e),xbmcgui.NOTIFICATION_ERROR,2000), VSlog('Erreur: ' + str(e))

@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-#Vstream https://github.com/Kodi-vStream/venom-xbmc-addons
+#Vstream https://github.com/Kodi-vStream/primatech-xbmc-addons
 from resources.lib.gui.hoster import cHosterGui
 from resources.lib.gui.gui import cGui
 from resources.lib.handler.inputParameterHandler import cInputParameterHandler
@@ -8,7 +8,7 @@ from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.parser import cParser
 from resources.lib.util import cUtil
 from resources.lib.config import cConfig
-from resources.lib.util import VSlog
+from resources.lib.util import VSlog, VSerror
 
 import re, base64, urllib
 
@@ -20,8 +20,8 @@ SITE_DESC = 'Films, Séries & Mangas en streaming'
 
 URL_MAIN = 'https://www6.french-streaming.com/'
 
-URL_SEARCH_MOVIE = (URL_MAIN + 'index.php?do=search&subaction=search&catlist[]=9&story=', 'showMovies')
-URL_SEARCH_SERIE = (URL_MAIN + 'index.php?do=search&subaction=search&catlist[]=10&story=', 'showSeries')
+URL_SEARCH_MOVIES = (URL_MAIN + 'search/', 'showMovies')
+URL_SEARCH_SERIES = (URL_MAIN + 'search/', 'showSeries')
 FUNCTION_SEARCH = 'showMovies'
 
 MOVIE_NEWS = (URL_MAIN + 'films-streaming/', 'showMovies')
@@ -137,12 +137,12 @@ def load():
     oGui = cGui()
 
     oOutputParameterHandler = cOutputParameterHandler()
-    oOutputParameterHandler.addParameter('siteUrl', 'http://venom/')
-    oGui.addDir(SITE_IDENTIFIER, 'showSearch', 'Recherche Film', 'search.png', oOutputParameterHandler)
+    oOutputParameterHandler.addParameter('siteUrl', 'http://primatech/')
+    oGui.addDir(SITE_IDENTIFIER, 'showSearchMovie', 'Recherche Films', 'search.png', oOutputParameterHandler)
 
     oOutputParameterHandler = cOutputParameterHandler()
-    oOutputParameterHandler.addParameter('siteUrl', 'http://venom/')
-    oGui.addDir(SITE_IDENTIFIER, 'showSearchSeries', 'Recherche Série', 'search.png', oOutputParameterHandler)
+    oOutputParameterHandler.addParameter('siteUrl', 'http://primatech/')
+    oGui.addDir(SITE_IDENTIFIER, 'showSearchSerie', 'Recherche Séries', 'search.png', oOutputParameterHandler)
 
     oOutputParameterHandler = cOutputParameterHandler()
     oOutputParameterHandler.addParameter('siteUrl', MOVIE_MOVIE[0])
@@ -160,10 +160,6 @@ def load():
 
 def showMoviesMenu():
     oGui = cGui()
-
-    oOutputParameterHandler = cOutputParameterHandler()
-    oOutputParameterHandler.addParameter('siteUrl', 'http://venom/')
-    oGui.addDir(SITE_IDENTIFIER, 'showSearch', 'Recherche Film', 'search.png', oOutputParameterHandler)
 
     oOutputParameterHandler = cOutputParameterHandler()
     oOutputParameterHandler.addParameter('siteUrl', MOVIE_NEWS[0])
@@ -189,10 +185,6 @@ def showMoviesMenu():
 
 def showSeriesMenu():
     oGui = cGui()
-
-    oOutputParameterHandler = cOutputParameterHandler()
-    oOutputParameterHandler.addParameter('siteUrl', 'http://venom/')
-    oGui.addDir(SITE_IDENTIFIER, 'showSearchSeries', 'Recherche Série', 'search.png', oOutputParameterHandler)
 
     oOutputParameterHandler = cOutputParameterHandler()
     oOutputParameterHandler.addParameter('siteUrl', SERIE_NEWS[0])
@@ -221,22 +213,22 @@ def showMangasMenu():
 
     oGui.setEndOfDirectory()
 
-def showSearch():
+def showSearchMovie():
     oGui = cGui()
 
     sSearchText = oGui.showKeyBoard()
     if (sSearchText != False):
-        sUrl = URL_SEARCH_MOVIE[0] + sSearchText
+        sUrl = URL_SEARCH_MOVIES[0] + urllib.pathname2url(sSearchText)
         showMovies(sUrl)
         oGui.setEndOfDirectory(500)
         return
 
-def showSearchSeries():
+def showSearchSerie():
     oGui = cGui()
 
     sSearchText = oGui.showKeyBoard()
     if (sSearchText != False):
-        sUrl = URL_SEARCH_SERIE[0] + sSearchText
+        sUrl = URL_SEARCH_SERIES[0] + urllib.pathname2url(sSearchText)
         showSeries(sUrl)
         oGui.setEndOfDirectory(500)
         return
@@ -352,7 +344,7 @@ def showMovies(sSearch = ''):
 
             #Si recherche et trop de resultat, on nettoye
             if sSearch and total > 2:
-                if cUtil().CheckOccurence(sUrl.replace(URL_SEARCH_MOVIE[0], ''), aEntry[4]) == 0:
+                if cUtil().CheckOccurence(sUrl.replace(URL_SEARCH_MOVIES[0], ''), aEntry[4]) == 0:
                     continue
 
             sQual = aEntry[0]
@@ -416,7 +408,7 @@ def showSeries(sSearch = ''):
 
             #Si recherche et trop de resultat, on nettoye
             if sSearch and total > 2:
-                if cUtil().CheckOccurence(sUrl.replace(URL_SEARCH_SERIE[0], ''), aEntry[2]) == 0:
+                if cUtil().CheckOccurence(sUrl.replace(URL_SEARCH_SERIES[0], ''), aEntry[2]) == 0:
                     continue
 
             sUrl2 = URL_MAIN[:-1] + aEntry[0]
@@ -502,6 +494,8 @@ def showHosters():
                 oHoster.setDisplayName(sMovieTitle)
                 oHoster.setFileName(sMovieTitle)
                 cHosterGui().showHoster(oHoster, sHosterUrl, sThumb, url, "")
+            else:
+                VSerror("Fichier introuvable")
 
 def showEpisode():
     oGui = cGui()
@@ -602,6 +596,8 @@ def serieHosters():
                 oHoster.setDisplayName(sMovieTitle)
                 oHoster.setFileName(sMovieTitle)
                 cHosterGui().showHoster(oHoster, sHosterUrl, sThumb, url, "")
+            else:
+                VSerror("Fichier introuvable")
 
 def mangaHosters():
     # oGui = cGui()
@@ -629,3 +625,5 @@ def mangaHosters():
                 oHoster.setDisplayName(sTitle)
                 oHoster.setFileName(sTitle)
                 cHosterGui().showHoster(oHoster, sHosterUrl, sThumb, url, "")
+            else:
+                VSerror("Fichier introuvable")

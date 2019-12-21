@@ -970,8 +970,8 @@ msgid "Server"
 msgstr "Serveur"
 
 msgctxt "#30518"
-msgid "Change server"
-msgstr "Changer de serveur"
+msgid "Backup server"
+msgstr "Serveur de secours"
 
 msgctxt "#30519"
 msgid "Select a server"

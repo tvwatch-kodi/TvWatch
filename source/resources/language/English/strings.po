@@ -969,7 +969,7 @@ msgid "Server"
 msgstr ""
 
 msgctxt "#30518"
-msgid "Change server"
+msgid "Backup server"
 msgstr ""
 
 msgctxt "#30519"

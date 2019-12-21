@@ -153,8 +153,8 @@ def load():
     else:
         oGui.addDir(SITE_IDENTIFIER, 'checkUpdate', VSlang(30473), 'update.png', oOutputParameterHandler)
 
-    # oOutputParameterHandler = cOutputParameterHandler()
-    # oGui.addDir(SITE_IDENTIFIER, 'changeServer', VSlang(30518), 'update.png', oOutputParameterHandler) #Dessins Animés
+    oOutputParameterHandler = cOutputParameterHandler()
+    oGui.addDir(SITE_IDENTIFIER, 'changeServer', VSlang(30518), 'update.png', oOutputParameterHandler) #Use second server
 
     oGui.setEndOfDirectory(50)
 
@@ -337,17 +337,8 @@ def showFilms():
     oGui.setEndOfDirectory(50)
 
 def changeServer():
-    oConfig = cConfig()
-    list = ["ZoneTelechargement", "FrenchStream"]
-    ret = VScreateDialogSelect(list, VSlang(30519))
-    if oConfig.getSetting('serverType') != str(ret):
-        oConfig.setSetting('serverType',str(ret))
-        if str(ret) == "0":  #zt
-            load()
-        elif str(ret) == "1": #french_stream_com
-            from resources.sites.french_stream_com import load
-            load()
-        VSupdate()
+    from resources.sites.french_stream_com import load
+    load()
 
 def showSeries():
     oGui = cGui()
