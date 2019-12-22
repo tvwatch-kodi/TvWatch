@@ -818,8 +818,6 @@ def showHosters(params = {}, playNow = True):# recherche et affiche les hotes
     meta = {}
     meta['sBaseUrl'] = sUrl
     meta['sItemUrl'] = datas[0]
-    meta['sEncodeUrl'] = datas[1]
-    meta['sNextUrl'] = datas[2]
     meta['sMainUrl'] = sMainUrl
     meta['sMovieTitle'] = sMovieTitle
     meta['sThumbnail'] = sThumbnail
@@ -859,7 +857,6 @@ def showSeriesHosters():# recherche et affiche les hotes
         oRequestHandler.enableDNS(True)
     sHtmlContent = oRequestHandler.request()
 
-
     Links = ExtractUptoboxLinksForTvShows(sHtmlContent)
 
     episodes = []
@@ -872,12 +869,10 @@ def showSeriesHosters():# recherche et affiche les hotes
             if dialog.iscanceled():
                 break
 
-            sName = aEntry[3]
+            sName = aEntry[1]
             sName = sName.replace('Télécharger','')
             sName = sName.replace('pisodes','pisode')
             sItemUrl = aEntry[0]
-            sEncodeUrl = aEntry[1]
-            sNextUrl = aEntry[2]
 
             # if sName != '' and sName.find('pisode') != -1:
             sTitle = sMovieTitle + ' ' + sName
@@ -894,8 +889,6 @@ def showSeriesHosters():# recherche et affiche les hotes
             meta['sQual'] = sQual
             meta['refresh'] = "False"
             meta['episode'] = '0'
-            meta['sEncodeUrl'] = sEncodeUrl
-            meta['sNextUrl'] = sNextUrl
             meta['sBaseUrl'] = sBaseUrl
 
             if "Episode" in sTitle:
@@ -938,8 +931,6 @@ def showSeriesHosters():# recherche et affiche les hotes
             oOutputParameterHandler.addParameter('sType', episode['sType'])
             oOutputParameterHandler.addParameter('sQual', episode['sQual'])
             oOutputParameterHandler.addParameter('refresh', episode['refresh'])
-            oOutputParameterHandler.addParameter('sEncodeUrl', episode['sEncodeUrl'])
-            oOutputParameterHandler.addParameter('sNextUrl', episode['sNextUrl'])
             oOutputParameterHandler.addParameter('sBaseUrl', episode['sBaseUrl'])
             oOutputParameterHandler.addParameter('status', 'NotStarted')
 
@@ -952,23 +943,6 @@ def showSeriesHosters():# recherche et affiche les hotes
         cConfig().finishDialog(dialog)
 
     oGui.setEndOfDirectory(50)
-
-    # if len(episodes) == 1:
-    #     params = {}
-    #     params['sItemUrl'] = episodes[0]['sItemUrl']
-    #     params['sMainUrl'] = sMainUrl
-    #     params['sMovieTitle'] = episodes[0]['sMovieTitle']
-    #     params['sThumbnail'] = episodes[0]['sThumbnail']
-    #     params['sType'] = episodes[0]['sType']
-    #     params['sQual'] = episodes[0]['sQual']
-    #     params['refresh'] = episodes[0]['refresh']
-    #
-    #     try:
-    #         Display_protected_link(params)
-    #     except Exception, e:
-    #         VSlog("showSeriesHosters ERROR: " + e.message)
-    # else:
-    #     oGui.setEndOfDirectory(50)
 
 def showStreamingHosters():# recherche et affiche les hotes
     oGui = cGui()
@@ -1015,14 +989,10 @@ def Display_protected_link(params = {}, playNow = True):
     sType = oInputParameterHandler.getValue('sType')
     sQual = oInputParameterHandler.getValue('sQual')
     refresh = oInputParameterHandler.getValue('refresh')
-    sEncodeUrl = oInputParameterHandler.getValue('sEncodeUrl')
-    sNextUrl = oInputParameterHandler.getValue('sNextUrl')
     sBaseUrl = oInputParameterHandler.getValue('sBaseUrl')
 
     if params != {}:
         sUrl = params['sItemUrl']
-        sEncodeUrl = params['sEncodeUrl']
-        sNextUrl = params['sNextUrl']
         sMainUrl = params['sMainUrl']
         sMovieTitle = params['sMovieTitle']
         sThumbnail = params['sThumbnail']
@@ -1032,8 +1002,6 @@ def Display_protected_link(params = {}, playNow = True):
         sBaseUrl = params['sBaseUrl']
 
     # VSlog(sUrl)
-    # VSlog(sEncodeUrl)
-    # VSlog(sNextUrl)
     # VSlog(sMainUrl)
     # VSlog(sMovieTitle)
     # VSlog(sThumbnail)
@@ -1046,9 +1014,8 @@ def Display_protected_link(params = {}, playNow = True):
 
     #Est ce un lien dl-protect ?
     if (URL_DL_PROTECT in sUrl) or (URL_ZT_PROTECT in sUrl):
-        f = { 'url' : sEncodeUrl, 'nextURL' : sNextUrl}
-        data = urllib.urlencode(f)
-        sHtmlContent = DecryptDlProtecte(sUrl, data, sBaseUrl)
+
+        sHtmlContent = DecryptDlProtecte(sUrl)
 
         # VSwriteInFile("test.html",sHtmlContent)
 
@@ -1073,23 +1040,6 @@ def Display_protected_link(params = {}, playNow = True):
             b = sHtmlContent[a:].find('"')
             sUrl = sHtmlContent[a:a+b]
 
-            # if not cHoster().getMediaLinkByUserToken(sUrl)[0]:
-            #     VSlog("File not found with protect-stream for URL: " + sUrl)
-            #     if '<div class="lienet2">' in sHtmlContent:
-            #         sHtmlContent = sHtmlContent[sHtmlContent.find('<div class="lienet2">'):]
-            #         a = sHtmlContent.find('<a href="') + len('<a href="')
-            #         b = sHtmlContent[a:].find('"')
-            #         sUrl = sHtmlContent[a:a+b]
-            #         params['sItemUrl'] = sUrl
-            #         params['sMainUrl'] = sMainUrl
-            #         params['sMovieTitle'] = sMovieTitle
-            #         params['sThumbnail'] = sThumbnail
-            #         params['sType'] = sType
-            #         params['sQual'] = sQual
-            #         params['refresh'] = refresh
-            #         return Display_protected_link(params, playNow)
-            # else:
-            #     aResult_dlprotecte = (True, [sUrl])
     elif "torrent/" in sUrl:
 
         sUrl = URL_MAIN+"/"+sUrl
@@ -1487,78 +1437,31 @@ def CutPremiumlinks(sHtmlContent):
         sHtmlContent = sHtmlContent[a:]
     return sHtmlContent
 
-def ExtractUptoboxLinksOLD(sHtmlContent):
-    #Recupere les liens Uptobox uniquement
-
-    trig1 = 'href="'
-    trig2 = 'font-weight:bold'
-    trig3 = '">'
-    trig4 = '</a>'
-
-    Links = []
-    if 'uptobox' in sHtmlContent.lower():
-        a = sHtmlContent.lower().find('uptobox')
-        aa = a
-        sHtmlContent = sHtmlContent[a:]
-        stop = False
-        while not stop:
-            if trig1 in sHtmlContent:
-                a = sHtmlContent.find(trig1) + len(trig1)
-            if trig2 in sHtmlContent:
-                aa = sHtmlContent.find(trig2) + len(trig2)
-            if a < aa:
-                b = sHtmlContent[a:].find(trig3)
-                c = sHtmlContent[a+b:].find(trig4)
-                link = sHtmlContent[a:a+b]
-                name = sHtmlContent[a+b+2:a+b+c]
-                Links.append([link, name])
-                sHtmlContent = sHtmlContent[a+b+c+2:]
-            else:
-                stop = True
-    return Links
-
 def ExtractUptoboxLinks(sHtmlContent):
     #Recupere les liens Uptobox uniquement
 
-    trig1 = '<form action="'
-    trig2 = 'name="url"'
-    trig3 = 'name="nextURL"'
-    trig4 = '</button>'
+    trig0 = 'Uptobox</div>'
+    trig1 = 'href="'
+    trig2 = '">'
+    trig3 = '</'
 
     Links = []
-    if 'uptobox' in sHtmlContent.lower():
-        a = sHtmlContent.lower().find('uptobox')
-        aa = a
-        sHtmlContent = sHtmlContent[a+len("Uptobox</div>"):]
+    if trig0 in sHtmlContent:
+        a = sHtmlContent.find(trig0)
+        aa = 0
+        sHtmlContent = sHtmlContent[a+len(trig0):]
         stop = False
         while not stop:
             if trig1 in sHtmlContent:
                 a = sHtmlContent.find(trig1) + len(trig1)
                 if '"' in sHtmlContent[a:]:
-                    aa = sHtmlContent[a:].find('"') + a
+                    aa = sHtmlContent[a:].find(trig2) + a
                     link = sHtmlContent[a:aa]
-                    sHtmlContent = sHtmlContent[aa:]
-            if trig2 in sHtmlContent:
-                a = sHtmlContent.find(trig2) + len(trig2)
-                if 'value="' in sHtmlContent[a:]:
-                    aa = sHtmlContent[a:].find('value="') + len('value="') + a
-                    aaa = sHtmlContent[aa:].find('"') + aa
-                    data = sHtmlContent[aa:aaa]
-                    sHtmlContent = sHtmlContent[aaa:]
-            if trig3 in sHtmlContent:
-                a = sHtmlContent.find(trig3) + len(trig3)
-                if 'value="' in sHtmlContent[a:]:
-                    aa = sHtmlContent[a:].find('value="') + len('value="') + a
-                    aaa = sHtmlContent[aa:].find('"') + aa
-                    nextURL = sHtmlContent[aa:aaa]
-                    sHtmlContent = sHtmlContent[aaa:]
-            if trig4 in sHtmlContent:
-                a = sHtmlContent.find(trig4)
-                if '>' in sHtmlContent[:a]:
-                    aa = sHtmlContent[:a].rfind('>') + len('>')
-                    name = sHtmlContent[aa:a]
+                    sHtmlContent = sHtmlContent[aa+len(trig2):]
+                    aaa = sHtmlContent.find(trig3)
+                    name = sHtmlContent[:aaa]
 
-            Links.append([link, data, nextURL, name])
+            Links.append([link, name])
 
             if trig1 in sHtmlContent:
                 a = sHtmlContent.find(trig1)
@@ -1609,29 +1512,41 @@ def ExtractUptoboxLinksForMovies(sHtmlContent):
         link = Links[0]
     return link
 
-def DecryptDlProtecte(url, data, baseUrl):
+def DecryptDlProtecte(url):
     VSlog('DecryptDlProtecte : ' + url)
-
-    # url = url.replace('https', 'http')
 
     if not (url):
         return ''
 
-    # 1ere Requete pour recuperer le cookie
     oRequestHandler = cRequestHandler(url)
-    if URL_HOST.split('.')[1] in url:
-        oRequestHandler.enableDNS(True)
+    sHtmlContent = oRequestHandler.request()
+
+    oParser = cParser()
+    sPattern = '<form action="(.+?)".+?<input type="hidden" name="_token" value="(.+?)">.+?<input type="hidden" value="(.+?)".+?>'
+    result = oParser.parse(sHtmlContent, sPattern)
+
+    if (result[0]):
+        RestUrl = str(result[1][0][0])
+        token = str(result[1][0][1])
+        urlData = str(result[1][0][2])
+
+    f = { '_token' : token, 'url' : urlData}
+    data = urllib.urlencode(f)
+
+    oRequestHandler = cRequestHandler('http://'+url.split('/')[2]+'/to/'+RestUrl)
     oRequestHandler.setRequestType(1)
-    oRequestHandler.addHeaderEntry('Host', url.split('/')[2])
-    oRequestHandler.addHeaderEntry('Referer', baseUrl)
-    oRequestHandler.addHeaderEntry('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8')
     oRequestHandler.addHeaderEntry('User-Agent', UA)
+    oRequestHandler.addHeaderEntry('Host', url.split('/')[2])
+    oRequestHandler.addHeaderEntry('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8')
     oRequestHandler.addHeaderEntry('Accept-Language', 'fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3')
-    oRequestHandler.addHeaderEntry('Content-Length', len(str(data)))
-    oRequestHandler.addHeaderEntry('Content-Type',  "application/x-www-form-urlencoded")
     oRequestHandler.addHeaderEntry('Accept-Encoding', 'gzip, deflate')
+    oRequestHandler.addHeaderEntry('Referer', url)
+    oRequestHandler.addHeaderEntry('Content-Type',  "application/x-www-form-urlencoded")
+    oRequestHandler.addHeaderEntry('Content-Length', len(str(data)))
+    oRequestHandler.addHeaderEntry('Origin', 'https://'+url.split('/')[2])
     oRequestHandler.addParametersLine(data)
     sHtmlContent = oRequestHandler.request()
+
 
     return sHtmlContent
 

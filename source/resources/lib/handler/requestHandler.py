@@ -165,8 +165,8 @@ class cRequestHandler:
             if self.__enableSSL:
                 VSlog('USE SSL')
                 import ssl
-                # gcontext = ssl.SSLContext(ssl.PROTOCOL_TLS)
-                gcontext = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
+                gcontext = ssl.SSLContext(ssl.PROTOCOL_TLS)
+                # gcontext = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
                 oResponse = urllib2.urlopen(oRequest, timeout = self.__timeout,context=gcontext)
             else:
                 oResponse = urllib2.urlopen(oRequest, timeout = self.__timeout)
