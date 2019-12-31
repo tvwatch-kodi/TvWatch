@@ -4,7 +4,7 @@
 =============================================================================
 - Auteurs : Primatech
 =============================================================================
-- Current Version 2.4.4 - 31.12.2019
+- Current Version 2.4.5 - 31.12.2019
 =============================================================================
 - Version 1.0.0
 21-02-2018 -- @tvwatch-kodi -- First stable version
@@ -201,4 +201,6 @@
 22-12-2019 -- @tvwatch-kodi -- Fix links extraction module
 - Version 2.4.4
 31-12-2019 -- @tvwatch-kodi -- Fix server decrypt url module
+- Version 2.4.5
+31-12-2019 -- @tvwatch-kodi -- Remove wrong error message when using backup server
 

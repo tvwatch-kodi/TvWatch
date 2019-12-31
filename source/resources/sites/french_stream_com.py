@@ -494,8 +494,10 @@ def showHosters():
                 oHoster.setDisplayName(sMovieTitle)
                 oHoster.setFileName(sMovieTitle)
                 cHosterGui().showHoster(oHoster, sHosterUrl, sThumb, url, "")
-            else:
-                VSerror("Fichier introuvable")
+                return
+
+    VSlog("Fichier introuvable")
+    VSerror("Fichier introuvable")
 
 def showEpisode():
     oGui = cGui()
@@ -596,8 +598,10 @@ def serieHosters():
                 oHoster.setDisplayName(sMovieTitle)
                 oHoster.setFileName(sMovieTitle)
                 cHosterGui().showHoster(oHoster, sHosterUrl, sThumb, url, "")
-            else:
-                VSerror("Fichier introuvable")
+                return
+
+    VSlog("Fichier introuvable")
+    VSerror("Fichier introuvable")
 
 def mangaHosters():
     # oGui = cGui()
@@ -625,5 +629,7 @@ def mangaHosters():
                 oHoster.setDisplayName(sTitle)
                 oHoster.setFileName(sTitle)
                 cHosterGui().showHoster(oHoster, sHosterUrl, sThumb, url, "")
-            else:
-                VSerror("Fichier introuvable")
+                return
+                
+    VSlog("Fichier introuvable")
+    VSerror("Fichier introuvable")
