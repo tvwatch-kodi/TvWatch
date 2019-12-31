@@ -23,6 +23,9 @@ except ImportError:
 #old version
 from requests.packages.urllib3.util.ssl_ import create_urllib3_context
 
+# from ssl import ssl_
+# create_urllib3_context = ssl_.create_urllib3_context
+
 ##########################################################################################################################################################
 #
 # Ok so a big thx to VeNoMouS for this code
