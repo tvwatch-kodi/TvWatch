@@ -220,6 +220,9 @@ class cRequestHandler:
                  self.__enableDNS = True
                  return self.__callRequest()
 
+        except Exception, e:
+                VSlog("%s 3: (%s),%s" % (VSlang(30205), e.message , self.__sUrl))
+
         if (self.__bRemoveNewLines == True):
             sContent = sContent.replace("\n","")
             sContent = sContent.replace("\r\t","")

@@ -58,26 +58,26 @@ FUNCTION_SEARCH = 'showMovies'
 
 TV_EN_DIRECT = (URL_MAIN + 'tv/', 'showTvGroup')
 
-MOVIE_NEWS = (URL_MAIN + 'nouveaute/', 'showMovies') # films (derniers ajouts)
-MOVIE_EXCLUS = (URL_MAIN + 'exclus/', 'showMovies') # exclus (films populaires)
-MOVIE_3D = (URL_MAIN + 'films-bluray-3d/', 'showMovies') # films en 3D
-MOVIE_HD = (URL_MAIN + 'films-bluray-hd/', 'showMovies') # films en HD
-MOVIE_HDLIGHT = (URL_MAIN + 'x265-x264-hdlight/', 'showMovies') # films en x265 et x264
-MOVIE_VOSTFR = (URL_MAIN + 'filmsenvostfr/', 'showMovies') # films VOSTFR
-MOVIE_4K = (URL_MAIN + 'film-ultra-hd-4k/', 'showMovies') # films "4k"
-MOVIE_MKV = (URL_MAIN + 'films-mkv/', 'showMovies')
+MOVIE_NEWS = (URL_MAIN + 'film-gratuit/', 'showMovies') # films (derniers ajouts)
+MOVIE_EXCLUS = (URL_MAIN + 'nouveaux-films/', 'showMovies') # exclus (films populaires)
+MOVIE_3D = (URL_MAIN + 'film-bluray-3d/', 'showMovies') # films en 3D
+MOVIE_HD = (URL_MAIN + 'film-bluray-hd/', 'showMovies') # films en HD
+MOVIE_HDLIGHT = (URL_MAIN + 'film-x265-x264-hdlight/', 'showMovies') # films en x265 et x264
+MOVIE_VOSTFR = (URL_MAIN + 'film-vostfr/', 'showMovies') # films VOSTFR
+MOVIE_4K = (URL_MAIN + 'films-ultra-hd-4k/', 'showMovies') # films "4k"
+MOVIE_MKV = (URL_MAIN + 'film-mkv/', 'showMovies')
 MOVIE_VO = (URL_MAIN + 'films-vo/','showMovies')
-MOVIE_INTEGRAL = (URL_MAIN + 'collection-films-integrale/','showMovies')
+MOVIE_INTEGRAL = (URL_MAIN + 'collections-films-integrale/','showMovies')
 MOVIE_ANIME = (URL_MAIN + 'dessins-animes/', 'showMovies') # dessins animes
 
-SERIE_VFS = (URL_MAIN + 'series-vf/', 'showMovies') # serie VF
-SERIE_VOSTFRS = (URL_MAIN + 'series-vostfr/', 'showMovies') # serie VOSTFR
-SERIE_VF_720 = (URL_MAIN + 'series-vf-en-hd/','showMovies')
-SERIE_VF_1080 = (URL_MAIN + 'series-vf-1080p/','showMovies')
-SERIE_VOSTFRS_720 = (URL_MAIN + 'series-vostfr-hd/','showMovies')
-SERIE_VOSTFRS_1080 = (URL_MAIN + 'series-vostfr-1080p/','showMovies')
-SERIE_VO = (URL_MAIN + 'series-vo/', 'showMovies')
-ANCIENNE_SERIE = (URL_MAIN + 'telecharger-series/ancienne-serie/', 'showMovies')
+SERIE_VFS = (URL_MAIN + 'serie-vf/', 'showMovies') # serie VF
+SERIE_VOSTFRS = (URL_MAIN + 'serie-vostfr/', 'showMovies') # serie VOSTFR
+SERIE_VF_720 = (URL_MAIN + 'serie-vf-en-hd/','showMovies')
+SERIE_VF_1080 = (URL_MAIN + 'serie-vf-1080p/','showMovies')
+SERIE_VOSTFRS_720 = (URL_MAIN + 'serie-vostfr-hd/','showMovies')
+SERIE_VOSTFRS_1080 = (URL_MAIN + 'serie-vostfr-1080p/','showMovies')
+SERIE_VO = (URL_MAIN + 'serie-vo/', 'showMovies')
+ANCIENNE_SERIE = (URL_MAIN + 'telecharger-serie/ancienne-serie/', 'showMovies')
 
 ANIM_VFS = (URL_MAIN + 'animes-vf/', 'showMovies') # Anime VF
 ANIM_VOSTFRS = (URL_MAIN + 'animes-vostfr/', 'showMovies') # Anime VOSTFR
@@ -88,7 +88,7 @@ ANIM_VOSTFRS_1080 = (URL_MAIN + 'animes-vostfr-1080p/','showMovies')
 ANIM_VOSTEN = (URL_MAIN + 'animes-vosten/', 'showMovies')
 FILM_ANIM = (URL_MAIN + 'films-mangas/','showMovies')
 
-DOC_NEWS = (URL_MAIN + 'documentaires-gratuit/', 'showMovies') # docs
+DOC_NEWS = (URL_MAIN + 'documentaire-gratuit/', 'showMovies') # docs
 DOC_DOCS = ('http://', 'load')
 
 SPORT_SPORTS = (URL_MAIN + 'sport/', 'showMovies') # sports
@@ -513,7 +513,7 @@ def showMovies(sSearch = ''):
 
             sDisplayTitle = sTitle
 
-            if 'films-gratuit' in sUrl2 or '4k' in sUrl2:
+            if 'film-gratuit' in sUrl2 or '4k' in sUrl2:
                 oGui.addMovie(SITE_IDENTIFIER, 'showMoviesLinks', sDisplayTitle, sIcon, sThumbnail, '', oOutputParameterHandler)
             elif movie != "True":
                 oGui.addTV(SITE_IDENTIFIER, 'showSeriesLinks', sDisplayTitle, sIcon, sThumbnail, '', oOutputParameterHandler)
