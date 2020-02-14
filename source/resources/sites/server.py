@@ -51,9 +51,9 @@ URL_IMAGE = 'http://www.zone-image.com/'
 URL_DL_PROTECT =  'dl-protect'
 URL_ZT_PROTECT =  'zt-protect'
 
-URL_SEARCH = (URL_MAIN + 'engine/ajax/controller.php?mod=filter&q=', 'showMovies')
-URL_SEARCH_MOVIES = (URL_MAIN + 'engine/ajax/controller.php?mod=filter&q=', 'showMovies')
-URL_SEARCH_SERIES = (URL_MAIN  + 'engine/ajax/controller.php?mod=filter&q=', 'showMovies')
+URL_SEARCH = (URL_MAIN + 'index.php?', 'showMovies')
+URL_SEARCH_MOVIES = (URL_MAIN + 'index.php?', 'showMovies')
+URL_SEARCH_SERIES = (URL_MAIN  + 'index.php?', 'showMovies')
 FUNCTION_SEARCH = 'showMovies'
 
 TV_EN_DIRECT = (URL_MAIN + 'tv/', 'showTvGroup')
@@ -163,7 +163,8 @@ def showSearch():
 
     sSearchText = oGui.showKeyBoard()
     if (sSearchText != False):
-        sUrl = URL_SEARCH[0] + sSearchText + '&note=0&art=0&AiffchageMode=0&inputTirePar=0&cstart=1'
+        # sUrl = URL_SEARCH[0] + sSearchText + '&note=0&art=0&AiffchageMode=0&inputTirePar=0&cstart=1'
+        sUrl = sSearchText
         showMovies(sUrl)
         oGui.setEndOfDirectory()
         return
@@ -399,7 +400,6 @@ def showGenre(basePath):
     oGui.setEndOfDirectory(500)
 
 def showMovies(sSearch = ''):
-    ancienAffichage = False
     oGui = cGui()
     bGlobal_Search = False
     view = 500
@@ -407,60 +407,29 @@ def showMovies(sSearch = ''):
     oParser = cParser()
     aResult = None
 
-    oInputParameterHandler = cInputParameterHandler()
-    sUrl = oInputParameterHandler.getValue('sItemUrl')
-    try:
-        movie = oInputParameterHandler.getValue('movie')
-    except:
-        pass
-    sUrl = fixUrl(sUrl)
-
     if sSearch:
-        sUrl = sSearch
+        if URL_SEARCH[0] in sSearch:
+            bGlobal_Search = True
+            sSearch=sSearch.replace(URL_SEARCH[0],'')
 
-    oRequestHandler = cRequestHandler(sUrl)
-    if URL_HOST.split('.')[1] in sUrl:
-        oRequestHandler.enableDNS(True)
-    oRequestHandler.addHeaderEntry('User-Agent', UA)
-    oRequestHandler.addHeaderEntry('Accept-Encoding','gzip, deflate')
-    sHtmlContent = oRequestHandler.request()
+        sHtmlContent, aResult = searchOnServer(sSearch)
 
-    #sPattern = '<div style="height:[0-9]{3}px;"> *<a href="([^"]+)"><img class="[^"]+?" data-newsid="[^"]+?" src="([^<"]+)".+?<div class="[^"]+?" style="[^"]+?"> *<a href="[^"]+?"> ([^<]+?)<'
-    if 'genres' in sUrl or 'controller.php' in sUrl:
-        sPattern = '<a href="([^"]+)" *><img class="mainimg.+?src="([^"]+)"(?:.|\s)+?<a href=".+?" *>([^"]+)</a>'
     else:
-        sPattern = '<a title="([^"]+)" href="([^"]+)"><img class="mainimg".+?src="([^"]+)".+?</a>'
-
-    aResult = oParser.parse(sHtmlContent, sPattern)
-
-    # if sSearch:
-    #     if URL_SEARCH[0] in sSearch:
-    #         bGlobal_Search = True
-    #         sSearch=sSearch.replace(URL_SEARCH[0],'')
-    #
-    #     sHtmlContent, aResult = searchOnServer(sSearch)
-    #
-    # else:
-    #     oInputParameterHandler = cInputParameterHandler()
-    #     sUrl = oInputParameterHandler.getValue('sItemUrl')
-    #     try:
-    #         movie = oInputParameterHandler.getValue('movie')
-    #     except:
-    #         pass
-    #     sUrl = fixUrl(sUrl)
-    #     #request = urllib2.Request(sUrl, None, headers)
-    #     #sPattern = '<div style="height:[0-9]{3}px;"> *<a href="([^"]+)"><img class="[^"]+?" data-newsid="[^"]+?" src="([^<"]+)".+?<div class="[^"]+?" style="[^"]+?"> *<a href="[^"]+?"> ([^<]+?)<'
-    #     sPattern = '<div style="height:[0-9]{3}px;">\s*<a href="([^"]+)"><img class="[^"]+?" data-newsid="[^"]+?" src="([^<"]+)".+?<a href="[^"]+" *>([^<]+)<'
-    #     oRequestHandler = cRequestHandler(sUrl)
-    #     if URL_HOST.split('.')[1] in sUrl:
-    #         oRequestHandler.enableDNS(True)
-    #     sHtmlContent = oRequestHandler.request()
-    #     aResult = oParser.parse(sHtmlContent, sPattern)
-
-    if (aResult[0] == False):
-        sPattern = '<a href="([^"]+)" *><img class="mainimg.+?src="([^"]+)"(?:.|\s)+?<a href=".+?" *>([^"]+)</a>'
+        oInputParameterHandler = cInputParameterHandler()
+        sUrl = oInputParameterHandler.getValue('sItemUrl')
+        try:
+            movie = oInputParameterHandler.getValue('movie')
+        except:
+            pass
+        sUrl = fixUrl(sUrl)
+        #request = urllib2.Request(sUrl, None, headers)
+        #sPattern = '<div style="height:[0-9]{3}px;"> *<a href="([^"]+)"><img class="[^"]+?" data-newsid="[^"]+?" src="([^<"]+)".+?<div class="[^"]+?" style="[^"]+?"> *<a href="[^"]+?"> ([^<]+?)<'
+        sPattern = '<div style="height:[0-9]{3}px;">\s*<a href="([^"]+)"><img class="[^"]+?" data-newsid="[^"]+?" src="([^<"]+)".+?<a href="[^"]+" *>([^<]+)<'
+        oRequestHandler = cRequestHandler(sUrl)
+        if URL_HOST.split('.')[1] in sUrl:
+            oRequestHandler.enableDNS(True)
+        sHtmlContent = oRequestHandler.request()
         aResult = oParser.parse(sHtmlContent, sPattern)
-        ancienAffichage = True #Si le site utile l'ancienne affichage
 
     #VSlog(aResult)
     if (aResult[0] == False):
@@ -473,15 +442,8 @@ def showMovies(sSearch = ''):
             cConfig().updateDialog(dialog, total)
             if dialog.iscanceled():
                 break
-
-            if 'controller.php' in sUrl or 'genres' in sUrl or ancienAffichage == True:
-                sTitle = aEntry[2]
-                sUrl2 = aEntry[0]
-                sThumbnail = aEntry[1]
-            else:
-                sTitle = aEntry[0]
-                sUrl2 = aEntry[1]
-                sThumbnail = aEntry[2]
+            sTitle = str(aEntry[2])
+            sUrl2 = aEntry[0]
 
             #Si recherche et trop de resultat, on nettoye
             #31/12/17 Ne fonctionne plus ?

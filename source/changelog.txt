@@ -4,7 +4,7 @@
 =============================================================================
 - Auteurs : Primatech
 =============================================================================
-- Current Version 2.4.6 - 6.2.2020
+- Current Version 2.4.7 - 14.2.2020
 =============================================================================
 - Version 1.0.0
 21-02-2018 -- @tvwatch-kodi -- First stable version
@@ -205,3 +205,6 @@
 31-12-2019 -- @tvwatch-kodi -- Remove wrong error message when using backup server
 - Version 2.4.6
 06-02-2020 -- @tvwatch-kodi -- Fix server parameters
+- Version 2.4.7
+14-02-2020 -- @tvwatch-kodi -- Fix search module
+
