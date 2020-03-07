@@ -33,7 +33,7 @@ SITE_DESC = 'Fichier en DDL, HD'
 
 # URL_HOST = 'https://www.annuairetelechargement.com/'
 # URL_HOST = 'https://www.annuaire-telechargement.com/'
-URL_HOST = 'https://www.zone-telechargement.net/'
+URL_HOST = 'https://www.zone-annuaire.com/'
 
 def GetURL_MAIN():
     # oRequestHandler = cRequestHandler(URL_HOST)
