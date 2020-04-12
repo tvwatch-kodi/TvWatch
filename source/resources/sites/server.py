@@ -31,8 +31,6 @@ SITE_IDENTIFIER = 'server'
 SITE_NAME = '[COLOR violet]TvWatch[/COLOR]'
 SITE_DESC = 'Fichier en DDL, HD'
 
-# URL_HOST = 'https://www.annuairetelechargement.com/'
-# URL_HOST = 'https://www.annuaire-telechargement.com/'
 URL_HOST = 'https://www.zone-annuaire.com/'
 
 def GetURL_MAIN():
@@ -51,9 +49,14 @@ URL_IMAGE = 'http://www.zone-image.com/'
 URL_DL_PROTECT =  'dl-protect'
 URL_ZT_PROTECT =  'zt-protect'
 
-URL_SEARCH = (URL_MAIN + 'index.php?', 'showMovies')
-URL_SEARCH_MOVIES = (URL_MAIN + 'index.php?', 'showMovies')
-URL_SEARCH_SERIES = (URL_MAIN  + 'index.php?', 'showMovies')
+# URL_SEARCH = (URL_MAIN + 'index.php?do=search&old=1', 'showMovies')
+# URL_SEARCH_MOVIES = (URL_MAIN + 'index.php?do=search&old=1', 'showMovies')
+# URL_SEARCH_SERIES = (URL_MAIN  + 'index.php?do=search&old=1', 'showMovies')
+# FUNCTION_SEARCH = 'showMovies'
+
+URL_SEARCH = (URL_MAIN + 'engine/ajax/controller.php?mod=filter&q=', 'showMovies')
+URL_SEARCH_MOVIES = (URL_MAIN + 'engine/ajax/controller.php?mod=filter&q=', 'showMovies')
+URL_SEARCH_SERIES = (URL_MAIN  + 'engine/ajax/controller.php?mod=filter&q=', 'showMovies')
 FUNCTION_SEARCH = 'showMovies'
 
 TV_EN_DIRECT = (URL_MAIN + 'tv/', 'showTvGroup')
@@ -159,15 +162,14 @@ def load():
     oGui.setEndOfDirectory(50)
 
 def showSearch():
-    oGui = cGui()
 
-    sSearchText = oGui.showKeyBoard()
+    sSearchText = cGui().showKeyBoard()
     if (sSearchText != False):
-        # sUrl = URL_SEARCH[0] + sSearchText + '&note=0&art=0&AiffchageMode=0&inputTirePar=0&cstart=1'
+        # sSearchText = urllib.quote(sSearchText)
+        # sUrl = URL_SEARCH[0] + sSearchText + '&note=0&art=0&AiffchageMode=0&inputTirePar=0&cstart=0'
         sUrl = sSearchText
         showMovies(sUrl)
-        oGui.setEndOfDirectory()
-        return
+    return
 
 def showTvGroup():
     oGui = cGui()
@@ -407,31 +409,38 @@ def showMovies(sSearch = ''):
     oParser = cParser()
     aResult = None
 
+    oInputParameterHandler = cInputParameterHandler()
+    sUrl = oInputParameterHandler.getValue('sItemUrl')
     if sSearch:
-        if URL_SEARCH[0] in sSearch:
-            bGlobal_Search = True
-            sSearch=sSearch.replace(URL_SEARCH[0],'')
+        sSearch = urllib.quote(sSearch)
+        sUrl = URL_SEARCH[0] + sSearch + '&note=0&art=0&AiffchageMode=0&inputTirePar=0&cstart=0'
+        
+        # if URL_SEARCH[0] in sSearch:
+        #     bGlobal_Search = True
+        #     sSearch=sSearch.replace(URL_SEARCH[0],'')
+        #
+        # sHtmlContent, aResult = searchOnServer(sSearch)
 
-        sHtmlContent, aResult = searchOnServer(sSearch)
+    sUrl = fixUrl(sUrl)
 
-    else:
-        oInputParameterHandler = cInputParameterHandler()
-        sUrl = oInputParameterHandler.getValue('sItemUrl')
-        try:
-            movie = oInputParameterHandler.getValue('movie')
-        except:
-            pass
-        sUrl = fixUrl(sUrl)
-        #request = urllib2.Request(sUrl, None, headers)
-        #sPattern = '<div style="height:[0-9]{3}px;"> *<a href="([^"]+)"><img class="[^"]+?" data-newsid="[^"]+?" src="([^<"]+)".+?<div class="[^"]+?" style="[^"]+?"> *<a href="[^"]+?"> ([^<]+?)<'
-        sPattern = '<div style="height:[0-9]{3}px;">\s*<a href="([^"]+)"><img class="[^"]+?" data-newsid="[^"]+?" src="([^<"]+)".+?<a href="[^"]+" *>([^<]+)<'
-        oRequestHandler = cRequestHandler(sUrl)
-        if URL_HOST.split('.')[1] in sUrl:
-            oRequestHandler.enableDNS(True)
-        sHtmlContent = oRequestHandler.request()
-        aResult = oParser.parse(sHtmlContent, sPattern)
+    try:
+        movie = oInputParameterHandler.getValue('movie')
+    except:
+        pass
+
+    oRequestHandler = cRequestHandler(sUrl.replace('https','http'))
+    if URL_HOST.split('.')[1] in sUrl:
+        oRequestHandler.enableDNS(True)
+    oRequestHandler.addHeaderEntry('User-Agent', UA)
+    oRequestHandler.addHeaderEntry('Accept-Encoding','gzip, deflate')
+    sHtmlContent = oRequestHandler.request()
+
+    sPattern = '<img class="mainimg.+?src="([^"]+)"(?:.|\s)+?<a href="([^"]+)">([^"]+)</a>.+?<span class=".+?<b>([^"]+)</span>.+?">([^<]+)</span>'
+
+    aResult = oParser.parse(sHtmlContent, sPattern)
 
     #VSlog(aResult)
+    itemToDisplay = []
     if (aResult[0] == False):
         oGui.addText(SITE_IDENTIFIER,'[COLOR khaki]' + VSlang(30438) + '[/COLOR]')
         view = 50
@@ -443,21 +452,40 @@ def showMovies(sSearch = ''):
             if dialog.iscanceled():
                 break
             sTitle = str(aEntry[2])
-            sUrl2 = aEntry[0]
+            sUrl2 = aEntry[1]
+            sThumbnail = aEntry[0]
+            sQual = aEntry[3]
+            sLang = aEntry[4]
 
-            #Si recherche et trop de resultat, on nettoye
-            #31/12/17 Ne fonctionne plus ?
-            # if sSearch and total > 2:
-            #     if cUtil().CheckOccurence(sSearch, sTitle) == 0:
-            #         continue
-
-            if 'http' in aEntry[1]:
-                sThumbnail = aEntry[1]
+            if sTitle not in itemToDisplay:
+                itemToDisplay.append(sTitle)
             else:
-                sThumbnail = URL_IMAGE+"/"+aEntry[1]
-            while "//" in sThumbnail:
-                sThumbnail = sThumbnail.replace("//","/")
-            sThumbnail = sThumbnail.replace(":/","://")
+                #Item already added to display, do not process it again
+                continue
+
+            #on vire le tiret des series
+            sTitle = sTitle.replace(' - Saison', ' Saison').replace('COMPLETE', 'Complete')
+            if not '[Complete]' in sTitle:
+                sTitle = sTitle.replace('COMPLETE', '[Complete]')
+            sDisplayTitle = sTitle.replace('Complete', 'Complète')
+            #nettoyage du titre
+            sTitle = re.sub('\[\w+]', '', sTitle)
+
+            sDisplayTitle = ('%s [%s] %s)') % (sTitle, sQual, sLang)
+
+            if not sThumbnail.startswith('http'):
+                sThumbnail = URL_MAIN + sThumbnail
+
+            if not sUrl2.startswith('https'):
+                sUrl2 = URL_MAIN + sUrl2
+
+            # if 'http' in aEntry[1]:
+            #     sThumbnail = aEntry[1]
+            # else:
+            #     sThumbnail = URL_IMAGE+"/"+aEntry[1]
+            # while "//" in sThumbnail:
+            #     sThumbnail = sThumbnail.replace("//","/")
+            # sThumbnail = sThumbnail.replace(":/","://")
 
             sIcon = ''
             if sSearch:
@@ -469,11 +497,6 @@ def showMovies(sSearch = ''):
             oOutputParameterHandler.addParameter('sMovieTitle', str(sTitle))
             oOutputParameterHandler.addParameter('sThumbnail', sThumbnail)
 
-            # Peut ne plus fonctionner !! (Fonctionne au 04/02/2018)
-            # sThumbnail = sThumbnail.replace("zone-telechargement.ws","zone-telechargement1.com")
-            # sThumbnail = sThumbnail.replace("https://ww1.zone-telechargement","https://www.zone-telechargement")
-
-            sDisplayTitle = sTitle
 
             if 'film-gratuit' in sUrl2 or '4k' in sUrl2:
                 oGui.addMovie(SITE_IDENTIFIER, 'showMoviesLinks', sDisplayTitle, sIcon, sThumbnail, '', oOutputParameterHandler)
@@ -1809,9 +1832,9 @@ def correctUrl(url):
     return ''
 
 def searchOnServer(sSearch, titleonly=False):
-    query_args = ( ( 'do' , 'search' ) , ('subaction' , 'search' ) , ('story' , sSearch ) )
+    query_args = (('do','search'), ('subaction','search'), ('search_start', '0'), ('full_search', '0'), ('result_from', '1'), ('story', sSearch))
     if titleonly:
-        query_args = ( ( 'do' , 'search' ) , ('subaction' , 'search' ) , ('story' , sSearch ) , ('titleonly' , '3' ))
+        query_args = (('do','search'), ('subaction','search'), ('search_start', '0'), ('full_search', '0'), ('result_from', '1'), ('story', sSearch), ('titleonly', '3'))
 
     sPattern = '<a href="([^"]+)" *><img class="mainimg.+?src="([^"]+)"(?:.|\s)+?<a href=".+?" *>([^"]+)</a>'
     data = urllib.urlencode(query_args)
@@ -1825,11 +1848,18 @@ def searchOnServer(sSearch, titleonly=False):
     oRequestHandler.addParameters('Accept-Language','fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3')
     oRequestHandler.addParameters('Accept-Encoding','gzip, deflate, br')
     oRequestHandler.addParameters('Referer', URL_MAIN)
+    # oRequestHandler.addParameters('Referer', URL_SEARCH[0])
+    # oRequestHandler.addParameters('origin', URL_MAIN)
+    # oRequestHandler.addParameters('sec-fetch-dest', 'document')
+    # oRequestHandler.addParameters('sec-fetch-mode', 'navigate')
+    # oRequestHandler.addParameters('sec-fetch-site', 'same-origin')
+    # oRequestHandler.addParameters('sec-fetch-user', '?1')
     oRequestHandler.addParameters('Content-Type','application/x-www-form-urlencoded')
     sHtmlContent = oRequestHandler.request()
     oParser = cParser()
     aResult = oParser.parse(sHtmlContent, sPattern)
 
+    # VSwriteInFile("test.html",sHtmlContent)
     return sHtmlContent, aResult
 
 def findYearInHTML(sHtmlContent):

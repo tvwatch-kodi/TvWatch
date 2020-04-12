@@ -4,7 +4,11 @@
 import urllib
 import urllib2
 import socket
-from resources.lib.util import VSlang, VSlog
+
+from urllib2 import HTTPError, URLError
+
+from resources.lib.util import VSlang, VSlog, VSlog
+
 
 prv_getaddrinfo = socket.getaddrinfo
 def new_getaddrinfo(*args):
@@ -37,22 +41,22 @@ class cRequestHandler:
     REQUEST_TYPE_POST = 1
 
     def __init__(self, sUrl):
-        VSlog("Request handler URL: " + str(sUrl))
-        self.__sUrl = sUrl
-        self.__sRealUrl = ''
-        self.__cType = self.REQUEST_TYPE_GET
-        self.__aParamaters = {}
-        self.__aParamatersLine = ''
-        self.__aHeaderEntries = []
-        self.removeBreakLines(True)
-        self.removeNewLines(True)
-        self.__setDefaultHeader()
-        self.__timeout = 30
-        self.__bRemoveNewLines = False
-        self.__bRemoveBreakLines = False
-        self.__sResponseHeader = ''
-        self.__enableSSL = False
-        self.__enableDNS = False
+		VSlog("Request handler URL: " + str(sUrl))
+		self.__sUrl = sUrl
+		self.__sRealUrl = ''
+		self.__cType = self.REQUEST_TYPE_GET
+		self.__aParamaters = {}
+		self.__aParamatersLine = ''
+		self.__aHeaderEntries = []
+		self.removeBreakLines(True)
+		self.removeNewLines(True)
+		self.__setDefaultHeader()
+		self.__timeout = 30
+		self.__bRemoveNewLines = False
+		self.__bRemoveBreakLines = False
+		self.__sResponseHeader = ''
+		self.__enableSSL = False
+		self.__enableDNS = False
 
     def removeNewLines(self, bRemoveNewLines):
         self.__bRemoveNewLines = bRemoveNewLines
@@ -85,7 +89,7 @@ class cRequestHandler:
     def addParametersLine(self, mParameterValue):
         self.__aParamatersLine = mParameterValue
 
-    #egg addMultipartFiled('sess_id':sId,'upload_type':'url','srv_tmp_url':sTmp)
+    #egg addMultipartFiled({'sess_id':sId,'upload_type':'url','srv_tmp_url':sTmp})
     def addMultipartFiled(self,fields ):
         mpartdata = MPencode(fields)
         self.__aParamatersLine = mpartdata[1]
@@ -101,6 +105,8 @@ class cRequestHandler:
         return self.__sRealUrl
 
     def GetCookies(self):
+        if not self.__sResponseHeader:
+            return ''
         if 'Set-Cookie' in self.__sResponseHeader:
             import re
 
@@ -108,7 +114,7 @@ class cRequestHandler:
             #c = ''
             #for i in cookie_string:
             #    c = c + i + ', '
-            c = self.__sResponseHeader.getheader('set-cookie')
+            c = self.__sResponseHeader.get('set-cookie')
 
             c2 = re.findall('(?:^|,) *([^;,]+?)=([^;,\/]+?);',c)
             if c2:
@@ -163,10 +169,10 @@ class cRequestHandler:
         try:
 
             if self.__enableSSL:
-                VSlog('USE SSL')
+                VSlog('Retrying with SSL bug')
                 import ssl
-                gcontext = ssl.SSLContext(ssl.PROTOCOL_TLS)
-                # gcontext = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
+				# gcontext = ssl.SSLContext(ssl.PROTOCOL_TLS)
+                gcontext = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
                 oResponse = urllib2.urlopen(oRequest, timeout = self.__timeout,context=gcontext)
             else:
                 oResponse = urllib2.urlopen(oRequest, timeout = self.__timeout)
@@ -192,16 +198,25 @@ class cRequestHandler:
                 #Protected by cloudFlare ?
                 from resources.lib import cloudflare
                 if cloudflare.CheckIfActive(e.read()):
-
+                    self.__sResponseHeader = e.hdrs
                     cookies = self.GetCookies()
-
-                    VSlog('Page protegee par cloudflare')
+                    VSlog( 'Page protegee par cloudflare')
                     CF = cloudflare.CloudflareBypass()
                     sContent = CF.GetHtml(self.__sUrl,e.read(),cookies,sParameters,oRequest.headers)
-                    if sContent == 'CLOUDFLARE_ISSUE':
-                        VSlog("GetHtml failed due to CloudFlare protection. Retrying once...")
-                        sContent = CF.GetHtml(self.__sUrl,e.read(),cookies,sParameters,oRequest.headers)
-                    self.__sRealUrl,self.__sResponseHeader = CF.GetReponseInfo()
+                    self.__sRealUrl, self.__sResponseHeader = CF.GetReponseInfo()
+                else:
+                    sContent = e.read()
+                    self.__sRealUrl = e.geturl()
+                    self.__sResponseHeader = e.headers()
+
+            else:
+                try:
+                    VSlog("%s (%d),%s" % (VSlang(30205), e.code , self.__sUrl))
+                    self.__sRealUrl = e.geturl()
+                    self.__sResponseHeader = e.headers
+                    sContent = e.read()
+                except:
+                    sContent = ''
 
             if not sContent:
                 VSlog("%s 1: (%d),%s" % (VSlang(30205), e.code , self.__sUrl))
@@ -211,17 +226,18 @@ class cRequestHandler:
                 return ''
 
         except urllib2.URLError, e:
-            VSlog("%s 2: (%s),%s" % (VSlang(30205), e.reason , self.__sUrl))
-            if 'CERTIFICATE_VERIFY_FAILED' in str(e.reason) and self.__enableSSL == False:
-                self.__enableSSL = True
-                return self.__callRequest()
-            # elif 'getaddrinfo failed' in str(e.reason) and self.__enableDNS == False:
-            elif self.__enableDNS == False:
-                 self.__enableDNS = True
-                 return self.__callRequest()
+			VSlog("%s 2: (%s),%s" % (VSlang(30205), e.reason , self.__sUrl))
+			if 'CERTIFICATE_VERIFY_FAILED' in str(e.reason) and self.__enableSSL == False:
+				self.__enableSSL = True
+				return self.__callRequest()
+			# elif 'getaddrinfo failed' in str(e.reason) and self.__enableDNS == False:
+			elif self.__enableDNS == False:
+				self.__enableDNS = True
+				return self.__callRequest()
 
         except Exception, e:
-                VSlog("%s 3: (%s),%s" % (VSlang(30205), e.message , self.__sUrl))
+			VSlog("%s 3: (%s),%s" % (VSlang(30205), e.message , self.__sUrl))
+			return ''
 
         if (self.__bRemoveNewLines == True):
             sContent = sContent.replace("\n","")
