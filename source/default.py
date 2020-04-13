@@ -16,6 +16,7 @@ from resources.lib.config import cConfig
 from resources.lib.config import GestionCookie
 from resources.lib.db import cDb
 from resources.lib.cast import cCast
+import traceback
 
 import xbmc, xbmcgui, sys
 
@@ -24,6 +25,8 @@ import xbmc, xbmcgui, sys
 
 class main:
     def __init__(self):
+        reload(sys)
+        sys.setdefaultencoding('utf8')
         self.oConfig = cConfig()
         loc = self.oConfig.getLocation()
         VSlog(loc)
@@ -134,13 +137,13 @@ class main:
                 function()
             except Exception as e:
                 VSlog('could not load site: ' + sSiteName + ' error: ' + str(e))
+                traceback.print_exc()
                 try:
                     plugins = __import__('resources.lib.gui.%s' % sSiteName, fromlist=[sSiteName])
                     function = getattr(plugins, sFunction)
                     function()
                 except Exception as e:
                     VSlog('could not load gui: ' + sSiteName + ' error: ' + str(e))
-                import traceback
                 traceback.print_exc()
                 return
 
