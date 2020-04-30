@@ -4,7 +4,7 @@
 =============================================================================
 - Auteurs : Primatech
 =============================================================================
-- Current Version 2.4.11 - 13.4.2020
+- Current Version 2.4.12 - 30.4.2020
 =============================================================================
 - Version 1.0.0
 21-02-2018 -- @tvwatch-kodi -- First stable version
@@ -220,4 +220,6 @@
 - Version 2.4.11
 13-04-2020 -- @tvwatch-kodi -- Change to utf8 mode to avoid unicode decode errors
 13-04-2020 -- @tvwatch-kodi -- Print traceback on exception
+- Version 2.4.12
+30-04-2020 -- @tvwatch-kodi -- EOL version
 

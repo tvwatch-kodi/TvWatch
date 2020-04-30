@@ -455,7 +455,7 @@ class dialog(xbmcgui.Dialog):
         if len(list_url) == 1:
             return list_url[0]
 
-        ret = self.select(addon().VSlang(30448), list_qual)
+        ret = self.select(VSlang(30448), list_qual)
         if ret > -1:
             return list_url[ret]
         return ''
